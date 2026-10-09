@@ -6,9 +6,12 @@ import base64
 import binascii
 import datetime as dt
 import secrets
+import threading
 import uuid
 from dataclasses import dataclass
 from typing import Callable, Protocol
+
+from crypto.sm2 import SM2KeyPair
 
 from .binding import build_report_data, csr_public_key_der, verify_report_data
 from .ca import CertificateAuthority
@@ -16,14 +19,21 @@ from .errors import (
     AttestationRejected,
     ChallengeExpired,
     ChallengeNotFound,
+    LeaseRejected,
 )
 from .models import (
     AttestRequest,
     AttestationResponse,
     ChallengeRequest,
     ChallengeResponse,
+    ConsumeTicketRequest,
+    ConsumeTicketResponse,
+    IssueJobTicketRequest,
+    JobTicketResponse,
+    TicketPublicKeyResponse,
 )
 from .policy import PolicyRegistry, VerifiedQuote
+from .tickets import JobTicketLedger
 
 
 def utc_now() -> dt.datetime:
@@ -45,6 +55,13 @@ class _Challenge:
     expires_at: dt.datetime
 
 
+@dataclass(frozen=True)
+class _NodeLease:
+    role: str
+    release_id: str
+    expires_at: dt.datetime
+
+
 class KASService:
     """Issue one-use challenges and short-lived node credentials."""
 
@@ -54,8 +71,10 @@ class KASService:
         quote_verifier: QuoteVerifier,
         policy_registry: PolicyRegistry,
         certificate_authority: CertificateAuthority,
+        ticket_signing_key: SM2KeyPair,
         challenge_ttl: dt.timedelta = dt.timedelta(minutes=2),
         node_lease_ttl: dt.timedelta = dt.timedelta(hours=1),
+        ticket_ttl: dt.timedelta = dt.timedelta(minutes=5),
         clock: Callable[[], dt.datetime] = utc_now,
     ) -> None:
         self._quote_verifier = quote_verifier
@@ -65,6 +84,13 @@ class KASService:
         self._node_lease_ttl = node_lease_ttl
         self._clock = clock
         self._challenges: dict[str, _Challenge] = {}
+        self._leases: dict[str, _NodeLease] = {}
+        self._lease_lock = threading.Lock()
+        self._tickets = JobTicketLedger(
+            signing_key=ticket_signing_key,
+            ticket_ttl=ticket_ttl,
+            clock=clock,
+        )
 
     def issue_challenge(self, request: ChallengeRequest) -> ChallengeResponse:
         now = self._clock()
@@ -129,12 +155,57 @@ class KASService:
             now=now,
             ttl=self._node_lease_ttl,
         )
+        lease_id = str(uuid.uuid4())
+        with self._lease_lock:
+            self._leases[lease_id] = _NodeLease(
+                role=request.role,
+                release_id=request.release_id,
+                expires_at=lease_expires_at,
+            )
         return AttestationResponse(
             node_certificate_pem=certificate.certificate_pem,
             ca_bundle_pem=certificate.ca_bundle_pem,
-            lease_id=str(uuid.uuid4()),
+            lease_id=lease_id,
             expires_at=lease_expires_at,
         )
+
+    def issue_job_ticket(self, request: IssueJobTicketRequest) -> JobTicketResponse:
+        now = self._clock()
+        self._policies.get(request.release_id, now=now)
+        ticket = self._tickets.issue(request)
+        return JobTicketResponse(**ticket.to_dict())
+
+    def consume_ticket(
+        self,
+        request: ConsumeTicketRequest,
+    ) -> ConsumeTicketResponse:
+        self._tickets.consume(
+            request,
+            lease_check=self._require_active_lease,
+        )
+        return ConsumeTicketResponse(status="accepted")
+
+    def ticket_public_key(self) -> TicketPublicKeyResponse:
+        return TicketPublicKeyResponse(public_key=self._tickets.public_key)
+
+    def _require_active_lease(
+        self,
+        lease_id: str,
+        expected_node_role: str,
+        expected_release_id: str,
+    ) -> None:
+        now = self._clock()
+        with self._lease_lock:
+            lease = self._leases.get(lease_id)
+            if lease is None:
+                raise LeaseRejected("enclave Lease is unknown")
+            if now >= lease.expires_at:
+                self._leases.pop(lease_id, None)
+                raise LeaseRejected("enclave Lease has expired")
+        if lease.role != expected_node_role:
+            raise LeaseRejected("enclave Lease role mismatch")
+        if lease.release_id != expected_release_id:
+            raise LeaseRejected("enclave Lease release mismatch")
 
     def expected_report_data(self, challenge_id: str, csr_pem: str) -> bytes:
         """Build expected REPORTDATA for enclave-side integration tests."""

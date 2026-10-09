@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "A1-22 redacted audit event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_hash",
+    "ticket_id",
+    "release_id",
+    "measurement",
+    "result_code",
+    "bytes",
+    "elapsed_ms"
+  ],
+  "properties": {
+    "session_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ticket_id": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 64
+    },
+    "release_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "measurement": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "result_code": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_]{1,64}$"
+    },
+    "bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "elapsed_ms": {
+      "type": "number",
+      "minimum": 0
+    }
+  }
+}

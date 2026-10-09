@@ -25,6 +25,12 @@
 3. `D2`：协议 schema、国密会话和 `JobTicket` 状态机。
 4. `D4`：本地 3PC RSS 最小算子与 enclave 内 mTLS 前置验证。
 
+当前本地代码已完成 `D0`、`D1` 与 `D2` 的可测试实现：SM2 身份证书、
+`ClientHello -> ServerHello -> Finished -> FinishedAck`、SM3/HKDF 方向密钥、
+SM4-GCM 帧、严格 counter 反重放、`Close` 状态机、KAS 一次性 `JobTicket`
+账本与脱敏审计 schema。D2 的 SM4-GCM 组合已用标准向量验证；正式 SGX 部署
+仍需将纯 Python SM4 分组原语替换为常数时间 native 实现。
+
 ## 仓库结构
 
 ```text

@@ -19,3 +19,23 @@ class AttestationRejected(KASError):
 
 class PolicyRejected(KASError):
     """The quote does not satisfy the registered release policy."""
+
+
+class TicketNotFound(KASError):
+    """The requested JobTicket does not exist."""
+
+
+class TicketExpired(KASError):
+    """The JobTicket has exceeded its validity window."""
+
+
+class TicketAlreadyConsumed(KASError):
+    """The one-use JobTicket was consumed previously."""
+
+
+class TicketBindingRejected(KASError):
+    """The ticket signature or request binding is invalid."""
+
+
+class LeaseRejected(KASError):
+    """The enclave Lease is missing, expired, or bound to another node."""

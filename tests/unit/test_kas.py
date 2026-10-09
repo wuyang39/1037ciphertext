@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.x509.oid import NameOID
 from fastapi.testclient import TestClient
 
+from crypto.sm2 import SM2KeyPair
 from kas.app import create_app
 from kas.binding import build_report_data
 from kas.ca import RELEASE_EXTENSION_OID, CertificateAuthority
@@ -107,6 +108,7 @@ def make_service(
         or FakeVerifier(MRENCLAVE, MRSIGNER, 3, False, b"\x00" * 64),
         policy_registry=PolicyRegistry([make_release()]),
         certificate_authority=make_ca(),
+        ticket_signing_key=SM2KeyPair.generate(),
         clock=clock or (lambda: NOW),
     )
 

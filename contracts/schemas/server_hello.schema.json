@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "A1-22 ServerHello",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol_version",
+    "session_id",
+    "node_role",
+    "release_id",
+    "model_version",
+    "model_manifest_hash",
+    "precision_plan_hash",
+    "share_epoch",
+    "server_nonce",
+    "server_ephemeral_pub",
+    "node_certificate",
+    "signature"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "a122-gm-session-v1"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "node_role": {
+      "enum": ["P0", "P1", "P2"]
+    },
+    "release_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "model_manifest_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "precision_plan_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "share_epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "server_nonce": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "server_ephemeral_pub": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    },
+    "node_certificate": {
+      "type": "object"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    }
+  }
+}

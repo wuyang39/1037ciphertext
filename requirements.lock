@@ -1,4 +1,4 @@
-# Direct dependency lock for the local D0/D1 development environment.
+# Direct dependency lock for the local D0/D1/D2 development environment.
 # Regenerate only through a reviewed dependency update.
 cryptography==48.0.0
 fastapi==0.109.0

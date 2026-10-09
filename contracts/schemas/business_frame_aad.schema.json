@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "A1-22 business frame AAD",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol_version",
+    "session_id",
+    "epoch",
+    "counter",
+    "sender",
+    "receiver",
+    "model_manifest_hash",
+    "request_hash",
+    "message_type"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": "a122-gm-session-v1"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "counter": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4294967295
+    },
+    "sender": {
+      "enum": ["C", "P0", "P1", "P2"]
+    },
+    "receiver": {
+      "enum": ["C", "P0", "P1", "P2"]
+    },
+    "model_manifest_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "request_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "message_type": {
+      "enum": ["Request", "Response", "Result", "Close"]
+    }
+  }
+}

@@ -9,13 +9,23 @@ from .errors import (
     AttestationRejected,
     ChallengeExpired,
     ChallengeNotFound,
+    LeaseRejected,
     PolicyRejected,
+    TicketAlreadyConsumed,
+    TicketBindingRejected,
+    TicketExpired,
+    TicketNotFound,
 )
 from .models import (
     AttestRequest,
     AttestationResponse,
     ChallengeRequest,
     ChallengeResponse,
+    ConsumeTicketRequest,
+    ConsumeTicketResponse,
+    IssueJobTicketRequest,
+    JobTicketResponse,
+    TicketPublicKeyResponse,
 )
 from .service import KASService
 from .settings import KASSettings, build_service
@@ -42,6 +52,22 @@ def create_app(service: KASService | None = None) -> FastAPI:
     def attest(request: AttestRequest) -> AttestationResponse:
         return kas.attest(request)
 
+    @app.post("/v1/issue-job-ticket", response_model=JobTicketResponse)
+    def issue_job_ticket(
+        request: IssueJobTicketRequest,
+    ) -> JobTicketResponse:
+        return kas.issue_job_ticket(request)
+
+    @app.post("/v1/consume-ticket", response_model=ConsumeTicketResponse)
+    def consume_ticket(
+        request: ConsumeTicketRequest,
+    ) -> ConsumeTicketResponse:
+        return kas.consume_ticket(request)
+
+    @app.get("/v1/ticket-public-key", response_model=TicketPublicKeyResponse)
+    def ticket_public_key() -> TicketPublicKeyResponse:
+        return kas.ticket_public_key()
+
     @app.exception_handler(ChallengeNotFound)
     def challenge_not_found(_request, exc: ChallengeNotFound):
         return JSONResponse(status_code=404, content={"detail": str(exc)})
@@ -52,7 +78,21 @@ def create_app(service: KASService | None = None) -> FastAPI:
 
     @app.exception_handler(AttestationRejected)
     @app.exception_handler(PolicyRejected)
+    @app.exception_handler(TicketBindingRejected)
+    @app.exception_handler(LeaseRejected)
     def rejected(_request, exc: Exception):
         return JSONResponse(status_code=403, content={"detail": str(exc)})
+
+    @app.exception_handler(TicketNotFound)
+    def ticket_not_found(_request, exc: TicketNotFound):
+        return JSONResponse(status_code=404, content={"detail": str(exc)})
+
+    @app.exception_handler(TicketExpired)
+    def ticket_expired(_request, exc: TicketExpired):
+        return JSONResponse(status_code=410, content={"detail": str(exc)})
+
+    @app.exception_handler(TicketAlreadyConsumed)
+    def ticket_consumed(_request, exc: TicketAlreadyConsumed):
+        return JSONResponse(status_code=409, content={"detail": str(exc)})
 
     return app

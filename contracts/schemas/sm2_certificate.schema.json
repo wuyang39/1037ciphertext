@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "A1-22 SM2 identity certificate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "certificate_version",
+    "serial_number",
+    "role",
+    "release_id",
+    "public_key",
+    "issued_at",
+    "expires_at",
+    "signature"
+  ],
+  "properties": {
+    "certificate_version": {
+      "const": "a122-sm2-cert-v1"
+    },
+    "serial_number": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "role": {
+      "enum": ["C", "P0", "P1", "P2"]
+    },
+    "release_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "public_key": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    }
+  }
+}

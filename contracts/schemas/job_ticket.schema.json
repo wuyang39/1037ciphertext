@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "A1-22 JobTicket",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ticket_id",
+    "session_id",
+    "node_role",
+    "release_id",
+    "model_manifest_hash",
+    "precision_plan_hash",
+    "share_epoch",
+    "length_bound",
+    "max_new_tokens",
+    "client_ephemeral_pub",
+    "expiry",
+    "counter",
+    "KAS_signature"
+  ],
+  "properties": {
+    "ticket_id": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 64
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "node_role": {
+      "enum": ["P0", "P1", "P2"]
+    },
+    "release_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "model_manifest_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "precision_plan_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "share_epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "length_bound": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "max_new_tokens": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "client_ephemeral_pub": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    },
+    "expiry": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "counter": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "KAS_signature": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{128}$"
+    }
+  }
+}
