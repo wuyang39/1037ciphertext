@@ -1,0 +1,55 @@
+# Secrets and private material
+.env
+.env.*
+!.env.example
+secrets/
+secure/
+certs/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.der
+*.csr
+model_share*.bin
+*.share
+
+# Local model and dataset artifacts
+artifacts/
+checkpoints/
+data/
+models/
+
+# Runtime, benchmark, and evidence outputs
+runs/
+traces/
+benchmark/results/
+benchmark/runs/
+*.pcap
+*.core
+core
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
