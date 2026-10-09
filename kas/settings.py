@@ -23,6 +23,7 @@ class KASSettings:
     release_policy_path: Path
     dcap_verifier_bin: Path
     ticket_signing_key_path: Path
+    storage_key_master_hex: str
     host: str = "127.0.0.1"
     port: int = 8443
     challenge_ttl_seconds: int = 120
@@ -37,6 +38,7 @@ class KASSettings:
             "KAS_RELEASE_POLICY_PATH",
             "KAS_DCAP_VERIFY_BIN",
             "KAS_TICKET_SIGNING_KEY_PATH",
+            "KAS_STORAGE_KEY_MASTER_HEX",
         )
         missing = [name for name in required if not values.get(name)]
         if missing:
@@ -49,6 +51,7 @@ class KASSettings:
             release_policy_path=Path(values["KAS_RELEASE_POLICY_PATH"]),
             dcap_verifier_bin=Path(values["KAS_DCAP_VERIFY_BIN"]),
             ticket_signing_key_path=Path(values["KAS_TICKET_SIGNING_KEY_PATH"]),
+            storage_key_master_hex=values["KAS_STORAGE_KEY_MASTER_HEX"],
             host=values.get("KAS_HOST", "127.0.0.1"),
             port=int(values.get("KAS_PORT", "8443")),
             challenge_ttl_seconds=int(values.get("KAS_CHALLENGE_TTL_SECONDS", "120")),
@@ -64,6 +67,12 @@ def build_service(settings: KASSettings) -> KASService:
     ).strip()
     if ticket_private_key.startswith("0x"):
         ticket_private_key = ticket_private_key[2:]
+    try:
+        storage_key_master = bytes.fromhex(settings.storage_key_master_hex)
+    except ValueError as exc:
+        raise ValueError("KAS_STORAGE_KEY_MASTER_HEX must be hexadecimal") from exc
+    if len(storage_key_master) < 32:
+        raise ValueError("KAS_STORAGE_KEY_MASTER_HEX must contain at least 32 bytes")
     return KASService(
         quote_verifier=DcapQuoteVerifier(settings.dcap_verifier_bin),
         policy_registry=PolicyRegistry.from_json_file(settings.release_policy_path),
@@ -72,6 +81,7 @@ def build_service(settings: KASSettings) -> KASService:
             settings.ca_certificate_path,
         ),
         ticket_signing_key=SM2KeyPair.from_private_key(ticket_private_key),
+        storage_key_master=storage_key_master,
         challenge_ttl=dt.timedelta(seconds=settings.challenge_ttl_seconds),
         node_lease_ttl=dt.timedelta(seconds=settings.node_lease_ttl_seconds),
     )

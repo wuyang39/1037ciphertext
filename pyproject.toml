@@ -27,12 +27,15 @@ dev = [
 
 [tool.setuptools.packages.find]
 include = [
+  "benchmark*",
   "client*",
   "contracts*",
   "crypto*",
+  "infra*",
   "kas*",
   "model*",
   "mpc*",
+  "tee*",
 ]
 
 [tool.pytest.ini_options]

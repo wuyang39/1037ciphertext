@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import binascii
 import datetime as dt
+import hashlib
 import secrets
 import threading
 import uuid
@@ -12,6 +13,7 @@ from dataclasses import dataclass
 from typing import Callable, Protocol
 
 from crypto.sm2 import SM2KeyPair
+from crypto.sm3 import hkdf, sm3
 
 from .binding import build_report_data, csr_public_key_der, verify_report_data
 from .ca import CertificateAuthority
@@ -20,6 +22,7 @@ from .errors import (
     ChallengeExpired,
     ChallengeNotFound,
     LeaseRejected,
+    StorageKeyRejected,
 )
 from .models import (
     AttestRequest,
@@ -30,6 +33,8 @@ from .models import (
     ConsumeTicketResponse,
     IssueJobTicketRequest,
     JobTicketResponse,
+    ReleaseStorageKeyRequest,
+    ReleaseStorageKeyResponse,
     TicketPublicKeyResponse,
 )
 from .policy import PolicyRegistry, VerifiedQuote
@@ -72,6 +77,7 @@ class KASService:
         policy_registry: PolicyRegistry,
         certificate_authority: CertificateAuthority,
         ticket_signing_key: SM2KeyPair,
+        storage_key_master: bytes | None = None,
         challenge_ttl: dt.timedelta = dt.timedelta(minutes=2),
         node_lease_ttl: dt.timedelta = dt.timedelta(hours=1),
         ticket_ttl: dt.timedelta = dt.timedelta(minutes=5),
@@ -82,9 +88,15 @@ class KASService:
         self._ca = certificate_authority
         self._challenge_ttl = challenge_ttl
         self._node_lease_ttl = node_lease_ttl
+        storage_key_master = storage_key_master or secrets.token_bytes(32)
+        if len(storage_key_master) < 32:
+            raise ValueError("storage_key_master must contain at least 32 bytes")
+        self._storage_key_master = bytes(storage_key_master)
         self._clock = clock
         self._challenges: dict[str, _Challenge] = {}
         self._leases: dict[str, _NodeLease] = {}
+        self._released_storage_keys: set[tuple[str, int, str]] = set()
+        self._storage_key_lock = threading.Lock()
         self._lease_lock = threading.Lock()
         self._tickets = JobTicketLedger(
             signing_key=ticket_signing_key,
@@ -188,12 +200,57 @@ class KASService:
     def ticket_public_key(self) -> TicketPublicKeyResponse:
         return TicketPublicKeyResponse(public_key=self._tickets.public_key)
 
+    def release_storage_key(
+        self,
+        request: ReleaseStorageKeyRequest,
+    ) -> ReleaseStorageKeyResponse:
+        """Release one purpose-bound key only through an active Lease."""
+        lease = self._require_active_lease(
+            request.lease_id,
+            request.role,
+            request.release_id,
+        )
+        replay_key = (request.lease_id, request.share_epoch, request.purpose)
+        with self._storage_key_lock:
+            if replay_key in self._released_storage_keys:
+                raise StorageKeyRejected(
+                    "storage key was already released for this Lease and epoch"
+                )
+            self._released_storage_keys.add(replay_key)
+
+        context = b"".join(
+            (
+                b"A1-22:storage-key:v1\0",
+                request.role.encode("ascii"),
+                b"\0",
+                request.release_id.encode("utf-8"),
+                b"\0",
+                request.share_epoch.to_bytes(8, "big"),
+                b"\0",
+                request.purpose.encode("ascii"),
+            )
+        )
+        key = hkdf(
+            salt=sm3(b"A1-22:storage-key-salt:v1\0"),
+            input_key_material=self._storage_key_master,
+            info=context,
+            length=32,
+        )
+        key_id = hashlib.sha256(
+            b"A1-22:storage-key-id:v1\0" + key
+        ).hexdigest()
+        return ReleaseStorageKeyResponse(
+            key_id=key_id,
+            key_hex=key.hex(),
+            expires_at=lease.expires_at,
+        )
+
     def _require_active_lease(
         self,
         lease_id: str,
         expected_node_role: str,
         expected_release_id: str,
-    ) -> None:
+    ) -> _NodeLease:
         now = self._clock()
         with self._lease_lock:
             lease = self._leases.get(lease_id)
@@ -206,6 +263,7 @@ class KASService:
             raise LeaseRejected("enclave Lease role mismatch")
         if lease.release_id != expected_release_id:
             raise LeaseRejected("enclave Lease release mismatch")
+        return lease
 
     def expected_report_data(self, challenge_id: str, csr_pem: str) -> bytes:
         """Build expected REPORTDATA for enclave-side integration tests."""

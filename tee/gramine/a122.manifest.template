@@ -1,0 +1,48 @@
+# A1-22 Gramine manifest template.
+#
+# The build process substitutes {{ ... }} values from a signed release
+# manifest. Production refuses this file when sgx.debug is true.
+
+loader.entrypoint = "file:{{ entrypoint }}"
+loader.insecure__use_cmdline_argv = false
+loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib:/usr/local/lib"
+loader.env.A1_22_RELEASE_ID = "{{ release_id }}"
+loader.env.A1_22_ROLE = "{{ role }}"
+loader.env.A1_22_SHARE_EPOCH = "{{ share_epoch }}"
+
+sgx.debug = false
+sgx.enclave_size = "{{ enclave_size }}"
+sgx.max_threads = 32
+sgx.remote_attestation = "dcap"
+sgx.attestation_quote_type = "ecdsa"
+
+sys.stack.size = "8M"
+sys.enable_sigterm_injection = true
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ lib_dir }}" },
+  { path = "/usr/lib", uri = "file:{{ lib_dir }}" },
+  { path = "/usr/local/lib", uri = "file:{{ lib_dir }}" },
+  { path = "/run/tee", uri = "file:{{ run_tee_dir }}", type = "tmpfs" },
+  { path = "/run/session", uri = "file:{{ run_session_dir }}", type = "tmpfs" },
+  { path = "/secure", uri = "file:{{ secure_fs_dir }}", type = "encrypted" },
+]
+
+fs.allowed_files = [
+  "{{ entrypoint }}",
+  "{{ model_share_path }}",
+  "{{ preprocessing_package_path }}",
+]
+
+fs.allowed_dirs = [
+  "{{ lib_dir }}",
+  "{{ run_tee_dir }}",
+  "{{ run_session_dir }}",
+  "{{ secure_fs_dir }}",
+]
+
+sgx.trusted_files = [
+  "file:{{ entrypoint }}",
+  "file:{{ python_runtime_path }}",
+  "file:{{ lib_dir }}",
+]

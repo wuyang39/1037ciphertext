@@ -15,6 +15,7 @@ from .errors import (
     TicketBindingRejected,
     TicketExpired,
     TicketNotFound,
+    StorageKeyRejected,
 )
 from .models import (
     AttestRequest,
@@ -25,6 +26,8 @@ from .models import (
     ConsumeTicketResponse,
     IssueJobTicketRequest,
     JobTicketResponse,
+    ReleaseStorageKeyRequest,
+    ReleaseStorageKeyResponse,
     TicketPublicKeyResponse,
 )
 from .service import KASService
@@ -68,6 +71,15 @@ def create_app(service: KASService | None = None) -> FastAPI:
     def ticket_public_key() -> TicketPublicKeyResponse:
         return kas.ticket_public_key()
 
+    @app.post(
+        "/v1/release-storage-key",
+        response_model=ReleaseStorageKeyResponse,
+    )
+    def release_storage_key(
+        request: ReleaseStorageKeyRequest,
+    ) -> ReleaseStorageKeyResponse:
+        return kas.release_storage_key(request)
+
     @app.exception_handler(ChallengeNotFound)
     def challenge_not_found(_request, exc: ChallengeNotFound):
         return JSONResponse(status_code=404, content={"detail": str(exc)})
@@ -93,6 +105,10 @@ def create_app(service: KASService | None = None) -> FastAPI:
 
     @app.exception_handler(TicketAlreadyConsumed)
     def ticket_consumed(_request, exc: TicketAlreadyConsumed):
+        return JSONResponse(status_code=409, content={"detail": str(exc)})
+
+    @app.exception_handler(StorageKeyRejected)
+    def storage_key_rejected(_request, exc: StorageKeyRejected):
         return JSONResponse(status_code=409, content={"detail": str(exc)})
 
     return app

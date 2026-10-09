@@ -21,7 +21,7 @@ from kas.errors import (
     ChallengeNotFound,
     PolicyRejected,
 )
-from kas.models import AttestRequest, ChallengeRequest
+from kas.models import AttestRequest, ChallengeRequest, ReleaseStorageKeyRequest
 from kas.policy import PolicyRegistry, ReleaseManifest, VerifiedQuote
 from kas.service import KASService
 
@@ -270,3 +270,40 @@ def test_fastapi_challenge_endpoint() -> None:
     )
     assert response.status_code == 201
     assert len(response.json()["nonce"]) == 64
+
+
+def test_storage_key_requires_active_lease_and_rejects_replay() -> None:
+    csr_pem, public_key_der = make_csr()
+    verifier = FakeVerifier(MRENCLAVE, MRSIGNER, 3, False, b"\x00" * 64)
+    service = make_service(verifier=verifier)
+    challenge = service.issue_challenge(
+        ChallengeRequest(role="P0", release_id="a122-test-v1")
+    )
+    verifier.report_data = build_report_data(
+        public_key_der,
+        "P0",
+        "a122-test-v1",
+        bytes.fromhex(challenge.nonce),
+    )
+    response = service.attest(
+        AttestRequest(
+            challenge_id=challenge.challenge_id,
+            role="P0",
+            release_id="a122-test-v1",
+            dcap_quote_b64=base64.b64encode(b"test-quote").decode("ascii"),
+            csr_pem=csr_pem,
+        )
+    )
+    request = ReleaseStorageKeyRequest(
+        lease_id=response.lease_id,
+        role="P0",
+        release_id="a122-test-v1",
+        share_epoch=7,
+        purpose="model-store",
+    )
+    released = service.release_storage_key(request)
+    assert len(released.key_hex) == 64
+    from kas.errors import StorageKeyRejected
+
+    with pytest.raises(StorageKeyRejected):
+        service.release_storage_key(request)

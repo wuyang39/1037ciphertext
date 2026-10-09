@@ -53,10 +53,20 @@ POST /v1/consume-ticket
 
 GET /v1/ticket-public-key
   -> {public_key}
+
+POST /v1/release-storage-key
+  {lease_id, role, release_id, share_epoch, purpose}
+  -> {key_id, key_hex, expires_at}
 ```
 
 `consume-ticket` 的失败不会返回 `accepted`：未知 Ticket 为 404，已消费为
 409，过期为 410，签名/绑定/Lease 不合法为 403。
+
+`release-storage-key` 只接受仍有效的节点 Lease。Key 由 KAS 的
+`KAS_STORAGE_KEY_MASTER_HEX`、角色、release、epoch 和 purpose 经 HKDF-SM3
+确定性派生；同一 `(lease_id, share_epoch, purpose)` 的重复放行返回 409。
+该接口在当前本地代码中是 mock HTTP 交付，服务器阶段必须把它放到
+已验证的 RA-TLS 通道上。
 
 challenge 为一次性对象。即使 Quote 验证失败，challenge 也已消费，不能重试同一
 nonce。正式 KAS 没有“跳过验证”配置；缺少 CA、policy 或 DCAP verifier 时启动失败。
@@ -131,6 +141,7 @@ KAS_CA_CERT_PATH
 KAS_RELEASE_POLICY_PATH
 KAS_DCAP_VERIFY_BIN
 KAS_TICKET_SIGNING_KEY_PATH
+KAS_STORAGE_KEY_MASTER_HEX
 KAS_HOST
 KAS_PORT
 KAS_CHALLENGE_TTL_SECONDS
@@ -139,3 +150,26 @@ KAS_NODE_LEASE_TTL_SECONDS
 
 CA 私钥和 Ticket 签名私钥不得进入 Git、镜像环境变量或普通配置。示例 policy
 只用于 schema 演示，必须替换为 release pipeline 登记的真实测量值。
+
+## D3-D8 本地实现边界
+
+- `tee/storage.py`：可验证的 encrypted-FS mock，支持 lease 绑定、错误 key、
+  篡改、错 epoch 和失败清理；它不能证明宿主上的真实密文卷已经安全。
+- `tee/worker.py`：固定入口 `run_inference(ticket, input_share)`，启动前要求
+  active Lease、release 绑定的 storage key 和 Worker startup hash。
+- `mpc/secure_ops/rss.py`：3PC RSS ring 算术和 Beaver 乘法 mock，覆盖
+  add、mul、matmul、truncate、compare、reciprocal 与 1,000 组向量。
+- `mpc/spu_backend/mtls.py`：TLS 1.3、KAS CA、双向证书、SAN allowlist 和
+  builtin services 关闭的 fail-closed policy mock；不是实际 TLS 实现。
+- `mpc/secure_ops/transformer.py`：Tiny Decoder Block 的固定点/RSS 本地参考。
+  Softmax、LayerNorm、GELU、Argmax 的运行路径显式标为 simulation reveal，
+  正式路径必须替换为 secure operator。
+- `client/result.py`：三份 ResultFrame 的签名、加密、session/model/epoch/
+  decode_step/request 绑定与一致性检查。
+- `model/export.py`、`model/quantization.py`、`model/graph.py`：确定性权重
+  导出、dyadic 量化、静态图 hash。
+- `mpc/stage_planner/planner.py`：只合并 layout/scale 相同的相邻 stage，并
+  保留优化前后 graph hash。
+
+以上本地结果不得作为 SGX Quote、真实 encrypted FS、真实 mTLS、三节点
+enclave 或性能数据的验收证据。

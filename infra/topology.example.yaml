@@ -1,0 +1,27 @@
+version: a122-local-mock-v1
+roles:
+  - name: P0
+    san: spiffe://a122/P0
+  - name: P1
+    san: spiffe://a122/P1
+  - name: P2
+    san: spiffe://a122/P2
+control_plane:
+  kas: external
+  audit: external
+network_profiles:
+  - name: LAN
+    bandwidth_mbps: 1000
+    latency_ms: 1
+  - name: 100Mbps-40ms
+    bandwidth_mbps: 100
+    latency_ms: 40
+  - name: 100Mbps-80ms
+    bandwidth_mbps: 100
+    latency_ms: 80
+security:
+  tls_min_version: TLS1.3
+  require_client_certificate: true
+  allow_brpc_builtin_services: false
+  debug_enclave: false
+  sgx_acceptance: pending_server

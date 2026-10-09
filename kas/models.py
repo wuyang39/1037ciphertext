@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 NodeRole = Literal["P0", "P1", "P2"]
+StoragePurpose = Literal["model-store", "preprocessing-store"]
 
 
 class ProtocolModel(BaseModel):
@@ -82,3 +83,17 @@ class ConsumeTicketRequest(ProtocolModel):
 
 class ConsumeTicketResponse(ProtocolModel):
     status: Literal["accepted"]
+
+
+class ReleaseStorageKeyRequest(ProtocolModel):
+    lease_id: str = Field(min_length=1, max_length=128)
+    role: NodeRole
+    release_id: str = Field(min_length=3, max_length=128)
+    share_epoch: int = Field(ge=0)
+    purpose: StoragePurpose
+
+
+class ReleaseStorageKeyResponse(ProtocolModel):
+    key_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    key_hex: str = Field(pattern=r"^[0-9a-f]{64}$")
+    expires_at: datetime

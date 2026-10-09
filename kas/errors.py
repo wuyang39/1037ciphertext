@@ -39,3 +39,7 @@ class TicketBindingRejected(KASError):
 
 class LeaseRejected(KASError):
     """The enclave Lease is missing, expired, or bound to another node."""
+
+
+class StorageKeyRejected(KASError):
+    """A storage-key release request failed policy or replay checks."""
