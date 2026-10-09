@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://a122.local/schemas/model_manifest.schema.json",
+  "title": "A1-22 model manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "model_hash",
+    "tokenizer_hash",
+    "precision_plan_hash",
+    "model_version",
+    "operator_version"
+  ],
+  "properties": {
+    "model_hash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "tokenizer_hash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "precision_plan_hash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "operator_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

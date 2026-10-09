@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://a122.local/schemas/release_manifest.schema.json",
+  "title": "A1-22 SGX release manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "release_id",
+    "mrenclave",
+    "mrsigner",
+    "min_isvsvn",
+    "debug_allowed",
+    "spu_build_hash",
+    "expires_at"
+  ],
+  "properties": {
+    "release_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{3,128}$"
+    },
+    "mrenclave": {
+      "$ref": "#/$defs/hex32"
+    },
+    "mrsigner": {
+      "$ref": "#/$defs/hex32"
+    },
+    "min_isvsvn": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 65535
+    },
+    "debug_allowed": {
+      "const": false
+    },
+    "spu_build_hash": {
+      "$ref": "#/$defs/hex32"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "hex32": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

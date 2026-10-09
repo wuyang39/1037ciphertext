@@ -1,0 +1,13 @@
+# Direct dependency lock for the local D0/D1 development environment.
+# Regenerate only through a reviewed dependency update.
+cryptography==48.0.0
+fastapi==0.109.0
+gmssl==3.2.2
+httpx==0.27.2
+jsonschema==4.26.0
+numpy==2.4.2
+pycryptodomex==3.24.0
+pydantic==2.5.3
+pytest==9.1.1
+torch==2.12.0+cpu
+uvicorn==0.27.0

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://a122.local/schemas/precision_plan.schema.json",
+  "title": "A1-22 precision plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "plan_id",
+    "ring",
+    "tensor_layout",
+    "scales",
+    "approximations",
+    "error_thresholds"
+  ],
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{3,128}$"
+    },
+    "ring": {
+      "const": "Z_2_64"
+    },
+    "tensor_layout": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "scales": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 62
+      }
+    },
+    "approximations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128
+      }
+    },
+    "error_thresholds": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0
+      }
+    }
+  }
+}

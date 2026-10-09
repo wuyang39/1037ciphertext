@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a122-privacy-llm"
+version = "0.1.0"
+description = "A1-22 private decoder inference over 3PC RSS and SGX"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "cryptography>=48,<49",
+  "fastapi>=0.109,<0.110",
+  "gmssl>=3.2.2,<4",
+  "jsonschema>=4.26,<5",
+  "numpy>=2.4,<3",
+  "pydantic>=2.5,<3",
+  "torch>=2.12,<3",
+  "uvicorn>=0.27,<0.28",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.27,<0.28",
+  "pytest>=9.1,<10",
+]
+
+[tool.setuptools.packages.find]
+include = [
+  "client*",
+  "contracts*",
+  "crypto*",
+  "kas*",
+  "model*",
+  "mpc*",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["."]

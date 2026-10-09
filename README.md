@@ -11,6 +11,9 @@
 服务器租用、镜像复用、比赛日部署与资源释放方案见
 [`docs/服务器资源准备.md`](docs/服务器资源准备.md)。
 
+当前已经冻结的 canonical JSON、REPORTDATA 和 KAS 接口见
+[`docs/protocol-baseline.md`](docs/protocol-baseline.md)。
+
 ## 当前状态
 
 仓库已完成基线初始化，实施阶段按文档中的 `D0` 至 `D10` 验收门推进。任何前置验收门未通过时，不进入依赖它的后续阶段。
@@ -57,4 +60,11 @@
 ```powershell
 git status --short
 rg -n "reveal\\(|sgx\\.debug\\s*=\\s*true|BEGIN (RSA |EC |ENCRYPTED )?PRIVATE KEY" .
+```
+
+## 开发命令
+
+```powershell
+python -m pytest -q
+python -m model.build_tiny_fixture --output tests/fixtures/tiny_float_reference.json
 ```
