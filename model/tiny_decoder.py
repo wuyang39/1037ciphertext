@@ -42,6 +42,32 @@ class TinyDecoderOutput:
     past_key_values: Optional[tuple[tuple[Tensor, Tensor], ...]] = None
 
 
+def _fill_portable_normal(
+    tensor: Tensor, *, generator: torch.Generator, std: float
+) -> None:
+    """Fill ``tensor`` with a standard-normal sample that is bit-identical on
+    every platform.
+
+    ``torch.nn.init.normal_`` routes through the platform C library's
+    ``log``/``cos``, so Windows (MSVC) and Linux (glibc) disagree in the
+    low-order bits of the sampled floats.  ``parameter_hash`` is written into
+    frozen fixtures, model packages, and release manifests, so those bits must
+    not depend on the host.  Summing twelve uniforms (Irwin-Hall) keeps the
+    variance at 1 while using only IEEE-754 additions, which are identical on
+    every conforming platform.
+    """
+    with torch.no_grad():
+        accumulator = torch.zeros_like(tensor)
+        for _ in range(12):
+            accumulator = accumulator + torch.rand(
+                tensor.shape,
+                generator=generator,
+                dtype=tensor.dtype,
+                device=tensor.device,
+            )
+        tensor.copy_((accumulator - 6.0) * std)
+
+
 class _DecoderBlock(nn.Module):
     def __init__(self, config: TinyDecoderConfig) -> None:
         super().__init__()
@@ -132,7 +158,7 @@ class TinyDecoder(nn.Module):
         generator.manual_seed(seed)
         for name, parameter in self.named_parameters():
             if parameter.dim() >= 2:
-                nn.init.normal_(parameter, mean=0.0, std=0.02, generator=generator)
+                _fill_portable_normal(parameter, generator=generator, std=0.02)
             elif name.endswith("bias"):
                 nn.init.zeros_(parameter)
             else:
