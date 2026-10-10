@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from crypto.sm4_gcm import AuthenticationError, SM4GCM, SM4GCMError
+from crypto.sm4_gcm import (
+    AuthenticationError,
+    PurePythonSM4GCM,
+    SM4GCM,
+    SM4GCMError,
+)
 
 
 def test_sm4_gcm_rfc8998_vector() -> None:
@@ -48,3 +53,20 @@ def test_sm4_gcm_rejects_tag_aad_and_ciphertext_changes() -> None:
 def test_sm4_gcm_rejects_invalid_nonce_length() -> None:
     with pytest.raises(SM4GCMError):
         SM4GCM(bytes(16)).encrypt(bytes(11), b"")
+
+
+def test_native_provider_matches_pure_python_oracle() -> None:
+    key = bytes(range(16))
+    nonce = bytes(range(12))
+    aad = b"a122-provider-equivalence"
+    plaintext = bytes(range(64))
+    native_ciphertext, native_tag = SM4GCM(key).encrypt(nonce, plaintext, aad)
+    python_ciphertext, python_tag = PurePythonSM4GCM(key).encrypt(
+        nonce,
+        plaintext,
+        aad,
+    )
+    assert SM4GCM.provider_name == "openssl-native-sm4-gcm"
+    assert native_ciphertext == python_ciphertext
+    assert native_tag == python_tag
+    assert SM4GCM(key).decrypt(nonce, native_ciphertext, native_tag, aad) == plaintext

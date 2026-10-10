@@ -1,0 +1,14 @@
+{
+  "enclave_size": "4G",
+  "entrypoint": "/app/a122-worker",
+  "lib_dir": "/usr/lib",
+  "model_share_path": "/secure/model-share-P0.bin",
+  "preprocessing_package_path": "/secure/preprocessing-P0.bin",
+  "python_runtime_path": "/usr/bin/python3",
+  "release_id": "local-checkpoint",
+  "role": "P0",
+  "run_session_dir": "/run/session",
+  "run_tee_dir": "/run/tee",
+  "secure_fs_dir": "/secure",
+  "share_epoch": 1
+}

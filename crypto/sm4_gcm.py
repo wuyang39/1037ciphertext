@@ -1,15 +1,11 @@
-"""SM4-GCM AEAD built on the vetted GmSSL SM4 block primitive.
-
-The GCM composition follows NIST SP 800-38D and is checked against the
-GB/T 36624-2018 and RFC 8998 vectors in the unit test suite. Production
-deployments should replace this Python composition with a native audited
-cryptographic provider; the pure-Python block primitive is not constant-time.
-"""
+"""SM4-GCM with an OpenSSL-native default and an explicit Python test oracle."""
 
 from __future__ import annotations
 
 import hmac
 
+from cryptography.exceptions import InvalidTag
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from gmssl.sm4 import SM4_ENCRYPT, CryptSM4
 
 
@@ -86,8 +82,10 @@ def _increment32(counter: bytes) -> bytes:
     return counter[:12] + low.to_bytes(4, "big")
 
 
-class SM4GCM:
-    """One-key SM4-GCM encryptor with a 16-byte authentication tag."""
+class PurePythonSM4GCM:
+    """Legacy pure-Python SM4-GCM oracle, never selected implicitly."""
+
+    provider_name = "python-gmssl-oracle"
 
     def __init__(self, key: bytes) -> None:
         if not isinstance(key, bytes) or len(key) != SM4_KEY_BYTES:
@@ -172,3 +170,80 @@ class SM4GCM:
         if not hmac.compare_digest(expected_tag, tag):
             raise AuthenticationError("SM4-GCM authentication failed")
         return self._crypt(_increment32(initial_counter), ciphertext)
+
+
+class SM4GCM:
+    """OpenSSL-native SM4-GCM encryptor with a 16-byte authentication tag."""
+
+    provider_name = "openssl-native-sm4-gcm"
+
+    def __init__(self, key: bytes) -> None:
+        if not isinstance(key, bytes) or len(key) != SM4_KEY_BYTES:
+            raise SM4GCMError("SM4-GCM key must be exactly 16 bytes")
+        try:
+            self._algorithm = algorithms.SM4(key)
+        except AttributeError as exc:
+            raise SM4GCMError("native SM4 is unavailable in this OpenSSL build") from exc
+        self._key = key
+
+    @staticmethod
+    def _validate_nonce(nonce: bytes) -> None:
+        if not isinstance(nonce, bytes) or len(nonce) != SM4_GCM_NONCE_BYTES:
+            raise SM4GCMError("SM4-GCM nonce must be exactly 12 bytes")
+
+    def encrypt(
+        self,
+        nonce: bytes,
+        plaintext: bytes,
+        aad: bytes = b"",
+    ) -> tuple[bytes, bytes]:
+        """Encrypt with the native provider and return ``(ciphertext, tag)``."""
+        self._validate_nonce(nonce)
+        if not isinstance(plaintext, bytes):
+            raise TypeError("plaintext must be bytes")
+        if not isinstance(aad, bytes):
+            raise TypeError("aad must be bytes")
+        encryptor = Cipher(
+            self._algorithm,
+            modes.GCM(nonce),
+        ).encryptor()
+        encryptor.authenticate_additional_data(aad)
+        ciphertext = encryptor.update(plaintext) + encryptor.finalize()
+        return ciphertext, encryptor.tag
+
+    def decrypt(
+        self,
+        nonce: bytes,
+        ciphertext: bytes,
+        tag: bytes,
+        aad: bytes = b"",
+    ) -> bytes:
+        """Authenticate and decrypt through the native OpenSSL provider."""
+        self._validate_nonce(nonce)
+        if not isinstance(ciphertext, bytes):
+            raise TypeError("ciphertext must be bytes")
+        if not isinstance(tag, bytes) or len(tag) != SM4_GCM_TAG_BYTES:
+            raise SM4GCMError("SM4-GCM tag must be exactly 16 bytes")
+        if not isinstance(aad, bytes):
+            raise TypeError("aad must be bytes")
+        try:
+            decryptor = Cipher(
+                self._algorithm,
+                modes.GCM(nonce, tag),
+            ).decryptor()
+            decryptor.authenticate_additional_data(aad)
+            return decryptor.update(ciphertext) + decryptor.finalize()
+        except InvalidTag as exc:
+            raise AuthenticationError("SM4-GCM authentication failed") from exc
+
+
+__all__ = [
+    "AuthenticationError",
+    "PurePythonSM4GCM",
+    "SM4GCM",
+    "SM4GCMError",
+    "SM4_BLOCK_BYTES",
+    "SM4_GCM_NONCE_BYTES",
+    "SM4_GCM_TAG_BYTES",
+    "SM4_KEY_BYTES",
+]

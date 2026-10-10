@@ -11,7 +11,14 @@ from pathlib import Path
 
 EXCLUDED_DIRS = {
     ".git",
+    ".codex-artifacts",
+    ".idea",
+    ".venv",
+    ".vscode",
+    "build",
+    "dist",
     ".pytest_cache",
+    "venv",
     "__pycache__",
     ".mypy_cache",
     ".ruff_cache",

@@ -12,6 +12,10 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from infra.evidence import build_record, write_json
+
 
 FORBIDDEN_PATTERNS = {
     "private_key": "BEGIN PRIVATE KEY",
@@ -142,11 +146,18 @@ def main() -> int:
     )
     args = parser.parse_args()
     document = collect(args.root)
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(
-        json.dumps(document, ensure_ascii=True, indent=2) + "\n",
-        encoding="utf-8",
+    record = build_record(
+        run_id="local-evidence-collection",
+        phase="D0-D10",
+        outcome=(
+            "failed_sensitive_markers"
+            if document["forbidden_pattern_findings"]
+            else "passed_redacted_local_scan"
+        ),
+        command="python infra/collect_evidence.py",
+        details=document,
     )
+    write_json(args.output, record)
     if args.fail_on_findings and document["forbidden_pattern_findings"]:
         return 1
     return 0

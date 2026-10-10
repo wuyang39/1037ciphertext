@@ -32,8 +32,18 @@ SM4-GCM 帧、严格 counter 反重放、`Close` 状态机、KAS 一次性 `JobT
 账本与脱敏审计 schema、受保护文件/Worker mock、3PC RSS 最小算子、mock
 mTLS、安全 Transformer Block、ResultFrame、KV wipe、确定性模型导出、
 dyadic 量化、静态图规划、脱敏 benchmark、本地负例与证据采集脚本。
-D2 的 SM4-GCM 组合已用标准向量验证；正式 SGX 部署仍需将纯 Python SM4
-分组原语替换为常数时间 native 实现。
+D2 的 SM4-GCM 默认已切换为 OpenSSL native 实现，并用 RFC 8998 和
+GB/T 36624-2018 向量验证；纯 Python 实现只保留为显式测试 oracle。
+
+本机 Linux/WSL 还可以运行真实 localhost TCP/TLS 1.3 三节点链路、Gramine
+manifest 静态检查、模型份额包、release 校验和证据封存：
+
+```powershell
+.\deploy\run_local_checks.ps1
+```
+
+详细能力边界和 Ubuntu/WSL 命令见
+[`docs/local-linux-development.md`](docs/local-linux-development.md)。
 
 本地 mock、encrypted FS、RSS、三节点 runtime 和 mTLS 均不是真实 SGX
 验收。真实 Quote、Gramine encrypted FS、YACL/BRPC、三节点 enclave 和 EPC
@@ -59,6 +69,7 @@ D2 的 SM4-GCM 组合已用标准向量验证；正式 SGX 部署仍需将纯 Py
 ├── third_party/yacl_tls/   # BRPC mTLS fail-closed 改造
 ├── infra/                  # Docker、Ansible/Terraform、安全组与拓扑
 ├── benchmark/              # trace、网络模拟、报表和图表脚本
+├── deploy/                 # 本地联调、服务器阶段脚本入口和运行手册
 ├── tests/                  # unit、integration、tee、security 与 e2e
 └── docs/                   # 核心设计、运行手册、模型卡、测试向量与 SBOM
 ```

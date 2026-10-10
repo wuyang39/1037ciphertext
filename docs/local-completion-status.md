@@ -16,6 +16,24 @@
 | D9 | 本地负例脚本、证据采集脚本、拓扑模板、验收清单 | 三域部署、独立账号/安全组、pcap、宿主机材料演示、离线复现 |
 | D10 | 安装手册、模型卡、SBOM、复现文档、攻击演示、确定性 release 构建 | 干净账号答辩演练、最终实测结论和证据冻结 |
 
+## 本机 Linux/WSL 增量完成
+
+除上表外，本机 Linux/WSL 阶段已经补充：
+
+- 真实 localhost TCP/TLS 1.3 三节点传输和 P0/P1/P2 定向链路。
+- 默认 OpenSSL native SM4-GCM，纯 Python 实现改为显式测试 oracle。
+- secure nonlinear provider 注入边界和未配置时 fail-closed。
+- Gramine manifest 模板渲染、占位符和静态安全策略校验。
+- Tiny 模型量化、份额拆分、可选加密份额和 package manifest 校验。
+- Tiny 参数初始化改为不依赖平台 libm 的可移植实现，使 `parameter_hash`、
+  浮点参考夹具和模型包 `model_hash` 在 Windows 与 Linux 上完全一致。
+- release archive、外部/embedded manifest 和敏感 marker 校验。
+- 统一 evidence schema、索引封存和 SHA-256 校验。
+- D1 环境自检、D1-D9 攻击矩阵和本机三节点部署演练。
+
+这些结果不代表 SGX、enclave 内 TLS、encrypted FS 或 EPC 验收。详细说明见
+[`local-linux-development.md`](local-linux-development.md)。
+
 ## 本地已执行
 
 ```powershell
@@ -25,6 +43,12 @@ git diff --check
 python infra/security_negative.py --output artifacts/evidence/negative-checks.json
 python infra/collect_evidence.py --root . --output artifacts/evidence/local-checks.json
 python infra/build_release.py --root . --output artifacts/a122-local.zip --version local-checkpoint
+python infra/attack_matrix.py --output artifacts/evidence/attack-matrix.json
+python infra.d1_environment_check.py --output artifacts/evidence/d1-environment.json
+python infra.local_three_node.py --output artifacts/evidence/local-three-node.json
+python infra.build_model_package.py --output artifacts/model-package --encrypt-local
+python infra.build_model_package.py --output artifacts/model-package --verify
+python infra.validate_gramine_manifest.py --values deploy/gramine-values.example.json
 ```
 
 当前本地结果只能作为 mock 与接口证据，不能标记为 SGX 验收通过。

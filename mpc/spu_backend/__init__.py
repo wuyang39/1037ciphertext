@@ -7,11 +7,21 @@ from .mtls import (
     TLSConfig,
 )
 from .topology import RSSTopology
+from .transport import (
+    TLSChannelError,
+    TLSFrameChannel,
+    TLSFrameServer,
+    TLSIdentity,
+)
 
 __all__ = [
     "MockTLSChannel",
     "RSSTopology",
     "TLSSession",
+    "TLSChannelError",
+    "TLSFrameChannel",
+    "TLSFrameServer",
+    "TLSIdentity",
     "TLSPolicyError",
     "TLSConfig",
 ]

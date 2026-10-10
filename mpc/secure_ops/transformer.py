@@ -19,6 +19,10 @@ from model.fixed_point import FixedPointFormat, RoundingMode, encode_fixed
 from model.fixed_point import to_signed
 
 from .fixed_point_adapter import FixedPointAdapter
+from .provider import (
+    SecureNonlinearProvider,
+    SimulationRevealProvider,
+)
 from .rss import RSSContext, RSSProtocolError, SharedTensor
 
 
@@ -82,6 +86,7 @@ class FixedSecureOps:
         context: RSSContext,
         *,
         fractional_bits: int = DEFAULT_FRACTIONAL_BITS,
+        nonlinear_provider: SecureNonlinearProvider | None = None,
     ) -> None:
         if fractional_bits < 1 or fractional_bits >= context.ring_bits:
             raise ValueError("fractional_bits must be inside the RSS ring")
@@ -89,6 +94,11 @@ class FixedSecureOps:
         self.fractional_bits = fractional_bits
         self.format = _fixed_format(fractional_bits, context.ring_bits)
         self.adapter = FixedPointAdapter(self.format, context)
+        self.nonlinear_provider = (
+            nonlinear_provider
+            if nonlinear_provider is not None
+            else SimulationRevealProvider()
+        )
 
     def share_value(self, value: Any) -> SharedTensor:
         """Share a rational value after deterministic fixed-point encoding."""
@@ -168,20 +178,17 @@ class FixedSecureOps:
         )
 
     def _nonlinear(self, input_shared: SharedTensor, transform: Any, name: str) -> SharedTensor:
-        if not self.context.reveal_allowed:
-            raise RSSProtocolError(
-                f"{name} requires a secure protocol; simulation reveal is disabled"
-            )
-        started = time.perf_counter()
-        decoded = self.decode(input_shared)
-        transformed = transform(decoded)
-        result = self.share_value(transformed)
-        return self.context.record_external(
-            operation=name,
-            result=result,
-            started=started,
-            rounds=1,
-            simulated_reveal=True,
+        return self.nonlinear_provider.evaluate(
+            name=name,
+            input_shared=input_shared,
+            context=self.context,
+            decode=self.decode,
+            encode=self.share_value,
+            transform=transform,
+            parameters={
+                "scale": self.format.scale,
+                "fractional_bits": self.fractional_bits,
+            },
         )
 
     def embedding(

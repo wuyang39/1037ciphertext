@@ -26,14 +26,17 @@ python -m pip install -e ".[dev]"
 ## 本地验收命令
 
 ```powershell
-python -m pytest -q
-python -m compileall -q client contracts crypto kas model mpc tee tests infra
-git diff --check
-python infra/security_negative.py --output artifacts/evidence/negative-checks.json
-python infra/collect_evidence.py --root . --output artifacts/evidence/local-checks.json
+.\deploy\run_local_checks.ps1
 ```
 
-`infra/run_local_checks.ps1` 会串行执行以上命令。
+Ubuntu/WSL 使用：
+
+```bash
+./deploy/run_local_checks.sh
+```
+
+脚本会运行测试、真实 TLS 三节点联调、模型包、攻击矩阵、release 校验和证据
+封存。完整能力边界见 [local-linux-development.md](local-linux-development.md)。
 
 ## 服务器阶段安装顺序
 

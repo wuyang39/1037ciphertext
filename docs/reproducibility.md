@@ -14,8 +14,17 @@
 python -m pytest -q
 python -m model.build_tiny_fixture --output tests/fixtures/tiny_float_reference.json
 python infra/security_negative.py --output artifacts/evidence/negative-checks.json
+python infra.attack_matrix.py --output artifacts/evidence/attack-matrix.json
+python infra.d1_environment_check.py --output artifacts/evidence/d1-environment.json
+python infra.local_three_node.py --output artifacts/evidence/local-three-node.json
+python infra.build_model_package.py --output artifacts/model-package --encrypt-local
+python infra.build_model_package.py --output artifacts/model-package --verify
+python infra.validate_gramine_manifest.py --values deploy/gramine-values.example.json --output artifacts/a122.manifest
 python infra/collect_evidence.py --root . --output artifacts/evidence/local-checks.json
 python infra/build_release.py --root . --output artifacts/a122-local.zip --version local-checkpoint
+python infra.validate_release.py artifacts/a122-local.zip --manifest artifacts/a122-local.manifest.json
+python infra.seal_evidence.py seal artifacts/evidence
+python infra.seal_evidence.py verify artifacts/evidence
 ```
 
 ## 可重复性边界

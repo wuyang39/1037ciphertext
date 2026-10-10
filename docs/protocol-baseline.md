@@ -127,11 +127,13 @@ attestation Lease。
 
 ## SM4-GCM 实现边界
 
-`crypto/sm4_gcm.py` 使用 GmSSL Python 的 SM4 分组原语，并按 NIST SP 800-38D
-组合 GCM。测试覆盖 GB/T 36624-2018、RFC 8998 与篡改拒绝向量。
+`crypto/sm4_gcm.py` 的默认 `SM4GCM` 使用 OpenSSL native SM4 和 native GCM，
+provider 标记为 `openssl-native-sm4-gcm`。测试覆盖 GB/T 36624-2018、
+RFC 8998、篡改拒绝和 native/Python oracle 一致性向量。
 
-该 SM4 分组原语是纯 Python，不具备生产级常数时间保证。正式 SGX 部署必须替换
-为经审计的 native GmSSL/硬件密码提供方；替换后协议字段和测试向量保持不变。
+`PurePythonSM4GCM` 仅保留为显式测试 oracle，不会被默认协议路径隐式选择。
+正式部署仍应使用组织批准的 OpenSSL/GmSSL/硬件密码构建，并确认 FIPS/合规配置；
+替换 provider 后协议字段和测试向量保持不变。
 
 ## 环境变量
 
@@ -161,9 +163,13 @@ CA 私钥和 Ticket 签名私钥不得进入 Git、镜像环境变量或普通�
   add、mul、matmul、truncate、compare、reciprocal 与 1,000 组向量。
 - `mpc/spu_backend/mtls.py`：TLS 1.3、KAS CA、双向证书、SAN allowlist 和
   builtin services 关闭的 fail-closed policy mock；不是实际 TLS 实现。
+- `mpc/spu_backend/transport.py`：真实 localhost TCP/TLS 1.3 frame
+  transport，用于本机三节点软件联调；TLS 在宿主进程终止，不是 enclave 内 mTLS。
 - `mpc/secure_ops/transformer.py`：Tiny Decoder Block 的固定点/RSS 本地参考。
   Softmax、LayerNorm、GELU、Argmax 的运行路径显式标为 simulation reveal，
   正式路径必须替换为 secure operator。
+- `mpc/secure_ops/provider.py`：可注入的 secure nonlinear provider 边界；
+  默认本地实现是显式 simulation reveal，生产 provider 未配置时 fail-closed。
 - `client/result.py`：三份 ResultFrame 的签名、加密、session/model/epoch/
   decode_step/request 绑定与一致性检查。
 - `model/export.py`、`model/quantization.py`、`model/graph.py`：确定性权重
