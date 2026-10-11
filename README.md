@@ -14,6 +14,9 @@
 当前已经冻结的 canonical JSON、REPORTDATA 和 KAS 接口见
 [`docs/protocol-baseline.md`](docs/protocol-baseline.md)。
 
+跨团队对齐的 Linux/CPU、版本、三节点端口与配置格式、KAS 部署和模型份额接口见
+[`docs/interface-freeze.md`](docs/interface-freeze.md)。
+
 ## 当前状态
 
 仓库已完成基线初始化，实施阶段按文档中的 `D0` 至 `D10` 验收门推进。任何前置验收门未通过时，不进入依赖它的后续阶段。

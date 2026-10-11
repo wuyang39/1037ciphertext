@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://a122.local/schemas/node_config.schema.json",
+  "title": "A1-22 node runtime config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "config_version",
+    "node_role",
+    "release_id",
+    "share_epoch",
+    "listen",
+    "peers",
+    "kas",
+    "paths",
+    "tls",
+    "sgx"
+  ],
+  "properties": {
+    "config_version": {
+      "const": "a122-node-config-v1"
+    },
+    "node_role": {
+      "enum": [
+        "P0",
+        "P1",
+        "P2"
+      ]
+    },
+    "release_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{3,128}$"
+    },
+    "share_epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "listen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "address",
+        "port"
+      ],
+      "properties": {
+        "address": {
+          "type": "string",
+          "minLength": 1
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      }
+    },
+    "peers": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "role",
+          "address",
+          "port",
+          "san"
+        ],
+        "properties": {
+          "role": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2"
+            ]
+          },
+          "address": {
+            "type": "string",
+            "minLength": 1
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "san": {
+            "type": "string",
+            "pattern": "^spiffe://a122/(P0|P1|P2)$"
+          }
+        }
+      }
+    },
+    "kas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base_url",
+        "ca_bundle_path"
+      ],
+      "properties": {
+        "base_url": {
+          "type": "string",
+          "pattern": "^https://[^/]+(:[0-9]{1,5})?$"
+        },
+        "ca_bundle_path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_share",
+        "preprocessing_package"
+      ],
+      "properties": {
+        "model_share": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preprocessing_package": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "tls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min_version",
+        "require_client_certificate",
+        "allow_brpc_builtin_services",
+        "role_san_allowlist"
+      ],
+      "properties": {
+        "min_version": {
+          "const": "TLS1.3"
+        },
+        "require_client_certificate": {
+          "const": true
+        },
+        "allow_brpc_builtin_services": {
+          "const": false
+        },
+        "role_san_allowlist": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^spiffe://a122/(P0|P1|P2)$"
+          }
+        }
+      }
+    },
+    "sgx": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "debug",
+        "enclave_size"
+      ],
+      "properties": {
+        "debug": {
+          "const": false
+        },
+        "enclave_size": {
+          "type": "string",
+          "pattern": "^[0-9]+[MG]$"
+        }
+      }
+    }
+  }
+}

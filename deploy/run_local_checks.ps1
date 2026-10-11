@@ -23,6 +23,9 @@ python -m infra.validate_gramine_manifest `
   --values deploy/gramine-values.example.json `
   --output (Join-Path $Evidence "a122.manifest") `
   --evidence (Join-Path $Evidence "gramine-manifest-validation.json")
+python -m infra.validate_node_config `
+  --config configs/node.example.json `
+  --output (Join-Path $Evidence "node-config-validation.json")
 python -m infra.build_model_package --output $ModelPackage --encrypt-local
 python -m infra.build_model_package --output $ModelPackage --verify
 python -m infra.collect_evidence --root . --output (Join-Path $Evidence "source-scan.json")

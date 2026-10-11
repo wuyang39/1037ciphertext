@@ -1,0 +1,45 @@
+{
+  "config_version": "a122-node-config-v1",
+  "node_role": "P0",
+  "release_id": "a122-tee-v1.0.0",
+  "share_epoch": 1,
+  "listen": {
+    "address": "0.0.0.0",
+    "port": 47100
+  },
+  "peers": [
+    {
+      "role": "P1",
+      "address": "192.0.2.11",
+      "port": 47101,
+      "san": "spiffe://a122/P1"
+    },
+    {
+      "role": "P2",
+      "address": "192.0.2.12",
+      "port": 47102,
+      "san": "spiffe://a122/P2"
+    }
+  ],
+  "kas": {
+    "base_url": "https://kas.a122.internal:8443",
+    "ca_bundle_path": "/etc/a122/kas-ca.pem"
+  },
+  "paths": {
+    "model_share": "/secure/model-share-P0.bin",
+    "preprocessing_package": "/secure/preprocessing-P0.bin"
+  },
+  "tls": {
+    "min_version": "TLS1.3",
+    "require_client_certificate": true,
+    "allow_brpc_builtin_services": false,
+    "role_san_allowlist": [
+      "spiffe://a122/P1",
+      "spiffe://a122/P2"
+    ]
+  },
+  "sgx": {
+    "debug": false,
+    "enclave_size": "4G"
+  }
+}

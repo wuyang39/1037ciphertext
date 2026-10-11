@@ -2,6 +2,9 @@
 
 本文记录当前代码已经冻结的 D0/D1/D2 接口。修改 canonical JSON、REPORTDATA 绑定、release policy、会话字段、帧 AAD 或 KAS 配置字段时，必须同步更新 schema、测试向量、版本号和本文。
 
+环境、版本、三节点端口与配置格式、KAS 部署位置和模型份额等跨团队约定见
+[`interface-freeze.md`](interface-freeze.md)。
+
 ## Canonical JSON
 
 manifest、policy 和后续签名对象统一使用以下编码计算哈希：
