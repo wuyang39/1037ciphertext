@@ -1,0 +1,154 @@
+{
+  "all_refused": true,
+  "cases": {
+    "no-client-cert": {
+      "case": "no-client-cert",
+      "elapsed_seconds": 57.406,
+      "exit_status": 3,
+      "expected": "certificate",
+      "output_tail": "#8 _PyEval_EvalFrameDefault+0x55b28f4fed6c\n#9 _PyEval_Vector+0x55b28f4d5ff6\n#10 builtin_exec+0x55b28f61a86b\n#11 cfunction_vectorcall_FASTCALL_KEYWORDS+0x55b28f48d36b\n#12 _PyEval_EvalFrameDefault+0x55b28f4fe9a9\n#13 _PyFunction_Vectorcall+0x55b28f4601f9\n#14 pymain_run_module+0x55b28f65962a\n#15 Py_RunMain+0x55b28f658e47",
+      "peers": {
+        "P1": {
+          "bytes": 3854,
+          "reported_failure": true
+        },
+        "P2": {
+          "bytes": 1318,
+          "reported_failure": true
+        }
+      },
+      "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: ",
+      "verdict": "refused"
+    },
+    "tls-disabled": {
+      "case": "tls-disabled",
+      "elapsed_seconds": 0.64,
+      "exit_status": 3,
+      "expected": "must not run without TLS",
+      "output_tail": "A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS",
+      "peers": {
+        "P1": {
+          "bytes": 0,
+          "reported_failure": false
+        },
+        "P2": {
+          "bytes": 0,
+          "reported_failure": false
+        }
+      },
+      "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS",
+      "verdict": "refused"
+    },
+    "wrong-ca": {
+      "case": "wrong-ca",
+      "elapsed_seconds": 0.672,
+      "exit_status": 3,
+      "expected": "was not signed by the KAS CA",
+      "output_tail": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA",
+      "peers": {
+        "P1": {
+          "bytes": 0,
+          "reported_failure": false
+        },
+        "P2": {
+          "bytes": 0,
+          "reported_failure": false
+        }
+      },
+      "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA",
+      "verdict": "refused"
+    },
+    "wrong-san": {
+      "case": "wrong-san",
+      "elapsed_seconds": 0.688,
+      "exit_status": 3,
+      "expected": "SAN does not match its role",
+      "output_tail": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate SAN does not match its role",
+      "peers": {
+        "P1": {
+          "bytes": 0,
+          "reported_failure": false
+        },
+        "P2": {
+          "bytes": 0,
+          "reported_failure": false
+        }
+      },
+      "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate SAN does not match its role",
+      "verdict": "refused"
+    }
+  },
+  "commit": "a2d8026db2a137d0c638f88a23c63aa92234daf3",
+  "mode": "three-instances-negatives",
+  "phase": "D4",
+  "plaintext_probes": {
+    "all_listeners_connected": true,
+    "any_plaintext_service": false,
+    "driver": "P0",
+    "marker": "A1-22-PLAINTEXT-PROBE",
+    "probes": [
+      {
+        "connected": true,
+        "host": "172.27.172.202",
+        "listener": "brpc",
+        "outcome": "no_plaintext_reply",
+        "port": 47101,
+        "reply_bytes": 0,
+        "role": "P1"
+      },
+      {
+        "connected": true,
+        "host": "172.27.172.202",
+        "listener": "share",
+        "outcome": "connection_reset",
+        "port": 47201,
+        "reply_bytes": 0,
+        "role": "P1"
+      },
+      {
+        "connected": true,
+        "host": "172.27.172.203",
+        "listener": "brpc",
+        "outcome": "no_plaintext_reply",
+        "port": 47102,
+        "reply_bytes": 0,
+        "role": "P2"
+      },
+      {
+        "connected": true,
+        "host": "172.27.172.203",
+        "listener": "share",
+        "outcome": "connection_reset",
+        "port": 47202,
+        "reply_bytes": 0,
+        "role": "P2"
+      }
+    ]
+  },
+  "roles": {
+    "P0": {
+      "brpc_port": 47100,
+      "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+      "private_address": "172.27.172.201",
+      "public_address": "47.116.200.143",
+      "share_port": 47200
+    },
+    "P1": {
+      "brpc_port": 47101,
+      "instance_id": "iZuf6bd6qnhgtveg5khyf1Z",
+      "private_address": "172.27.172.202",
+      "public_address": "47.117.34.67",
+      "share_port": 47201
+    },
+    "P2": {
+      "brpc_port": 47102,
+      "instance_id": "iZuf6bd6qnhgtveg5khygdZ",
+      "private_address": "172.27.172.203",
+      "public_address": "106.15.54.240",
+      "share_port": 47202
+    }
+  },
+  "run_id": "d4-negs-3host-20261012T154315Z",
+  "unexpected_cases": [],
+  "workspace": "~/a122-d4/three/workspace"
+}

@@ -1,0 +1,3 @@
+# wrong-san peer P2
+the peer ran its strict configuration against the driver's
+mutated one; this is the tail of its own log when the case ended

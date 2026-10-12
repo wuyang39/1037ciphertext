@@ -1,0 +1,5 @@
+# wrong-san driver (P0)
+config: ~/a122-d4/three/workspace/negative/wrong-san.json
+exit status: 3
+expected refusal: SAN does not match its role
+A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate SAN does not match its role

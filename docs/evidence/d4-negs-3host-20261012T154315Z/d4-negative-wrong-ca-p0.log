@@ -1,0 +1,5 @@
+# wrong-ca driver (P0)
+config: ~/a122-d4/three/workspace/negative/wrong-ca.json
+exit status: 3
+expected refusal: was not signed by the KAS CA
+A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA

@@ -14,11 +14,13 @@
 # Usage:
 #   CLUSTER=deploy/d4-three-hosts.json ./deploy/run_d4_three_hosts.sh
 #   SSHK=~/.ssh/a122_id_sgx SSHP=secret ./deploy/run_d4_three_hosts.sh --dry-run
+#   MODE=negatives ./deploy/run_d4_three_hosts.sh
 #
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-RUN_ID="${RUN_ID:-d4-3host-$(date -u +%Y%m%dT%H%M%SZ)}"
+MODE="${MODE:-run}"
+RUN_ID="${RUN_ID:-d4-${MODE}-3host-$(date -u +%Y%m%dT%H%M%SZ)}"
 OUT="${OUT:-$ROOT/artifacts/server/$RUN_ID/d4-three}"
 CLUSTER="${CLUSTER:-$ROOT/deploy/d4-three-hosts.json}"
 PYTHON="${PYTHON:-python3}"
@@ -32,19 +34,22 @@ fi
 echo "run_id  : $RUN_ID"
 echo "cluster : $CLUSTER"
 echo "evidence: $OUT"
+echo "mode    : $MODE"
 
 ARGS=(
-    -m infra.d4_three_hosts run
+    -m infra.d4_three_hosts "$MODE"
     --cluster "$CLUSTER"
     --out-dir "$OUT"
     --run-id "$RUN_ID"
 )
 [ -n "${SSHK:-}" ] && ARGS+=(--ssh-key "$SSHK")
 [ -n "${SSHP:-}" ] && ARGS+=(--ssh-key-password "$SSHP")
-[ -n "${IFACE:-}" ] && ARGS+=(--iface "$IFACE")
 [ -n "${SSH_USER:-}" ] && ARGS+=(--ssh-user "$SSH_USER")
-[ -n "${VECTORS:-}" ] && ARGS+=(--vectors "$VECTORS")
-[ -n "${BATCH:-}" ] && ARGS+=(--batch "$BATCH")
+if [ "$MODE" = "run" ]; then
+    [ -n "${IFACE:-}" ] && ARGS+=(--iface "$IFACE")
+    [ -n "${VECTORS:-}" ] && ARGS+=(--vectors "$VECTORS")
+    [ -n "${BATCH:-}" ] && ARGS+=(--batch "$BATCH")
+fi
 
 cd "$ROOT"
 PYTHONPATH="$ROOT" "$PYTHON" "${ARGS[@]}" "$@"

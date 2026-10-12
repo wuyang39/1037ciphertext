@@ -1,0 +1,5 @@
+# tls-disabled driver (P0)
+config: ~/a122-d4/three/workspace/negative/tls-disabled.json
+exit status: 3
+expected refusal: must not run without TLS
+A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS

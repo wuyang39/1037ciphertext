@@ -1,0 +1,27 @@
+# no-client-cert driver (P0)
+config: ~/a122-d4/three/workspace/negative/no-client-cert.json
+exit status: 3
+expected refusal: certificate
+[2026-10-12 23:45:01.874] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+[2026-10-12 23:45:01.874] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: 
+	[external/yacl~/yacl/link/context.cc:194] connect to mesh failed, failed to setup connection to rank=1
+stacktrace: 
+#0 yacl::link::Context::ConnectToMesh()+0x7f44e723d0b9
+#1 spu::BindLink()::{lambda()#18}::operator()()+0x7f44e3117487
+#2 pybind11::detail::argument_loader<>::call_impl<>()+0x7f44e313245f
+#3 pybind11::detail::argument_loader<>::call<>()+0x7f44e312ef11
+#4 pybind11::cpp_function::initialize<>()::{lambda()#3}::operator()()+0x7f44e3128171
+#5 pybind11::cpp_function::initialize<>()::{lambda()#3}::_FUN()+0x7f44e3128205
+#6 pybind11::cpp_function::dispatcher()+0x7f44e314a8ef
+#7 cfunction_call+0x55b28f48d8f5
+#8 _PyEval_EvalFrameDefault+0x55b28f4fed6c
+#9 _PyEval_Vector+0x55b28f4d5ff6
+#10 builtin_exec+0x55b28f61a86b
+#11 cfunction_vectorcall_FASTCALL_KEYWORDS+0x55b28f48d36b
+#12 _PyEval_EvalFrameDefault+0x55b28f4fe9a9
+#13 _PyFunction_Vectorcall+0x55b28f4601f9
+#14 pymain_run_module+0x55b28f65962a
+#15 Py_RunMain+0x55b28f658e47
+
+

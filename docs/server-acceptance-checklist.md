@@ -57,12 +57,15 @@ Gramine 运行 `d1-20261012T1830`，证据在
   `d4-3host-20261012T152216Z`：三份抓包各自 `tls13_only`、非 TLS 字节全 0，
   网格摘要与单实例一致，6/6 对端证书互校通过，三个节点都
   `teardown_finished: true`）
-- [ ] 三台独立实例上复跑四类 fail-closed 负例与明文探针。
+- [x] 三台独立实例上复跑四类 fail-closed 负例与明文探针。（运行
+  `d4-negs-3host-20261012T154315Z`：变异方在 P0、严格方分居 P1/P2，四个负例
+  均退出码 3 且理由与单实例一致，四个明文探针都建到 TCP 却拿不到业务应答）
 - [ ] 三个 `gramine-sgx` enclave 内复跑上述所有项目，并让证书来自真实
   attestation 放行。
 
-三台实例的基线已经就绪（同一提交 `bcd8935`、`spu` 0.9.5、SGX 设备与 `aesmd`
-正常、私网 `47100` 实测互通），见 [d4-acceptance.md](d4-acceptance.md) 第 8 节。
+三台实例的基线已经就绪（正向运行在提交 `bcd8935`、负例运行在 `a2d8026`，
+`spu` 0.9.5、SGX 设备与 `aesmd` 正常、私网 `47100` 实测互通），见
+[d4-acceptance.md](d4-acceptance.md) 第 8 节。
 - [ ] Tiny Decoder Block 在三个 enclave 完成。
 - [ ] 连续生成至少 2 token。
 - [ ] ResultFrame 重复、篡改 `decode_step`、模型混用、输入/Ticket 重放均被拒绝。
@@ -70,9 +73,11 @@ Gramine 运行 `d1-20261012T1830`，证据在
 
 D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
 [docs/evidence/d4-20261012T143111Z](evidence/d4-20261012T143111Z)（单实例三进程）
-与 [docs/evidence/d4-3host-20261012T152216Z](evidence/d4-3host-20261012T152216Z)
-（三实例）。链路、证书、抓包和拒绝路径是真的；`gramine-sgx` 内的执行与真实
-attestation 放行仍未验证。
+、[docs/evidence/d4-3host-20261012T152216Z](evidence/d4-3host-20261012T152216Z)
+（三实例正向）与
+[docs/evidence/d4-negs-3host-20261012T154315Z](evidence/d4-negs-3host-20261012T154315Z)
+（三实例负例）。链路、证书、抓包和拒绝路径是真的；`gramine-sgx` 内的执行与
+真实 attestation 放行仍未验证。
 
 ## D7-D8 模型与指标
 

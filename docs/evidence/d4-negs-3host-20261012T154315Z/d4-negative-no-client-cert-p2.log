@@ -1,0 +1,26 @@
+# no-client-cert peer P2
+the peer ran its strict configuration against the driver's
+mutated one; this is the tail of its own log when the case ended
+[2026-10-12 23:44:36.737] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+[2026-10-12 23:44:36.737] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: 
+	[external/yacl~/yacl/link/transport/channel.cc:430] Get data timeout, key=connect_0
+stacktrace: 
+#0 yacl::link::transport::Channel::Recv()+0x7f3eb7323b33
+#1 yacl::link::transport::Channel::TestRecv()+0x7f3eb731df21
+#2 yacl::link::Context::ConnectToMesh()+0x7f3eb731b722
+#3 spu::BindLink()::{lambda()#18}::operator()()+0x7f3eb31f5487
+#4 pybind11::detail::argument_loader<>::call_impl<>()+0x7f3eb321045f
+#5 pybind11::detail::argument_loader<>::call<>()+0x7f3eb320cf11
+#6 pybind11::cpp_function::initialize<>()::{lambda()#3}::operator()()+0x7f3eb3206171
+#7 pybind11::cpp_function::initialize<>()::{lambda()#3}::_FUN()+0x7f3eb3206205
+#8 pybind11::cpp_function::dispatcher()+0x7f3eb32288ef
+#9 cfunction_call+0x5572404fe8f5
+#10 _PyEval_EvalFrameDefault+0x55724056fd6c
+#11 _PyEval_Vector+0x557240546ff6
+#12 builtin_exec+0x55724068b86b
+#13 cfunction_vectorcall_FASTCALL_KEYWORDS+0x5572404fe36b
+#14 _PyEval_EvalFrameDefault+0x55724056f9a9
+#15 _PyFunction_Vectorcall+0x5572404d11f9
+
+

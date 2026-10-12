@@ -1,16 +1,17 @@
 # D4 三节点通信与 3PC RSS 验收记录
 
-> 运行编号：单实例 `d4-20261012T143111Z`（提交 `d048827`），三实例
-> `d4-3host-20261012T152216Z`（提交 `bcd8935`，由 `infra.d4_three_hosts`
-> 一条命令驱动）。
+> 运行编号：单实例 `d4-20261012T143111Z`（提交 `d048827`），三实例正向
+> `d4-3host-20261012T152216Z`（提交 `bcd8935`），三实例 fail-closed 负例
+> `d4-negs-3host-20261012T154315Z`（提交 `a2d8026`）；后两次都由
+> `infra.d4_three_hosts` 一条命令驱动。
 >
 > 结论：**D4 传输层与算子网格通过，且已在三台独立实例上复跑**。1,024 组向量
-> 全部与固定点参考一致，协议端口上的抓包只出现 TLS 1.3 记录，五类
-> 明文/证书/TLS 关闭场景全部 fail-closed。
+> 全部与固定点参考一致，协议端口上的抓包只出现 TLS 1.3 记录，明文/证书/关闭
+> TLS 四类 fail-closed 场景在 loopback 与跨 VPC 两种拓扑下都拒绝。
 >
 > 范围限定：链路两端都在**普通 Linux 进程内**终止 TLS，不在 `gramine-sgx`
 > 内；证书来自本次运行的本地 PKI，不是真实 attestation 放行的短期身份。
-> 三实例上的 fail-closed 负例尚未复跑，跨机只是正向网格加抓包。见第 7 节。
+> 见第 7 节。
 
 本记录对应 [后续开发总计划.md](后续开发总计划.md) 第 7 节。
 
@@ -60,9 +61,11 @@
 - [infra/d4_evidence.py](../infra/d4_evidence.py)：证据装配、跨机封存与哈希。
 - [infra/d4_three_hosts.py](../infra/d4_three_hosts.py)：三实例运行的操作机
   入口。校验每台实例的提交、发工作区、三台各自抓包与起节点、等驱动节点完成、
-  收回各角色的摘要与状态，并调用 `finalise_cross_host` 封存。
+  收回各角色的摘要与状态，并调用 `finalise_cross_host` 封存；`negatives`
+  子命令在同样三台上驱动 4.6 节的 fail-closed 负例。
 - [deploy/run_d4_three_hosts.sh](../deploy/run_d4_three_hosts.sh)：上一个入口的
-  脚本化包装，读 `deploy/d4-three-hosts.json` 作为集群描述。
+  脚本化包装，读 `deploy/d4-three-hosts.json` 作为集群描述；`MODE=negatives`
+  切到跨机 fail-closed 负例。
 
 ## 3. 流程
 
@@ -90,6 +93,13 @@
    本机摘要头的 TLS 摘要。
 6. 逐个角色等它对端写完 `node-status.json` 再取回，连同节点日志、向量结果和
    通信 trace 收进同一个目录，做跨机证书互校、封存索引与排除清单。
+
+跨机 fail-closed 负例（`python -m infra.d4_three_hosts negatives`，同样一条
+命令）：先只起 P1、P2，它们各自开出两个监听端口后等其余 mesh，端口因此
+处于"已监听、无业务"状态；操作机从 P0 向四个端口发明文探针（探针不参与
+网格，也就不会和向量比速度）。随后每个负例在 P0 用前台子进程跑一份变异配置，
+取真实退出状态，P1/P2 各自在本机跑严格配置并各自记录日志，逐步之间
+`pkill` 清空节点进程。
 
 ## 4. 结果
 
@@ -142,7 +152,7 @@ P1↔P2，P2 看到 P2↔P0 与 P2↔P1。没有任何一份出现低于 TLS 1.3
 
 ### 4.3 fail-closed 场景
 
-四个负例在单实例运行中执行（三实例运行没有复跑，见第 7 节）：
+四个负例在单实例运行中执行，跨机复跑见 4.6：
 
 | 场景 | 结果 | 拒绝理由（节点原始输出） | 耗时 |
 | --- | --- | --- | --- |
@@ -166,6 +176,37 @@ P1↔P2，P2 看到 P2↔P0 与 P2↔P1。没有任何一份出现低于 TLS 1.3
 `peer_certificates` 值。也就是说 mesh 的每一条边都认证到同一个身份集合，
 不存在某一方看到"另一张证书"的情况。
 
+### 4.6 跨机 fail-closed 复跑
+
+负例在跨 VPC 的三角上重跑一次（`d4-negs-3host-20261012T154315Z`，提交
+`a2d8026`）。与单实例不同的是，变异方是操作机上的 P0，严格方 P1/P2 分立
+在自己的实例上，所以每一次拒绝都跨过私网而不是 loopback：
+
+| 场景 | 结果 | 拒绝理由（节点原始输出） | 耗时 |
+| --- | --- | --- | --- |
+| `wrong-ca` | **refused** | `peer P2 certificate was not signed by the KAS CA` | 0.672 s |
+| `wrong-san` | **refused** | `peer P2 certificate SAN does not match its role` | 0.688 s |
+| `no-client-cert` | **refused** | `the BRPC link could not be established`（P1 日志逐次 `SSL routines::peer did not return a certificate`，P1/P2 各自也报链路失败） | 57.406 s |
+| `tls-disabled` | **refused** | `the SPU link must not run without TLS`，进程直接退出 | 0.640 s |
+
+四个负例退出状态均为 3，`all_refused: true`、`unexpected_cases: []`。`wrong-ca`
+与 `wrong-san` 在 0.7 秒内就否决，说明双方在校验阶段即中止握手，没有把链路
+拖到超时。
+
+明文探针只在 P1/P2 两个严格对端上发，操作机从 P0 连过去，四个监听端口全部
+`connected: true`（`all_listeners_connected: true`），但没有一个给出业务应答
+（`any_plaintext_service: false`）：
+
+| 监听 | 结果 |
+| --- | --- |
+| `172.27.172.202:47101`（P1 BRPC） | connected，`no_plaintext_reply` |
+| `172.27.172.202:47201`（P1 share） | connected，`connection_reset` |
+| `172.27.172.203:47102`（P2 BRPC） | connected，`no_plaintext_reply` |
+| `172.27.172.203:47202`（P2 share） | connected，`connection_reset` |
+
+端口确实在监听（所以探针能建 TCP），只是不接受明文——这与 4.3 节单实例的
+结论一致，区别是这次连的是私网地址。
+
 ## 5. 关键值
 
 | 项目 | 值 |
@@ -183,13 +224,16 @@ P1↔P2，P2 看到 P2↔P0 与 P2↔P1。没有任何一份出现低于 TLS 1.3
 | 三实例 `d4-three-P2.pcap` | 143216390 字节，sha256 `9739bb92af40cc06cc3836023bd6a90fcdf57207fcd8f5417eab0cfd16cff9b8` |
 | 单实例 evidence-index.json | sha256 `e01ecec23b29c735ee1873cb9d1e3aeabebdd7f21c86cdafc01ec46e9f353c7e` |
 | 三实例 evidence-index.json | sha256 `f793c120dfd1ccb646eff2f9e0ee35deabdc90f3ac42ef37422a4d567268f2c5` |
+| 三实例负例 evidence-index.json | sha256 `32b0d1c569aabe9044571e45d70afc1ed77625d3bc55bcf22b048a2692b0cc61` |
 
 ## 6. 证据位置
 
 单实例运行证据在
-[docs/evidence/d4-20261012T143111Z](evidence/d4-20261012T143111Z)，三实例运行
-证据在 [docs/evidence/d4-3host-20261012T152216Z](evidence/d4-3host-20261012T152216Z)；
-两个目录各有一份 `README.md` 说明每个文件的含义。
+[docs/evidence/d4-20261012T143111Z](evidence/d4-20261012T143111Z)，三实例正向
+证据在 [docs/evidence/d4-3host-20261012T152216Z](evidence/d4-3host-20261012T152216Z)，
+三实例负例证据在
+[docs/evidence/d4-negs-3host-20261012T154315Z](evidence/d4-negs-3host-20261012T154315Z)；
+三个目录各有一份 `README.md` 说明每个文件的含义。
 
 四份原始抓包都超过 GitHub 单文件上限，未随仓库提交：入库目录与封存索引
 逐字节一致，只少这些文件，只有它们的摘要、哈希和可复算脚本入库。每个包的
@@ -206,9 +250,10 @@ P1↔P2，P2 看到 P2↔P0 与 P2↔P1。没有任何一份出现低于 TLS 1.3
    的实测结论；"enclave 内 mTLS" 的说法要等这一步。
 2. **KAS 证明链**：证书由 `kas.ca` 的签发路径产生，但 CA 与叶证书来自本次
    运行的本地 PKI，不是真实 attestation 放行出来的短期身份和 Lease。
-3. **跨机 fail-closed 负例**：三实例运行只跑了正向网格和抓包。错误 CA/SAN、
-   无客户端证书、关闭 TLS 与明文探针目前只在单实例上验证过，跨机复跑
-   需要把负例配置分发到对应实例后再来一轮。
+3. **负例只跑过一次**：错误 CA/SAN、无客户端证书、关闭 TLS 与明文探针在跨机
+   形态下各跑了一次（4.6 节，`d4-negs-3host-20261012T154315Z`），单次通过
+   不足以排除"偶尔放行"，也没有做重复运行统计；这四个场景同样还没在
+   `gramine-sgx` 内跑过。
 4. **D5 之后**：Tiny Decoder Block、两 token 自回归、正式英文 GPT-2 和性能
    对照均未执行。
 
@@ -221,6 +266,10 @@ PYTHON=~/a122-venv311/bin/python bash deploy/run_d4_accept.sh
 
 # 三实例（操作机上，cluster 文件给出三个私网地址与各自的 ssh 公网地址）
 CLUSTER=deploy/d4-three-hosts.json SSHK=~/.ssh/a122_id_sgx \
+  ./deploy/run_d4_three_hosts.sh
+
+# 三实例 fail-closed 负例（同一条入口，只换 MODE）
+MODE=negatives CLUSTER=deploy/d4-three-hosts.json SSHK=~/.ssh/a122_id_sgx \
   ./deploy/run_d4_three_hosts.sh
 ```
 
