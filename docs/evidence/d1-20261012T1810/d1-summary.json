@@ -1,10 +1,10 @@
 {
   "accepted": true,
   "mrenclave": "8c8170e210f65e196b8230212805bf29e0917af0a90c610ff869d2a207a5571f",
-  "mrsigner": "9842c8cb89dc2424f3057599d07852a6e071d2cc839cd339c3201f192a562b85",
+  "mrsigner": "fb8f5b31fd44ae0979e34b39dbedb124309e79597d43e90891ec0cc7c17e238d",
   "phase": "D1",
   "release_id": "a122-d1-quote-probe",
-  "run_id": "d1-20261012T1748",
+  "run_id": "d1-20261012T1810",
   "steps": {
     "accepted-release": "accepted",
     "deny-debug-quote": "rejected",

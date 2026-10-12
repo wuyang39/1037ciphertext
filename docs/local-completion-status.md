@@ -4,7 +4,7 @@
 拒绝路径和测试已经可运行；`服务器待办` 表示必须在真实 enclave 上重新验收。
 
 > 服务器阶段进展：D1 证明闭环已在真实 SGX 实例上通过（运行
-> `d1-20261012T1748`），见 [d1-server-acceptance.md](d1-server-acceptance.md)。
+> `d1-20261012T1810`），见 [d1-server-acceptance.md](d1-server-acceptance.md)。
 > D3 及之后仍待执行。
 
 ## 状态矩阵

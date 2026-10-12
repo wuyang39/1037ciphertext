@@ -1,0 +1,92 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "file_count": 17,
+  "files": [
+    {
+      "bytes": 793,
+      "path": "accepted-release.json",
+      "sha256": "3bb2ead20687366946b284b0a61046a8c6e75bc491f7f18c9c9f869921d20503"
+    },
+    {
+      "bytes": 353,
+      "path": "cpuinfo-and-devices.txt",
+      "sha256": "ef072c30c4bf0568be72e5df6f0bb6331b80815291cbffa5a38138f3c2223227"
+    },
+    {
+      "bytes": 1286,
+      "path": "d1-environment.json",
+      "sha256": "6263d54cd83d34deeba8ace51ac4dfc4e1b6d7c8bfcb96f1ad45cec27876c886"
+    },
+    {
+      "bytes": 497,
+      "path": "d1-summary.json",
+      "sha256": "160187f33a5cfd34fafba61e8fd0c23d8ca44c9ec9fdb90d3a53110789892927"
+    },
+    {
+      "bytes": 817,
+      "path": "dcap-verify.json",
+      "sha256": "32b3dc57641a01d9758eaaecb79750c2cd41aa77a5973c4a5210cb638dfb40db"
+    },
+    {
+      "bytes": 691,
+      "path": "deny-debug-quote.json",
+      "sha256": "d084a2e1ada62529a983866919aa5d82a27826ee6a816b88867a2b38830cf8bc"
+    },
+    {
+      "bytes": 739,
+      "path": "deny-replaced-public-key.json",
+      "sha256": "c1fbdd882c869204659bdc9fce0ebe47d09ab9c8fabf828e3f3ce17cb55fa8a4"
+    },
+    {
+      "bytes": 720,
+      "path": "deny-replayed-challenge.json",
+      "sha256": "302707a8536232c9bc29c65568eaaf5e1922f16b1fd757bbd24f8b64dd0d98e3"
+    },
+    {
+      "bytes": 720,
+      "path": "deny-tampered-measurement.json",
+      "sha256": "1c76986eb3c3eba57a683f50f38a8f8b4d7084efea5fe555acadc0462fdd7add"
+    },
+    {
+      "bytes": 2347,
+      "path": "instance-check.txt",
+      "sha256": "d108c1b8b6d85d0719a1d2ed623f29dce367d0000e2538fcfe81fae5d41a85cd"
+    },
+    {
+      "bytes": 445,
+      "path": "kas-policy.json",
+      "sha256": "cbc96ff296a1cd7184ed42b8896a595a0416086fa2929d11399b52f97336f88e"
+    },
+    {
+      "bytes": 305,
+      "path": "lease.json",
+      "sha256": "e76512075a1b7e49041dd7326ace4065bfbd82aacfcef5d72f36f8138bbb8863"
+    },
+    {
+      "bytes": 684,
+      "path": "node-certificate.pem",
+      "sha256": "f160c1e7b7b24aaf02cf11ba07ed36b61d33bdc2ce5f301bf6a8d8a7f341d95b"
+    },
+    {
+      "bytes": 383,
+      "path": "node-csr.pem",
+      "sha256": "9ef2e60614d9a4bec29724f2bf660db25ae02a54d92831cb488a183bc45e2288"
+    },
+    {
+      "bytes": 586,
+      "path": "quote-report.json",
+      "sha256": "5b0e872ca702046363ed3acd846dfe9cd1a3794a70c136f06edc5726e7eb2387"
+    },
+    {
+      "bytes": 4734,
+      "path": "quote.bin",
+      "sha256": "ad2997e8c4bddc72fb8258a27dac28eb37d2a35eaa0130e7c9b0e9cfa5963d07"
+    },
+    {
+      "bytes": 179,
+      "path": "sample-enclave.txt",
+      "sha256": "dd21ce7be5f0e77222aa2df5327c6fc962c033e0e222e3cb0102df35669cbad0"
+    }
+  ],
+  "root": "d1"
+}

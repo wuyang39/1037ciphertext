@@ -12,8 +12,8 @@
 - [x] 保存 Quote、验证报告、measurement、CSR/report-data 和拒绝日志。
 
 已完成项见 [d1-server-acceptance.md](d1-server-acceptance.md)（运行
-`d1-20261012T1748`），证据在
-[docs/evidence/d1-20261012T1748](evidence/d1-20261012T1748)。
+`d1-20261012T1810`），证据在
+[docs/evidence/d1-20261012T1810](evidence/d1-20261012T1810)。
 计划第 5 节的“最小 Gramine-SGX 程序”因实例账号无提权权限而未执行。
 
 ## D2 协议

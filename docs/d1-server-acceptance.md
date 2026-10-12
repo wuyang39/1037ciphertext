@@ -1,6 +1,6 @@
 # D1 单机真实 SGX 证明验收记录
 
-> 运行编号：`d1-20261012T1748`
+> 运行编号：`d1-20261012T1810`
 >
 > 结论：**D1 证明闭环通过**（正确 release 放行，四项拒绝负例全部拒绝）。
 
@@ -58,7 +58,7 @@ python3 -m infra.d1_environment_check --require-hardware \
 | 项目 | 值 |
 | --- | --- |
 | `MRENCLAVE` | `8c8170e210f65e196b8230212805bf29e0917af0a90c610ff869d2a207a5571f` |
-| `MRSIGNER` | `9842c8cb89dc2424f3057599d07852a6e071d2cc839cd339c3201f192a562b85` |
+| `MRSIGNER` | `fb8f5b31fd44ae0979e34b39dbedb124309e79597d43e90891ec0cc7c17e238d` |
 | `ATTRIBUTES.DEBUG` | `false`（flags `0x0000000000000005`） |
 | DCAP 校验状态 | `0x0000`（成功），结果 `0x0000a008`（非终结性：TCB 最新，需平台配置/软件加固） |
 | Collateral 过期状态 | `0`（未过期） |
@@ -73,18 +73,19 @@ fail-closed。附带的安全公告为 `INTEL-SA-00615 / 00657 / 00767`。
 
 ## 4. 证据
 
-完整证据目录：[docs/evidence/d1-20261012T1748](evidence/d1-20261012T1748)。
+完整证据目录：[docs/evidence/d1-20261012T1810](evidence/d1-20261012T1810)。
 
 离线校验：
 
 ```bash
 python -c "from pathlib import Path; from infra.evidence import verify_directory; \
-print(verify_directory(Path('docs/evidence/d1-20261012T1748'))['file_count'])"
+print(verify_directory(Path('docs/evidence/d1-20261012T1810'))['file_count'])"
 ```
 
 目录内含 `quote.bin`、`quote-report.json`、`dcap-verify.json`、
 `kas-policy.json`、`node-csr.pem`、`node-certificate.pem`、`lease.json`、
-四项 `deny-*.json` 和 `evidence.sha256`。
+四项 `deny-*.json`，以及 `instance-check.txt`、`cpuinfo-and-devices.txt`、
+`d1-environment.json`、`sample-enclave.txt` 和 `evidence.sha256`。
 
 ## 5. 本轮未完成
 

@@ -1,0 +1,16 @@
+# SGX flags in /proc/cpuinfo
+sgx
+sgx_lc
+
+# SGX devices
+crw-rw---- 1 root sgx     10, 125 Oct 12 17:08 /dev/sgx_enclave
+crw-rw---- 1 root sgx_prv 10, 126 Oct 12 17:08 /dev/sgx_provision
+
+# aesmd
+active
+
+# /etc/sgx_default_qcnl.conf
+{
+  "pccs_url": "https://sgx-dcap-server-vpc.cn-shanghai.aliyuncs.com/sgx/certification/v4/",
+  "use_secure_cert": true
+}

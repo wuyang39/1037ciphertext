@@ -1,0 +1,43 @@
+{
+  "audit_event_id": null,
+  "cloud_region": "local",
+  "command": "python -m infra.d1_environment_check",
+  "details": {
+    "checks": {
+      "aesmd_active": true,
+      "cpu_sgx": true,
+      "gramine_sgx": false,
+      "linux": true,
+      "pccs_configured": true,
+      "sgx_enclave_device": true,
+      "sgx_provision_device": true
+    },
+    "claim_boundary": {
+      "environment_check_only": true,
+      "quote_verified": false,
+      "sgx_acceptance": false
+    },
+    "evidence": {
+      "aesmd": "active",
+      "gramine": "command unavailable",
+      "qcnl_content_redacted": true,
+      "qcnl_sha256_marker": "present"
+    },
+    "host": {
+      "machine": "x86_64",
+      "platform": "Linux-5.15.0-191-generic-x86_64-with-glibc2.35",
+      "release": "5.15.0-191-generic"
+    },
+    "verdict": "accepted_for_d1_sample_work"
+  },
+  "evidence_version": "a122-evidence-v1",
+  "image_id": "local",
+  "instance_id": "local",
+  "outcome": "accepted_for_d1_sample_work",
+  "phase": "D1",
+  "release_id": "local-checkpoint",
+  "run_id": "local-d1-check",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "timestamp_utc": "2026-10-12T09:55:26+00:00"
+}
