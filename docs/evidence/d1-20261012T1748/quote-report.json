@@ -1,0 +1,17 @@
+{
+  "att_key_type": 2,
+  "attributes_flags": 5,
+  "attributes_xfrm": 231,
+  "cpu_svn": "1010100fffff00000000000000000000",
+  "debug": false,
+  "isv_prod_id": 0,
+  "isvsvn": 1,
+  "misc_select": 0,
+  "mrenclave": "8c8170e210f65e196b8230212805bf29e0917af0a90c610ff869d2a207a5571f",
+  "mrsigner": "9842c8cb89dc2424f3057599d07852a6e071d2cc839cd339c3201f192a562b85",
+  "pce_svn": 17,
+  "qe_svn": 12,
+  "quote_size": 4734,
+  "report_data_hex": "0c8c901c5b068ad12e05452799a85ef457b72329a66b05027172504825716f6a0000000000000000000000000000000000000000000000000000000000000000",
+  "version": 3
+}

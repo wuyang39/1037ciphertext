@@ -14,5 +14,7 @@
 *.lds text eol=lf
 Makefile text eol=lf
 
+docs/evidence/** text eol=lf
+
 *.bin binary
 *.pcap binary

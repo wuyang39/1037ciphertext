@@ -15,6 +15,10 @@ certs/
 model_share*.bin
 *.share
 
+# Sealed acceptance evidence is committed on purpose; it carries only public
+# certificates, quotes and redacted JSON records, never key material.
+!docs/evidence/**/*.pem
+
 # Local model and dataset artifacts
 artifacts/
 checkpoints/

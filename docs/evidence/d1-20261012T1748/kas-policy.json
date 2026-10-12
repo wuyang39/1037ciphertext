@@ -1,0 +1,13 @@
+{
+  "releases": [
+    {
+      "debug_allowed": false,
+      "expires_at": "2026-10-13T09:47:46+00:00",
+      "min_isvsvn": 1,
+      "mrenclave": "8c8170e210f65e196b8230212805bf29e0917af0a90c610ff869d2a207a5571f",
+      "mrsigner": "9842c8cb89dc2424f3057599d07852a6e071d2cc839cd339c3201f192a562b85",
+      "release_id": "a122-d1-quote-probe",
+      "spu_build_hash": "8c8170e210f65e196b8230212805bf29e0917af0a90c610ff869d2a207a5571f"
+    }
+  ]
+}

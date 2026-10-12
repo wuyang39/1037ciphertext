@@ -1,0 +1,21 @@
+{
+  "command": "/home/jiahao/1037ciphertext/tee/attestation/dcap_verifier/a122_dcap_verify --quote quote.bin --json",
+  "document": {
+    "attributes_flags": "0x0000000000000005",
+    "collateral_expiration_status": 0,
+    "dcap_result_prefix": "0xa000",
+    "dcap_verification_result": "0x0000a008",
+    "dcap_verify_status": "0x0000",
+    "debug": false,
+    "isv_prod_id": 0,
+    "isvsvn": 1,
+    "mrenclave": "8c8170e210f65e196b8230212805bf29e0917af0a90c610ff869d2a207a5571f",
+    "mrsigner": "9842c8cb89dc2424f3057599d07852a6e071d2cc839cd339c3201f192a562b85",
+    "quote_size": 4734,
+    "report_data_b64": "DIyQHFsGitEuBUUnmahe9Fe3IymmawUCcXJQSCVxb2oAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+    "signature_data_len": 4298,
+    "supplemental_data_version": 327683
+  },
+  "returncode": 0,
+  "stderr": ""
+}

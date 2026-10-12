@@ -4,12 +4,17 @@
 
 ## D1 证明
 
-- [ ] 正确 release 得到短期节点证书和 Lease。
-- [ ] 修改受测量文件被拒绝。
-- [ ] `sgx.debug=true` 被 KAS 拒绝。
-- [ ] 重放旧 challenge 被拒绝。
-- [ ] 替换临时公钥被拒绝。
-- [ ] 保存 Quote、验证报告、measurement、CSR/report-data 和拒绝日志。
+- [x] 正确 release 得到短期节点证书和 Lease。
+- [x] 修改受测量文件被拒绝。
+- [x] `sgx.debug=true` 被 KAS 拒绝。
+- [x] 重放旧 challenge 被拒绝。
+- [x] 替换临时公钥被拒绝。
+- [x] 保存 Quote、验证报告、measurement、CSR/report-data 和拒绝日志。
+
+已完成项见 [d1-server-acceptance.md](d1-server-acceptance.md)（运行
+`d1-20261012T1748`），证据在
+[docs/evidence/d1-20261012T1748](evidence/d1-20261012T1748)。
+计划第 5 节的“最小 Gramine-SGX 程序”因实例账号无提权权限而未执行。
 
 ## D2 协议
 

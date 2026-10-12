@@ -1,0 +1,72 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "file_count": 13,
+  "files": [
+    {
+      "bytes": 793,
+      "path": "accepted-release.json",
+      "sha256": "59ce0baf02bdbb30fd13115769059bfd77c6d7b9e72a48b62d7db04b6fcda104"
+    },
+    {
+      "bytes": 497,
+      "path": "d1-summary.json",
+      "sha256": "abd9abd3b1a2b532f73c094613a6e62890e1e9d0f5aac4b088247297f58667bd"
+    },
+    {
+      "bytes": 817,
+      "path": "dcap-verify.json",
+      "sha256": "0991990b2f811fc66df3922abd75426a5bcf154f3078140670e877c819d3ad2f"
+    },
+    {
+      "bytes": 691,
+      "path": "deny-debug-quote.json",
+      "sha256": "f5224753138d482993c7b29d60cea5040c3f9b7c1fa32c9d6b0f44f447cb83be"
+    },
+    {
+      "bytes": 739,
+      "path": "deny-replaced-public-key.json",
+      "sha256": "ce015eda7845d9f750126b7cddddeb4458726488d0850b131934c0af89a90eff"
+    },
+    {
+      "bytes": 720,
+      "path": "deny-replayed-challenge.json",
+      "sha256": "cd8f9b95369d90aa7b06656222c34a868c8a1812814585c38aaf29f624e24b15"
+    },
+    {
+      "bytes": 720,
+      "path": "deny-tampered-measurement.json",
+      "sha256": "4b1c2f4cd7adb4feff2773e6b08804adbf92ab0c9116a0f1ecbb3bc552f9e69c"
+    },
+    {
+      "bytes": 445,
+      "path": "kas-policy.json",
+      "sha256": "3afba6704dd75d7e92ea4d0d3f71d5b43e94be7c452988b6744d8a330853ac1b"
+    },
+    {
+      "bytes": 305,
+      "path": "lease.json",
+      "sha256": "97c77bf03bf58f9097063ad0eb2e73a1f917adc1d92ef22b374fb01623fedb33"
+    },
+    {
+      "bytes": 684,
+      "path": "node-certificate.pem",
+      "sha256": "8c9f35661ce3277dbac9a6f448585cb585c02123eb4c86d2bb296148b83cfe7a"
+    },
+    {
+      "bytes": 383,
+      "path": "node-csr.pem",
+      "sha256": "78277300444b350249898f38549f39e0cf8b73c01380ac2d8655a3936c0fb283"
+    },
+    {
+      "bytes": 586,
+      "path": "quote-report.json",
+      "sha256": "dc1b62de0596dc2dfde779f90afffe3f63f2a16031a5419436efc87c4c70d179"
+    },
+    {
+      "bytes": 4734,
+      "path": "quote.bin",
+      "sha256": "03550a2a66fadccfdb77a08f98afabf0878fb55803c9a881f48e2d39636686c0"
+    }
+  ],
+  "root": "d1"
+}

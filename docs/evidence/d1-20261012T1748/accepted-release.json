@@ -1,0 +1,20 @@
+{
+  "audit_event_id": null,
+  "cloud_region": "cn-shanghai",
+  "command": "KAS issue_challenge -> quote_probe -> attest",
+  "details": {
+    "dcap_verification_result": "0x0000a008",
+    "lease_id": "f7cf1b15-1f3d-4798-96c9-d05d5a34e8a9",
+    "node_certificate_pem_sha256": "8c9f35661ce3277dbac9a6f448585cb585c02123eb4c86d2bb296148b83cfe7a"
+  },
+  "evidence_version": "a122-evidence-v1",
+  "image_id": "unknown",
+  "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+  "outcome": "accepted",
+  "phase": "D1",
+  "release_id": "a122-d1-quote-probe",
+  "run_id": "d1-20261012T1748",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stdout_sha256": "a6d75a52245e822b42805e5bb238ecadc9e0ec98b41d8871be9484a1d618d14c",
+  "timestamp_utc": "2026-10-12T09:47:48+00:00"
+}
