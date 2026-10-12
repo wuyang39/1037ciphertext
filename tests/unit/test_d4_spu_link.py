@@ -45,7 +45,7 @@ def test_program_contains_the_six_operators() -> None:
     # disjoint: dim 0 batches, the last lhs axis contracts with the rhs rows.
     assert (
         "#mhlo.dot<lhs_batching_dimensions = [0], rhs_batching_dimensions = [0], "
-        "lhs_contracting_dimensions = [3], rhs_contracting_dimensions = [1]>"
+        "lhs_contracting_dimensions = [2], rhs_contracting_dimensions = [1]>"
         in program
     )
     with pytest.raises(ValueError):

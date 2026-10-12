@@ -52,7 +52,9 @@ def build_program(batch: int, rows: int, cols: int) -> str:
     mask_tensor = f"tensor<{batch}x{rows}x{cols}xi1>"
     dot_dims = (
         "#mhlo.dot<lhs_batching_dimensions = [0], rhs_batching_dimensions = [0], "
-        f"lhs_contracting_dimensions = [{cols - 1}], rhs_contracting_dimensions = [1]>"
+        # The tensor is rank 3 (batch, rows, cols), so the contracting axes are
+        # the lhs column axis (2) and the rhs row axis (1).
+        "lhs_contracting_dimensions = [2], rhs_contracting_dimensions = [1]>"
     )
     return f"""
 func.func @main(%x: {tensor}, %y: {tensor}) -> ({", ".join([tensor] * 6)}) {{
