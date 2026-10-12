@@ -167,7 +167,10 @@ class EnclaveSession:
         )
         self.release_timeout = release_timeout
         self.control = ctx.control_root / name
-        self.control_guest = ctx.control_guest_dir
+        # /control is one shared mount, so each run gets its own subdirectory
+        # inside it; the host writes the challenge nonce there and the enclave
+        # publishes the Quote back into the same directory.
+        self.control_guest = f"{ctx.control_guest_dir}/{name}"
         self.challenge: dict[str, object] = {}
         self.quote: bytes = b""
         self.public_key: str = ""
@@ -297,6 +300,7 @@ def measure_enclave(ctx: Context) -> dict[str, object]:
     """Run the signed enclave once and read its claims from the DCAP verifier."""
     control = ctx.control_root / "bootstrap"
     control.mkdir(parents=True, exist_ok=True)
+    guest_control = f"{ctx.control_guest_dir}/bootstrap"
     (control / "nonce.hex").write_text(
         secrets.token_bytes(32).hex() + "\n",
         encoding="ascii",
@@ -306,7 +310,7 @@ def measure_enclave(ctx: Context) -> dict[str, object]:
         "./encfs_worker",
         f"{ctx.repo_guest_dir}/tee/enclave/encfs_worker.py",
         "--control-dir",
-        ctx.control_guest_dir,
+        guest_control,
         "--key-name",
         ctx.key_name,
         "--guest-file",
