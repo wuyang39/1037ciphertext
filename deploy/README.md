@@ -60,6 +60,7 @@ python -m infra.d1_environment_check --require-hardware \
 
 ```bash
 sudo bash deploy/install_gramine_server.sh   # 配置 packages.gramineproject.io 并安装 Gramine
+bash deploy/install_spu_server.sh            # 建 3.11 venv 并安装 spu + 验收依赖
 bash deploy/run_d1_gramine.sh                # 最小 Gramine-SGX 程序 + DCAP Quote 校验
 bash deploy/run_d1_server.sh                 # 三种 Quote 探针 + KAS 闭环与四项拒绝负例
 bash deploy/run_d3_encfs.sh                  # Gramine encrypted FS 挂载、明文删除与宿主侧拒绝
@@ -76,9 +77,13 @@ bash deploy/run_d4_accept.sh                 # D4 三节点传输、1,024 组 RS
 `run_d4_accept.sh` 需要带 `spu` 的 3.11 解释器和 tcpdump 的抓包权限：
 
 ```bash
+./deploy/install_spu_server.sh               # 每个 D4 节点都装同一个 spu 版本
 sudo setcap cap_net_raw,cap_net_admin+eip "$(command -v tcpdump)"
 PYTHON=~/a122-venv311/bin/python bash deploy/run_d4_accept.sh
 ```
+
+`install_spu_server.sh` 默认用阿里云 PyPI 镜像：cn-shanghai 的实例走默认源会
+在 `jaxlib` 上长时间停住，换源后同一条命令几十秒装完。
 
 它默认把 P0/P1/P2 跑成同机三进程，是跨三台实例、三个 `gramine-sgx` 节点前
 的固定彩排入口；结论与范围限定见 [d4-acceptance.md](../docs/d4-acceptance.md)。

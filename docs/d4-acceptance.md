@@ -146,3 +146,22 @@
 cd ~/1037ciphertext
 PYTHON=~/a122-venv311/bin/python bash deploy/run_d4_accept.sh
 ```
+
+## 8. 三实例复跑的前置状态（2026-10-12 检查）
+
+三台实例目前都停在同一个提交上，跨机私网也已连通，三实例复跑还差的是
+runner 本身，不是环境：
+
+| 角色 | 实例 | 私网 | 提交 | spu | 检查结果 |
+| --- | --- | --- | --- | --- | --- |
+| SGX1 | `iZuf6bjvfplpwleemaipwmZ` | `172.27.172.201` | `8d8e1aa` | 0.9.5 | SGX 设备 + `aesmd` 正常，Gramine 1.9 |
+| SGX2 | `iZuf6bd6qnhgtveg5khyf1Z` | `172.27.172.202` | `8d8e1aa` | 0.9.5 | 同上，本记录的运行节点 |
+| SGX3 | `iZuf6bd6qnhgtveg5khygdZ` | `172.27.172.203` | `8d8e1aa` | 0.9.5 | 同上 |
+
+- 私网互通：三台之间 `tcp/22` 全通；SGX1 → SGX2/SGX3 的 `47100` 实测可连，
+  说明安全组已放行同 VPC 的协议端口，不需要改控制台规则。
+- 依赖安装：SGX1/SGX3 的 `spu` 装到一半会卡在默认 PyPI 源（在 `jaxlib`
+  上停了 47 分钟），改用阿里云源后 30 秒装完。安装入口固化为
+  [deploy/install_spu_server.sh](../deploy/install_spu_server.sh)。
+- 仍缺：把三节点跑成三台实例上的独立进程、把节点进程换成 `gramine-sgx`、
+  以及让证书来自真实 attestation 放行（第 7 节第 1-3 条）。

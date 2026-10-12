@@ -54,6 +54,10 @@ Gramine 运行 `d1-20261012T1830`，证据在
 - [x] 至少 1,000 组 RSS 向量与固定点参考一致。（同上，1024 组全过，
   网格摘要 `96b6c835...`）
 - [ ] 同一套 runner 在三台独立实例、三个 enclave 内复跑上述四项。
+
+三台实例的基线已经就绪（同一提交 `8d8e1aa`、`spu` 0.9.5、SGX 设备与 `aesmd`
+正常、私网 `47100` 实测互通），缺的是跨机 runner 与 `gramine-sgx` 内的节点
+进程，见 [d4-acceptance.md](d4-acceptance.md) 第 8 节。
 - [ ] Tiny Decoder Block 在三个 enclave 完成。
 - [ ] 连续生成至少 2 token。
 - [ ] ResultFrame 重复、篡改 `decode_step`、模型混用、输入/Ticket 重放均被拒绝。
