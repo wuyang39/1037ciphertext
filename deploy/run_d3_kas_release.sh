@@ -72,8 +72,9 @@ mkdir -p "$WORK/kas" "$WORK/enclave" "$WORK/plain" "$WORK/store" "$WORK/bin" \
 
 PACKAGE="$WORK/package"
 PLAIN="$WORK/plain"
-STORE_ROOT="$WORK/store"
-STORE="$STORE_ROOT/secure"
+# The encrypted store directory is mounted at /secure, so the packager has to
+# write into exactly the directory the manifest mounts.
+STORE="$WORK/store"
 
 {
     echo "# gramine packages"
@@ -204,7 +205,7 @@ sed -e "s|@ENCLAVE_SIZE@|$ENCLAVE_SIZE|g" \
     -e "s|@CONTROL_GUEST_DIR@|/control|g" \
     -e "s|@CONTROL_HOST_DIR@|$WORK/control|g" \
     -e "s|@SECURE_GUEST_DIR@|/secure|g" \
-    -e "s|@SECURE_HOST_DIR@|$STORE_ROOT|g" \
+    -e "s|@SECURE_HOST_DIR@|$STORE|g" \
     -e "s|@KEY_NAME@|$KEY_NAME|g" \
     "$ROOT/tee/gramine/enclave/encfs_worker.manifest.template" \
     > "$WORK/enclave/encfs_worker.manifest.template"
