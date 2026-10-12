@@ -45,9 +45,15 @@ from infra.d4_evidence import (
     CROSS_HOST_ROLES,
     finalise_cross_host,
 )
-from infra.d4_workspace import DEFAULT_BATCH, ROLES
+from infra.d4_workspace import (
+    DEFAULT_BATCH,
+    EXPECTED_REFUSALS,
+    NEGATIVE_CASES,
+    ROLES,
+)
 from infra.d4_vectors import DEFAULT_COUNT
-from infra.evidence import write_json
+from infra.evidence import seal_directory, verify_directory, write_json
+from infra.d4_acceptance import REFUSED_MARKER
 
 
 DEFAULT_IFACE = "eth0"
@@ -57,6 +63,15 @@ DEFAULT_WORKSPACE = "~/a122-d4/three/workspace"
 READY_MARKER = "A122-D4-NODE-READY"
 DONE_MARKER = "A122-D4-NODE-DONE"
 D4_PORTS = (47100, 47101, 47102, 47200, 47201, 47202)
+# Matches every node process whatever its role or configuration. The dots are
+# escaped so the pattern cannot match the shell that runs ``pkill`` itself.
+NODE_PATTERN = r"tee\.enclave\.spu_node"
+DRIVER = "P0"
+# ``plaintext`` is the probe of the live listeners, not a mutated config, so it
+# is played by the probe step rather than by a driver run.
+CONFIGURED_CASES: tuple[str, ...] = tuple(
+    case for case in NEGATIVE_CASES if case != "plaintext"
+)
 
 
 class ThreeHostError(RuntimeError):
@@ -675,6 +690,367 @@ def run_three_hosts(
     )
 
 
+def probe_command(*, python: str, repo: str, host: str, port: int) -> str:
+    """Probe one listener from the driver's own host.
+
+    The probe runs on P0 so the bytes travel the same VPC path the mesh uses;
+    it reuses the single-host probe so both runs classify a refusal the same
+    way.
+    """
+    payload = (
+        "import json;"
+        "from infra.d4_acceptance import _plaintext_probe as p;"
+        f"print(json.dumps(p({host!r}, {port})))"
+    )
+    return (
+        f"cd {remote_path(repo)} && PYTHONPATH=. {remote_path(python)} -c "
+        f"{shlex.quote(payload)}"
+    )
+
+
+def kill_nodes(transport: Transport, role_routes: Mapping[str, SSHRoute]) -> None:
+    """Stop every node process on every instance."""
+    for role in ROLES:
+        transport.run(
+            role_routes[role],
+            f"pkill -f {shlex.quote(NODE_PATTERN)} || true",
+            check=False,
+        )
+
+
+def require_workspace(
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    *,
+    workspace: str,
+    cases: Sequence[str],
+) -> None:
+    """Refuse to start when an instance is missing the run's workspace."""
+    checks = [
+        f"test -f {remote_path(f'{workspace}/configs/{role}.json')}"
+        for role in ROLES
+    ]
+    checks += [
+        f"test -f {remote_path(f'{workspace}/negative/{case}.json')}"
+        for case in cases
+    ]
+    command = " && ".join(checks)
+    for role in ROLES:
+        status, _out, _err = transport.run(role_routes[role], command, check=False)
+        if status != 0:
+            raise ThreeHostError(
+                f"{role} has no usable workspace at {workspace}; run the "
+                "three-instance acceptance first so all three share it"
+            )
+
+
+def probe_live_listeners(
+    *,
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    cluster: Mapping[str, Any],
+    workspace: str,
+    repo: str,
+    python: str,
+    run_id: str,
+    node_timeout: float,
+) -> list[dict[str, Any]]:
+    """Send plaintext at every peer listener while the mesh is really up.
+
+    All three ranks start together because a link only comes up once every
+    rank is running; the probes then leave P0 for the peers' private
+    addresses.
+    """
+    logs = {role: f"/tmp/{run_id}-probe-{role}.log" for role in ROLES}
+    kill_nodes(transport, role_routes)
+    try:
+        for role in ("P1", "P2", DRIVER):
+            transport.start_background(
+                role_routes[role],
+                node_command(
+                    python=python,
+                    repo=repo,
+                    config=f"{workspace}/configs/{role}.json",
+                    log=logs[role],
+                ),
+            )
+            time.sleep(1.0)
+        for role in ("P1", "P2"):
+            wait_for_marker(
+                transport,
+                role_routes[role],
+                log=logs[role],
+                marker=READY_MARKER,
+                timeout=node_timeout,
+            )
+        probes: list[dict[str, Any]] = []
+        for role in ("P1", "P2"):
+            for kind, key in (("brpc", "brpc_port"), ("share", "share_port")):
+                port = int(cluster[role][key])
+                _status, out, _err = transport.run(
+                    role_routes[DRIVER],
+                    probe_command(
+                        python=python,
+                        repo=repo,
+                        host=str(cluster[role]["host"]),
+                        port=port,
+                    ),
+                    timeout=60,
+                )
+                try:
+                    probe = json.loads(out.strip().splitlines()[-1])
+                except (IndexError, json.JSONDecodeError) as exc:
+                    raise ThreeHostError(
+                        f"the probe of {role} port {port} returned nothing usable: "
+                        f"{out.strip()[-200:]!r}"
+                    ) from exc
+                probes.append({**probe, "role": role, "listener": kind})
+        return probes
+    finally:
+        kill_nodes(transport, role_routes)
+        time.sleep(1.0)
+
+
+def run_one_negative_case(
+    *,
+    case: str,
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    workspace: str,
+    repo: str,
+    python: str,
+    run_id: str,
+    out_dir: Path,
+    node_timeout: float,
+) -> dict[str, Any]:
+    """Play one fail-closed case with the peers live on their own instances."""
+    expected = EXPECTED_REFUSALS[case]
+    driver_config = f"{workspace}/negative/{case}.json"
+    peer_logs = {role: f"/tmp/{run_id}-{case}-{role}.log" for role in ("P1", "P2")}
+    kill_nodes(transport, role_routes)
+    try:
+        for role in ("P1", "P2"):
+            transport.start_background(
+                role_routes[role],
+                node_command(
+                    python=python,
+                    repo=repo,
+                    config=f"{workspace}/configs/{role}.json",
+                    log=peer_logs[role],
+                ),
+            )
+            time.sleep(0.5)
+        # Give the peers time to open their listeners before the driver
+        # rejects them: a refusal has to hold against a reachable peer.
+        time.sleep(2.0)
+        started = time.monotonic()
+        status, out, err = transport.run(
+            role_routes[DRIVER],
+            f"cd {remote_path(repo)} && PYTHONPATH=. {remote_path(python)} "
+            f"-m tee.enclave.spu_node --config {remote_path(driver_config)}",
+            timeout=node_timeout,
+            check=False,
+        )
+        elapsed = round(time.monotonic() - started, 3)
+        driver_text = out + (f"\n{err}" if err.strip() else "")
+        peers: dict[str, str] = {}
+        for role in ("P1", "P2"):
+            _peer_status, peer_out, _peer_err = transport.run(
+                role_routes[role],
+                f"tail -c 4000 {shlex.quote(peer_logs[role])} 2>/dev/null || true",
+                check=False,
+            )
+            peers[role] = peer_out
+    finally:
+        kill_nodes(transport, role_routes)
+        time.sleep(1.0)
+
+    refused = REFUSED_MARKER in driver_text
+    matched = expected in driver_text
+    # The missing-client-certificate case is refused by the handshake rather
+    # than by a certificate check, so its message names the link, not the cert.
+    verdict = (
+        "refused"
+        if refused and status != 0 and (matched or case == "no-client-cert")
+        else "unexpected"
+    )
+    (out_dir / f"d4-negative-{case}-p0.log").write_text(
+        "\n".join(
+            [
+                f"# {case} driver (P0)",
+                f"config: {driver_config}",
+                f"exit status: {status}",
+                f"expected refusal: {expected}",
+                "",
+            ]
+        )
+        + driver_text,
+        encoding="utf-8",
+        newline="\n",
+    )
+    for role, text in peers.items():
+        (out_dir / f"d4-negative-{case}-{role.lower()}.log").write_text(
+            "\n".join(
+                [
+                    f"# {case} peer {role}",
+                    "the peer ran its strict configuration against the driver's",
+                    "mutated one; this is the tail of its own log when the case ended",
+                    "",
+                ]
+            )
+            + text,
+            encoding="utf-8",
+            newline="\n",
+        )
+    return {
+        "case": case,
+        "expected": expected,
+        "verdict": verdict,
+        "exit_status": status,
+        "elapsed_seconds": elapsed,
+        "refusal_line": next(
+            (line for line in driver_text.splitlines() if REFUSED_MARKER in line),
+            "",
+        ),
+        "output_tail": "\n".join(driver_text.strip().splitlines()[-8:]),
+        "peers": {
+            role: {
+                "bytes": len(text),
+                "reported_failure": (
+                    REFUSED_MARKER in text or "could not be established" in text
+                ),
+            }
+            for role, text in peers.items()
+        },
+    }
+
+
+def run_negative_cases(
+    *,
+    cluster: Mapping[str, Any],
+    out_dir: Path,
+    run_id: str,
+    transport: Transport,
+    ssh_user: str,
+    ssh_host: str | None = None,
+    repo: str = DEFAULT_REPO,
+    python: str = DEFAULT_PYTHON,
+    workspace: str = DEFAULT_WORKSPACE,
+    cases: Sequence[str] = CONFIGURED_CASES,
+    node_timeout: float = 300.0,
+    expect_commit: str | None = None,
+    include_probes: bool = True,
+) -> dict[str, Any]:
+    """Run every fail-closed case with the peers on their own instances.
+
+    The positive grid proves the mesh works across the private network; this
+    proves the same mesh refuses when one side is mutated: the driver runs the
+    mutated configuration on P0 while P1 and P2 stay strict on their own hosts,
+    and every listener is probed with plaintext while it is really serving.
+    """
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    unknown = [case for case in cases if case not in CONFIGURED_CASES]
+    if unknown:
+        raise ThreeHostError(
+            "these cases have no mutated configuration to run: "
+            + ", ".join(unknown)
+            + "; the plaintext case is the probe of the live listeners"
+        )
+    role_routes = routes(cluster, user=ssh_user, ssh_host=ssh_host)
+    private = endpoints(cluster)
+    if expect_commit:
+        for role in ROLES:
+            _status, out, _err = transport.run(
+                role_routes[role],
+                f"cd {remote_path(repo)} && git rev-parse HEAD",
+                check=False,
+            )
+            if out.strip() != expect_commit:
+                raise ThreeHostError(
+                    f"{role} is at {out.strip() or 'unknown'}, expected "
+                    f"{expect_commit}; fetch and check out that commit first"
+                )
+    require_workspace(
+        transport, role_routes, workspace=workspace, cases=tuple(cases)
+    )
+
+    try:
+        probes = (
+            probe_live_listeners(
+                transport=transport,
+                role_routes=role_routes,
+                cluster=private,
+                workspace=workspace,
+                repo=repo,
+                python=python,
+                run_id=run_id,
+                node_timeout=node_timeout,
+            )
+            if include_probes
+            else []
+        )
+        results = {
+            case: run_one_negative_case(
+                case=case,
+                transport=transport,
+                role_routes=role_routes,
+                workspace=workspace,
+                repo=repo,
+                python=python,
+                run_id=run_id,
+                out_dir=out_dir,
+                node_timeout=node_timeout,
+            )
+            for case in cases
+        }
+    finally:
+        kill_nodes(transport, role_routes)
+
+    plaintext_probes = {
+        "marker": "A1-22-PLAINTEXT-PROBE",
+        "driver": DRIVER,
+        "probes": probes,
+        "any_plaintext_service": any(
+            probe.get("outcome") == "plaintext_service_answered" for probe in probes
+        ),
+    }
+    write_json(out_dir / "d4-negatives-plaintext-probes.json", plaintext_probes)
+
+    failed = [
+        case for case, entry in results.items() if entry["verdict"] != "refused"
+    ]
+    summary = {
+        "run_id": run_id,
+        "phase": "D4",
+        "mode": "three-instances-negatives",
+        "commit": expect_commit or None,
+        "roles": {
+            role: {
+                "instance_id": role_routes[role].instance_id,
+                "private_address": private[role]["host"],
+                "public_address": role_routes[role].public_address,
+                "brpc_port": private[role]["brpc_port"],
+                "share_port": private[role]["share_port"],
+            }
+            for role in ROLES
+        },
+        "workspace": workspace,
+        "plaintext_probes": plaintext_probes,
+        "cases": results,
+        "all_refused": not failed,
+        "unexpected_cases": failed,
+    }
+    write_json(out_dir / "d4-negatives-summary.json", summary)
+    index = seal_directory(out_dir)
+    verify_directory(out_dir)
+    if failed:
+        raise ThreeHostError(
+            "the fail-closed cases did not all refuse: " + ", ".join(failed)
+        )
+    return {"summary": summary, "index": index}
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Run the D4 acceptance across three instances"
@@ -705,6 +1081,31 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="provision, distribute, then report what would run",
     )
+    negatives = subparsers.add_parser(
+        "negatives",
+        help="replay the fail-closed cases with the peers on their own hosts",
+    )
+    negatives.add_argument("--cluster", required=True, type=Path)
+    negatives.add_argument("--out-dir", required=True, type=Path)
+    negatives.add_argument("--run-id", default=None)
+    negatives.add_argument("--ssh-user", default="jiahao")
+    negatives.add_argument("--ssh-host", default=None)
+    negatives.add_argument("--ssh-key", default=None)
+    negatives.add_argument("--ssh-key-password", default=None)
+    negatives.add_argument("--repo", default=DEFAULT_REPO)
+    negatives.add_argument("--python", default=DEFAULT_PYTHON)
+    negatives.add_argument("--workspace", default=DEFAULT_WORKSPACE)
+    negatives.add_argument("--node-timeout", type=float, default=300.0)
+    negatives.add_argument(
+        "--no-probes",
+        action="store_true",
+        help="skip the plaintext probe of the live listeners",
+    )
+    negatives.add_argument(
+        "--expect-commit",
+        default="HEAD",
+        help="commit every instance must be on, or 'HEAD' for this checkout",
+    )
     args = parser.parse_args(argv)
 
     run_id = args.run_id or (
@@ -719,23 +1120,39 @@ def main(argv: Sequence[str] | None = None) -> int:
         key_password=args.ssh_key_password,
     )
     try:
-        result = run_three_hosts(
-            cluster=cluster,
-            out_dir=args.out_dir,
-            run_id=run_id,
-            transport=transport,
-            ssh_user=args.ssh_user,
-            ssh_host=args.ssh_host,
-            repo=args.repo,
-            python=args.python,
-            workspace=args.workspace,
-            iface=args.iface,
-            vector_count=args.vectors,
-            batch=args.batch,
-            node_timeout=args.node_timeout,
-            expect_commit=expect_commit or None,
-            dry_run=args.dry_run,
-        )
+        if args.command == "negatives":
+            result = run_negative_cases(
+                cluster=cluster,
+                out_dir=args.out_dir,
+                run_id=run_id,
+                transport=transport,
+                ssh_user=args.ssh_user,
+                ssh_host=args.ssh_host,
+                repo=args.repo,
+                python=args.python,
+                workspace=args.workspace,
+                node_timeout=args.node_timeout,
+                expect_commit=expect_commit or None,
+                include_probes=not args.no_probes,
+            )
+        else:
+            result = run_three_hosts(
+                cluster=cluster,
+                out_dir=args.out_dir,
+                run_id=run_id,
+                transport=transport,
+                ssh_user=args.ssh_user,
+                ssh_host=args.ssh_host,
+                repo=args.repo,
+                python=args.python,
+                workspace=args.workspace,
+                iface=args.iface,
+                vector_count=args.vectors,
+                batch=args.batch,
+                node_timeout=args.node_timeout,
+                expect_commit=expect_commit or None,
+                dry_run=args.dry_run,
+            )
     except ThreeHostError as exc:
         print(f"[d4-three] FAILED: {exc}", file=sys.stderr)
         return 1
@@ -746,6 +1163,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 __all__ = [
+    "CONFIGURED_CASES",
     "D4_PORTS",
     "DEFAULT_IFACE",
     "DEFAULT_PYTHON",
@@ -759,11 +1177,17 @@ __all__ = [
     "capture_command",
     "capture_filter",
     "endpoints",
+    "kill_nodes",
     "load_cluster",
     "main",
     "node_command",
+    "probe_command",
+    "probe_live_listeners",
     "remote_path",
+    "require_workspace",
     "routes",
+    "run_negative_cases",
+    "run_one_negative_case",
     "run_three_hosts",
     "summary_header",
     "wait_for_marker",

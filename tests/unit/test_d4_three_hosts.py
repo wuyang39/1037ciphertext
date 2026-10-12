@@ -14,15 +14,20 @@ from infra.d4_three_hosts import (
     Transport,
     capture_command,
     endpoints,
+    kill_nodes,
     load_cluster,
     node_command,
+    probe_command,
     remote_path,
+    require_workspace,
     routes,
+    run_negative_cases,
     run_three_hosts,
     summary_header,
     wait_for_marker,
     wait_for_remote_file,
 )
+from infra.d4_workspace import EXPECTED_REFUSALS, NEGATIVE_CASES
 from infra.evidence import load_exclusions, verify_directory
 
 
@@ -225,6 +230,197 @@ class FakeTransport:
 
     def close(self) -> None:
         self.closed = True
+
+
+REFUSALS = {
+    "wrong-ca": (
+        "A122-D4-NODE-REFUSED NodeError: peer P2 certificate was not signed by the KAS CA"
+    ),
+    "wrong-san": (
+        "A122-D4-NODE-REFUSED NodeError: peer P2 certificate SAN does not match its role"
+    ),
+    # The handshake stops here, so the driver names the link, not a certificate.
+    "no-client-cert": (
+        "A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established"
+    ),
+    "tls-disabled": (
+        "A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS"
+    ),
+}
+
+
+class NegativeTransport(FakeTransport):
+    """Answers the negative pass: peers strict on P1/P2, driver on P0."""
+
+    def __init__(self, *, leaky: str | None = None) -> None:
+        super().__init__()
+        self.leaky = leaky
+        self.backgrounds: list[tuple[str, str]] = []
+
+    def run(
+        self,
+        route: SSHRoute,
+        command: str,
+        *,
+        timeout: float | None = None,
+        check: bool = True,
+    ) -> tuple[int, str, str]:
+        self.commands.append((route.role, command))
+        if "_plaintext_probe" in command:
+            port = int(command.rsplit(",", 1)[1].split(")")[0].strip())
+            outcome = "closed_or_tls_only" if port < 47200 else "connection_reset"
+            return 0, json.dumps({"host": "172.27.172.202", "port": port,
+                                  "connected": True, "reply_bytes": 0,
+                                  "outcome": outcome}) + "\n", ""
+        if "-m tee.enclave.spu_node --config" in command:
+            case = command.split("/negative/")[1].split(".json")[0]
+            if case == self.leaky:
+                return 0, "batch 1/16 vectors=64 passed=64 failed=0\n", ""
+            return 3, REFUSALS[case] + "\n", ""
+        if command.startswith("test -f"):
+            return 0, "", ""
+        if command.startswith("pkill -f"):
+            assert route.role in {"P0", "P1", "P2"}
+            return 0, "", ""
+        if command.startswith("tail -c"):
+            return 0, "A122-D4-NODE-REFUSED SpuBackendError: peer rejected\n", ""
+        return super().run(route, command, timeout=timeout, check=check)
+
+    def start_background(self, route: SSHRoute, command: str, *, settle: float = 3.0):
+        self.backgrounds.append((route.role, command))
+        return "started\n"
+
+
+def test_probe_command_runs_on_the_driver_against_a_private_address() -> None:
+    command = probe_command(
+        python="/home/u/venv/bin/python",
+        repo="/home/u/repo",
+        host="172.27.172.202",
+        port=47201,
+    )
+    assert command.startswith("cd /home/u/repo && PYTHONPATH=.")
+    assert "_plaintext_probe" in command
+    assert "172.27.172.202" in command and "47201" in command
+
+
+def test_kill_nodes_matches_only_the_node_module() -> None:
+    class Recorder(FakeTransport):
+        def run(self, route, command, **kwargs):  # type: ignore[override]
+            self.commands.append((route.role, command))
+            return 0, "", ""
+
+    transport = Recorder()
+    kill_nodes(transport, routes(CLUSTER, user="jiahao"))  # type: ignore[arg-type]
+    assert [role for role, _command in transport.commands] == ["P0", "P1", "P2"]
+    for _role, command in transport.commands:
+        # The escaped dots keep the pattern from matching the pkill shell.
+        assert r"tee\.enclave\.spu_node" in command
+
+
+def test_require_workspace_reports_the_instance_that_is_missing_it() -> None:
+    class Missing(FakeTransport):
+        def run(self, route, command, **kwargs):  # type: ignore[override]
+            if command.startswith("test -f"):
+                return (1, "", "") if route.role == "P2" else (0, "", "")
+            return 0, "", ""
+
+    with pytest.raises(ThreeHostError, match="P2 has no usable workspace"):
+        require_workspace(
+            Missing(),  # type: ignore[arg-type]
+            routes(CLUSTER, user="jiahao"),
+            workspace="~/a122-d4/three/workspace",
+            cases=("wrong-ca",),
+        )
+
+
+def test_run_negative_cases_records_every_refusal(tmp_path: Path) -> None:
+    transport = NegativeTransport()
+    out_dir = tmp_path / "negatives"
+    result = run_negative_cases(
+        cluster=CLUSTER,
+        out_dir=out_dir,
+        run_id="d4-negs-test",
+        transport=transport,  # type: ignore[arg-type]
+        ssh_user="jiahao",
+        expect_commit=transport.commit,
+    )
+    summary = result["summary"]
+    assert summary["mode"] == "three-instances-negatives"
+    assert summary["all_refused"] is True
+    assert summary["unexpected_cases"] == []
+    assert set(summary["cases"]) == set(NEGATIVE_CASES) - {"plaintext"}
+    # A refusal has to name what it refused, or the verdict is not credited.
+    assert summary["cases"]["wrong-ca"]["verdict"] == "refused"
+    assert "not signed by the KAS CA" in summary["cases"]["wrong-ca"]["refusal_line"]
+    assert summary["cases"]["no-client-cert"]["verdict"] == "refused"
+    assert summary["cases"]["no-client-cert"]["exit_status"] == 3
+    assert summary["cases"]["no-client-cert"]["peers"]["P1"]["reported_failure"] is True
+    assert EXPECTED_REFUSALS["tls-disabled"] in summary["cases"]["tls-disabled"]["expected"]
+
+    # The peers ran strict on their own instances and only the driver was mutated.
+    peer_configs = [
+        command for _role, command in transport.backgrounds
+        if "/configs/P" in command and "negative" not in command
+    ]
+    assert peer_configs, "the peers were never started"
+    assert all("--config \"$HOME/a122-d4/three/workspace/configs/P" in c for c in peer_configs)
+    assert not any(
+        "negative" in command and "/configs/" in command
+        for _role, command in transport.backgrounds
+    )
+
+    probes = summary["plaintext_probes"]
+    assert probes["any_plaintext_service"] is False
+    assert [(p["role"], p["listener"]) for p in probes["probes"]] == [
+        ("P1", "brpc"),
+        ("P1", "share"),
+        ("P2", "brpc"),
+        ("P2", "share"),
+    ]
+    assert all(p["outcome"] != "plaintext_service_answered" for p in probes["probes"])
+
+    assert (out_dir / "d4-negative-wrong-ca-p0.log").read_text(
+        encoding="utf-8"
+    ).startswith("# wrong-ca driver (P0)")
+    assert (out_dir / "evidence-index.json").is_file()
+    assert (out_dir / "evidence.sha256").is_file()
+    verify_directory(out_dir)
+
+
+def test_run_negative_cases_refuses_to_credit_a_driver_that_did_not_refuse(
+    tmp_path: Path,
+) -> None:
+    transport = NegativeTransport(leaky="tls-disabled")
+    out_dir = tmp_path / "negatives"
+    with pytest.raises(ThreeHostError, match="did not all refuse: tls-disabled"):
+        run_negative_cases(
+            cluster=CLUSTER,
+            out_dir=out_dir,
+            run_id="d4-negs-test",
+            transport=transport,  # type: ignore[arg-type]
+            ssh_user="jiahao",
+            expect_commit=transport.commit,
+        )
+    # The failed run is still inspectable: the summary says which case leaked.
+    summary = json.loads(
+        (out_dir / "d4-negatives-summary.json").read_text(encoding="utf-8")
+    )
+    assert summary["all_refused"] is False
+    assert summary["unexpected_cases"] == ["tls-disabled"]
+    assert summary["cases"]["tls-disabled"]["exit_status"] == 0
+
+
+def test_run_negative_cases_refuses_a_host_on_the_wrong_commit(tmp_path: Path) -> None:
+    transport = NegativeTransport()
+    with pytest.raises(ThreeHostError, match="expected deadbeef"):
+        run_negative_cases(
+            cluster=CLUSTER,
+            out_dir=tmp_path / "negatives",
+            run_id="d4-negs-test",
+            transport=transport,  # type: ignore[arg-type]
+            ssh_user="jiahao",
+            expect_commit="deadbeef",
+        )
 
 
 _FAKE_SUMMARY = "\n".join(
