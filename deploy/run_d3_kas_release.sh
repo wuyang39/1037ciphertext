@@ -116,6 +116,25 @@ print(json.load(open(sys.argv[1]))["precision_plan_hash"])
     echo "precision_plan_hash=$PRECISION_PLAN_HASH"
 } >> "$OUT/d3-kas-env.txt"
 
+log "scrubbing the plaintext shares the package builder wrote"
+# The package builder leaves raw model shares next to its manifest. The run
+# only needs the manifest hashes, so the bytes are overwritten and removed
+# before anything else touches the host.
+PYTHONPATH="$ROOT" "$PYTHON" - "$PACKAGE/shares" <<'PY'
+import os
+import sys
+from pathlib import Path
+
+for path in sorted(Path(sys.argv[1]).glob("*")):
+    if not path.is_file():
+        continue
+    with path.open("r+b") as handle:
+        handle.write(b"\x00" * path.stat().st_size)
+        handle.flush()
+        os.fsync(handle.fileno())
+    path.unlink()
+PY
+
 log "building the DCAP verifier the KAS uses"
 (
     cd "$ROOT/tee/attestation/dcap_verifier"
@@ -253,21 +272,25 @@ log "capturing the host-side view of the encrypted store"
 } > "$OUT/host-leak.txt" 2>&1
 
 echo "==> host byte-substring search for the plaintext share"
-PYTHONPATH="$ROOT" "$PYTHON" - "$PLAIN/$SHARE_NAME" "$STORE/$SHARE_NAME" \
+PYTHONPATH="$ROOT" "$PYTHON" - "$WORK/needle.bin" "$STORE/$SHARE_NAME" \
+    "$PLAIN/$SHARE_NAME" \
     > "$OUT/host-substring-search.txt" 2>&1 <<'PY'
 import sys
 from pathlib import Path
 
-plain = Path(sys.argv[1])
+source = Path(sys.argv[1])
 stored = Path(sys.argv[2]).read_bytes()
-if plain.is_file():
-    needles = {"full_share": plain.read_bytes()}
-else:
-    needles = {}
-needles["first_64_bytes"] = b"" if not needles else needles["full_share"][:64]
+plain_share = Path(sys.argv[3])
+plain = source.read_bytes() if source.is_file() else b""
+needles = {
+    "full_share": plain,
+    "first_64_bytes": plain[:64],
+    "last_64_bytes": plain[-64:],
+}
 for name, needle in needles.items():
     print(f"{name}: length={len(needle)} found_in_store={bool(needle) and needle in stored}")
-print(f"plaintext_share_on_host={plain.is_file()} stored_bytes={len(stored)}")
+print(f"plaintext_share_on_host={plain_share.is_file()}")
+print(f"plaintext_bytes={len(plain)} stored_bytes={len(stored)}")
 PY
 
 log "scanning the instance for plaintext share material"

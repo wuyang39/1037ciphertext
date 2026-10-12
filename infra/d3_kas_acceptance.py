@@ -232,8 +232,40 @@ class EnclaveSession:
             stdout=handle,
             stderr=subprocess.STDOUT,
         )
-        self._wait_for_ready()
+        try:
+            self._wait_for_ready()
+        except BaseException:
+            # A session that never became ready must not leave an enclave
+            # process behind.
+            self._stop_process()
+            raise
         return self
+
+    def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
+        self._stop_process()
+        self._append_exit_status()
+        return None
+
+    def _stop_process(self) -> None:
+        """Stop the enclave process if the case did not let it finish."""
+        process = self.process
+        if process is None or process.poll() is not None:
+            return
+        process.terminate()
+        try:
+            process.wait(timeout=15)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait(timeout=30)
+
+    def _append_exit_status(self) -> None:
+        """Record the LibOS exit status the way the D1 runner does."""
+        status = self.process.returncode if self.process is not None else None
+        line = f"# gramine-sgx exit status: {status}\n"
+        if line in self.output.text:
+            return
+        with self._stdout_path.open("a", encoding="utf-8") as handle:
+            handle.write(line)
 
     def _wait_for_ready(self) -> None:
         deadline = time.monotonic() + DEFAULT_READY_TIMEOUT
@@ -284,15 +316,21 @@ class EnclaveSession:
         (self.control / "sealed.hex").write_text(bytes(raw).hex() + "\n", encoding="ascii")
 
     def finish(self, *, kill: bool = False, timeout: float = 420.0) -> EnclaveOutput:
-        if self.process is not None and self.process.poll() is None:
+        process = self.process
+        if process is not None and process.poll() is None:
             if kill:
-                self.process.send_signal(signal.SIGKILL)
+                process.send_signal(signal.SIGKILL)
+                try:
+                    process.wait(timeout=30)
+                except subprocess.TimeoutExpired:
+                    pass
             else:
                 try:
-                    self.process.wait(timeout=timeout)
+                    process.wait(timeout=timeout)
                 except subprocess.TimeoutExpired:
-                    self.process.kill()
-                    self.process.wait(timeout=30)
+                    process.kill()
+                    process.wait(timeout=30)
+        self._append_exit_status()
         return self.output
 
 
