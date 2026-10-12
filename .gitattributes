@@ -8,6 +8,11 @@
 *.yml text eol=lf
 *.sh text eol=lf
 *.ps1 text eol=crlf
+*.c text eol=lf
+*.cpp text eol=lf
+*.edl text eol=lf
+*.lds text eol=lf
+Makefile text eol=lf
 
 *.bin binary
 *.pcap binary

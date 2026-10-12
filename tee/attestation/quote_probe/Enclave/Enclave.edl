@@ -1,0 +1,13 @@
+enclave {
+    include "sgx_report.h"
+
+    trusted {
+        /* Ask the AESM/QE for the quoting enclave target info, then have this
+         * enclave produce a REPORT that binds the caller-supplied REPORTDATA.
+         * The A1-22 KAS binds the temporary node key, role, release and nonce
+         * into that 64-byte value (see kas/binding.py). */
+        public uint32_t enclave_create_report([in] const sgx_target_info_t* p_qe3_target,
+                                              [in] const sgx_report_data_t* p_report_data,
+                                              [out] sgx_report_t* p_report);
+    };
+};
