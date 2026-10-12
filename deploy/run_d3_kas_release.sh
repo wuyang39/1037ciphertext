@@ -38,6 +38,11 @@ RELEASE_ID="${RELEASE_ID:-a122-d3-kas-v1}"
 SHARE_EPOCH="${SHARE_EPOCH:-1}"
 MODEL_VERSION="${MODEL_VERSION:-tiny-local-v1}"
 KAS_PORT="${KAS_PORT:-18443}"
+# The two library directories are substituted separately so the rendered
+# manifest cannot end up with a "/usr//lib/..." path that Gramine treats as
+# unmounted. PYTHONPATH_GUEST is folded into the manifest below.
+ARCH_LIBDIR="${ARCH_LIBDIR:-/lib/x86_64-linux-gnu}"
+USR_LIBDIR="${USR_LIBDIR:-/usr/lib/x86_64-linux-gnu}"
 SHARE_NAME="model-share-P0.bin"
 PLAN_NAME="precision-plan-P0.json"
 
@@ -166,9 +171,15 @@ PY
 chmod 700 "$WORK/kas"
 
 log "rendering and signing the enclave Worker"
+# The in-enclave interpreter needs the same sys.path the host records, so the
+# user-site gmssl install stays importable once /app is prepended.
+PYTHONPATH_GUEST="$(env -u PYTHONPATH "$SYSTEM_PYTHON" -c \
+    'import sys; print(":".join(p for p in sys.path if p))')"
 sed -e "s|@ENCLAVE_SIZE@|$ENCLAVE_SIZE|g" \
     -e "s|@PYTHON@|$SYSTEM_PYTHON|g" \
-    -e "s|@ARCH_LIBDIR@|/lib/x86_64-linux-gnu|g" \
+    -e "s|@ARCH_LIBDIR@|$ARCH_LIBDIR|g" \
+    -e "s|@USR_LIBDIR@|$USR_LIBDIR|g" \
+    -e "s|@PYTHONPATH@|$PYTHONPATH_GUEST|g" \
     -e "s|@REPO_GUEST_DIR@|/app|g" \
     -e "s|@REPO_HOST_DIR@|$ROOT|g" \
     -e "s|@CONTROL_GUEST_DIR@|/control|g" \

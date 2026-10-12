@@ -12,8 +12,13 @@
 libos.entrypoint = "@PYTHON@"
 
 loader.log_level = "error"
-loader.env.LD_LIBRARY_PATH = "/lib:@ARCH_LIBDIR@:/usr/@ARCH_LIBDIR@"
-loader.env.PYTHONPATH = "@REPO_GUEST_DIR@"
+# @ARCH_LIBDIR@ and @USR_LIBDIR@ are distinct so the rendered paths never
+# collapse into a double slash, which Gramine treats as an unmounted path.
+loader.env.LD_LIBRARY_PATH = "/lib:@ARCH_LIBDIR@:@USR_LIBDIR@"
+# @PYTHONPATH@ carries the interpreter's own sys.path (it is what makes the
+# user-site copy of gmssl importable inside the LibOS); /app is appended for
+# the repo modules. Keeping both avoids shadowing the mounted site-packages.
+loader.env.PYTHONPATH = "@PYTHONPATH@:/app"
 loader.env.PYTHONDONTWRITEBYTECODE = "1"
 loader.insecure__use_cmdline_argv = true
 
@@ -27,7 +32,7 @@ sgx.remote_attestation = "dcap"
 fs.mounts = [
   { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
   { path = "@ARCH_LIBDIR@", uri = "file:@ARCH_LIBDIR@" },
-  { path = "/usr/@ARCH_LIBDIR@", uri = "file:/usr/@ARCH_LIBDIR@" },
+  { path = "@USR_LIBDIR@", uri = "file:@USR_LIBDIR@" },
 {% for path in python.get_sys_path("@PYTHON@") %}
   { path = "{{ path }}", uri = "file:{{ path }}" },
 {% endfor %}
@@ -42,7 +47,7 @@ sgx.trusted_files = [
   "file:@PYTHON@",
   "file:{{ gramine.runtimedir() }}/",
   "file:@ARCH_LIBDIR@/",
-  "file:/usr/@ARCH_LIBDIR@/",
+  "file:@USR_LIBDIR@/",
 {% for path in python.get_sys_path("@PYTHON@") %}
   "file:{{ path }}{{ '/' if path.is_dir() else '' }}",
 {% endfor %}
