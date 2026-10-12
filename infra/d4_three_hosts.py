@@ -390,6 +390,37 @@ def wait_for_marker(
     )
 
 
+def wait_for_remote_file(
+    transport: Transport,
+    route: SSHRoute,
+    remote: str,
+    *,
+    timeout: float = 180.0,
+    poll: float = 2.0,
+) -> None:
+    """Block until a file on the instance is written and not empty.
+
+    A rank writes its status after its own teardown finishes, which on a slow
+    or busy host happens after the driver has already stopped capturing. A
+    bounded wait keeps that lag from turning into a bare ``FileNotFoundError``
+    from sftp, and reports which role never got there.
+    """
+    deadline = time.monotonic() + timeout
+    while True:
+        _status, out, _err = transport.run(
+            route,
+            f"test -s {remote_path(remote)} && echo present || echo missing",
+            check=False,
+        )
+        if out.strip().endswith("present"):
+            return
+        if time.monotonic() > deadline:
+            raise ThreeHostError(
+                f"{route.role} never wrote {remote} within {timeout:.0f}s"
+            )
+        time.sleep(poll)
+
+
 def _local_head(repo: Path) -> str:
     try:
         return subprocess.run(
@@ -418,6 +449,7 @@ def run_three_hosts(
     vector_count: int = DEFAULT_COUNT,
     batch: int = DEFAULT_BATCH,
     node_timeout: float = 900.0,
+    node_status_timeout: float = 240.0,
     expect_commit: str | None = None,
     dry_run: bool = False,
 ) -> dict[str, Any]:
@@ -575,6 +607,15 @@ def run_three_hosts(
                 (out_dir / f"d4-three-{role}-tls-summary.txt").write_text(
                     header + body, encoding="utf-8"
                 )
+                # Every rank reports its own link facts, but a rank only
+                # writes them once its share channel and collective teardown
+                # have finished, so wait for the peer instead of racing it.
+                wait_for_remote_file(
+                    transport,
+                    role_routes[role],
+                    f"{workspace}/out/{role}/node-status.json",
+                    timeout=node_status_timeout,
+                )
                 transport.get(
                     role_routes[role],
                     f"{workspace}/out/{role}/node-status.json",
@@ -723,6 +764,7 @@ __all__ = [
     "run_three_hosts",
     "summary_header",
     "wait_for_marker",
+    "wait_for_remote_file",
 ]
 
 

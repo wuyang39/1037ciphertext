@@ -21,6 +21,7 @@ from infra.d4_three_hosts import (
     run_three_hosts,
     summary_header,
     wait_for_marker,
+    wait_for_remote_file,
 )
 from infra.evidence import load_exclusions, verify_directory
 
@@ -168,6 +169,8 @@ class FakeTransport:
             return 0, f"{marker} {route.role}\n", ""
         if "stat -c%s" in command:
             return 0, "1234\n" + "ef" * 32 + "\n", ""
+        if command.startswith("test -s"):
+            return 0, "present\n", ""
         if "-m infra.pcap_tls" in command:
             return 0, _FAKE_SUMMARY, ""
         return 0, "", ""
@@ -259,6 +262,40 @@ def test_wait_for_marker_reports_the_line_and_times_out(tmp_path: Path) -> None:
             marker="A122-D4-NODE-READY",
             timeout=0.1,
             poll=0.02,
+        )
+
+
+def test_wait_for_remote_file_tolerates_a_lagging_writer(tmp_path: Path) -> None:
+    """A rank that reports late is waited for, not turned into an sftp error."""
+
+    class Late(FakeTransport):
+        def __init__(self) -> None:
+            super().__init__()
+            self.probes = 0
+
+        def run(self, route, command, **kwargs):  # type: ignore[override]
+            assert command.startswith("test -s")
+            self.probes += 1
+            return 0, "present\n" if self.probes > 2 else "missing\n", ""
+
+    transport = Late()
+    route = routes(CLUSTER, user="jiahao")["P2"]
+    wait_for_remote_file(
+        transport,
+        route,
+        "~/a122-d4/three/workspace/out/P2/node-status.json",
+        timeout=5,
+        poll=0.01,
+    )
+    assert transport.probes == 3
+
+    class Never(Late):
+        def run(self, route, command, **kwargs):  # type: ignore[override]
+            return 0, "missing\n", ""
+
+    with pytest.raises(ThreeHostError, match="never wrote"):
+        wait_for_remote_file(
+            Never(), route, "/tmp/nothing", timeout=0.05, poll=0.01
         )
 
 
