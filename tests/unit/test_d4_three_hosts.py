@@ -15,6 +15,7 @@ from infra.d4_three_hosts import (
     endpoints,
     load_cluster,
     node_command,
+    remote_path,
     routes,
     run_three_hosts,
     summary_header,
@@ -88,6 +89,11 @@ def test_route_defaults_to_the_private_address_when_no_public_one_is_known() -> 
 
 
 def test_capture_and_node_commands_quote_their_paths() -> None:
+    # A home-relative default has to be expanded by the remote shell, so it
+    # goes through $HOME instead of shlex freezing the tilde.
+    assert remote_path("~/1037ciphertext") == '"$HOME/1037ciphertext"'
+    assert remote_path("/srv/a122 repo") == "'/srv/a122 repo'"
+    assert remote_path("/tmp/x") == "/tmp/x"
     capture = capture_command(
         iface="eth0", pcap="/tmp/run/P0.pcap", log="/tmp/run/P0.log"
     )

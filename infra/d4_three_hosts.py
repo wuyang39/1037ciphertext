@@ -241,6 +241,18 @@ def capture_filter() -> str:
     return " or ".join(f"port {port}" for port in D4_PORTS)
 
 
+def remote_path(value: str) -> str:
+    """Quote a path for the remote shell, expanding a leading ``~``.
+
+    ``shlex.quote`` would freeze ``~`` into a literal directory name, so a home
+    relative default has to go through ``$HOME`` and stay in double quotes.
+    """
+    if value == "~" or value.startswith("~/"):
+        rest = value[1:].replace("\\", "\\\\").replace('"', '\\"')
+        return f'"$HOME{rest}"'
+    return shlex.quote(value)
+
+
 def capture_command(*, iface: str, pcap: str, log: str) -> str:
     """Start a background capture that survives the ssh session ending."""
     return (
@@ -253,9 +265,9 @@ def capture_command(*, iface: str, pcap: str, log: str) -> str:
 
 def node_command(*, python: str, repo: str, config: str, log: str) -> str:
     return (
-        f"cd {shlex.quote(repo)} && "
-        f"setsid nohup {shlex.quote(python)} -m tee.enclave.spu_node "
-        f"--config {shlex.quote(config)} > {shlex.quote(log)} 2>&1 < /dev/null & "
+        f"cd {remote_path(repo)} && "
+        f"setsid nohup {remote_path(python)} -m tee.enclave.spu_node "
+        f"--config {remote_path(config)} > {shlex.quote(log)} 2>&1 < /dev/null & "
         f"echo started"
     )
 
@@ -358,7 +370,7 @@ def run_three_hosts(
         for role in ROLES:
             _status, out, _err = transport.run(
                 role_routes[role],
-                f"cd {shlex.quote(repo)} && git rev-parse HEAD",
+                f"cd {remote_path(repo)} && git rev-parse HEAD",
                 check=False,
             )
             if out.strip() != expect_commit:
@@ -385,22 +397,22 @@ def run_three_hosts(
             transport.run(
                 role_routes[role],
                 f"mkdir -p {shlex.quote(posixpath.dirname(pcaps[role]))} "
-                f"{shlex.quote(parent)}",
+                f"{remote_path(parent)}",
             )
 
         provision = (
-            f"cd {shlex.quote(repo)} && PYTHONPATH=. {shlex.quote(python)} "
+            f"cd {remote_path(repo)} && PYTHONPATH=. {remote_path(python)} "
             f"-m infra.d4_acceptance --mode provision "
-            f"--workspace {shlex.quote(workspace)} --run-id {shlex.quote(run_id)} "
+            f"--workspace {remote_path(workspace)} --run-id {shlex.quote(run_id)} "
             f"--cluster-file {shlex.quote(cluster_file)} "
             f"--vectors {int(vector_count)} --batch {int(batch)}"
         )
         captured: dict[str, dict[str, Any]] = {}
-        transport.run(role_routes["P0"], f"rm -rf {shlex.quote(parent)}")
+        transport.run(role_routes["P0"], f"rm -rf {remote_path(parent)}")
         transport.run(role_routes["P0"], provision, timeout=600)
         transport.run(
             role_routes["P0"],
-            f"tar czf {shlex.quote(tarball)} -C {shlex.quote(parent)} workspace",
+            f"tar czf {shlex.quote(tarball)} -C {remote_path(parent)} workspace",
             timeout=600,
         )
         local_tar = scratch_path / "workspace.tgz"
@@ -409,8 +421,8 @@ def run_three_hosts(
             transport.put(role_routes[role], local_tar, tarball)
             transport.run(
                 role_routes[role],
-                f"rm -rf {shlex.quote(parent)} && mkdir -p {shlex.quote(parent)} && "
-                f"tar xzf {shlex.quote(tarball)} -C {shlex.quote(parent)}",
+                f"rm -rf {remote_path(parent)} && mkdir -p {remote_path(parent)} && "
+                f"tar xzf {shlex.quote(tarball)} -C {remote_path(parent)}",
                 timeout=600,
             )
 
@@ -495,7 +507,7 @@ def run_three_hosts(
                     digest=digest,
                 )
                 analysis = (
-                    f"cd {shlex.quote(repo)} && PYTHONPATH=. {shlex.quote(python)} "
+                    f"cd {remote_path(repo)} && PYTHONPATH=. {remote_path(python)} "
                     f"-m infra.pcap_tls {shlex.quote(pcaps[role])} --d4-ports"
                 )
                 _status, body, _err = transport.run(
@@ -647,6 +659,7 @@ __all__ = [
     "load_cluster",
     "main",
     "node_command",
+    "remote_path",
     "routes",
     "run_three_hosts",
     "summary_header",
