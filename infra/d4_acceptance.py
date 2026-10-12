@@ -300,7 +300,10 @@ def run_negative_case(
     started = time.monotonic()
     peers: list[NodeProcess] = []
     if case == "no-client-cert":
-        # The peers stay strict; the local side stops presenting its certificate.
+        # The peers stay strict; the local side stops presenting its
+        # certificate. They start together with P0: a party never reaches the
+        # ready marker while another party is missing, so waiting for the
+        # peers first would deadlock the case.
         for role in ("P1", "P2"):
             peers.append(
                 NodeProcess(
@@ -311,8 +314,6 @@ def run_negative_case(
                     wrapper=wrapper,
                 )
             )
-        for peer in peers:
-            peer.wait_for_line(READY_MARKER, timeout=node_timeout)
     node = NodeProcess(
         role="P0",
         config_path=config_path,
@@ -547,7 +548,9 @@ def _write_cluster_file(path: Path, cluster: dict[str, dict[str, Any]]) -> None:
 
 def _grid_is_green(positive: dict[str, Any]) -> bool:
     summary = positive["vectors"]["summary"]
-    return summary.get("verdict") == "passed"
+    # The vector document names the field "verdicts" (see spu_node.run_node and
+    # the evidence bundle); reading "verdict" here always missed.
+    return summary.get("verdicts") == "passed"
 
 
 def run_loopback(

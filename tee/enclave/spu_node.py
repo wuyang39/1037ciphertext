@@ -269,6 +269,7 @@ def _serve_share_channel(
     config: NodeConfig,
     runtime_holder: dict[str, Any],
     stop_event: threading.Event,
+    served: dict[str, int],
 ) -> TLSFrameServer:
     identity = config.share_identity()
 
@@ -311,6 +312,7 @@ def _serve_share_channel(
                     x_share=decode_share(runtime.libspu, request["x_share"]),
                     y_share=decode_share(runtime.libspu, request["y_share"]),
                 )
+                served["batches"] += 1
                 response = {
                     "type": "result",
                     "role": config.role,
@@ -428,9 +430,10 @@ def run_node(config: NodeConfig) -> int:
     )
     stop_event = threading.Event()
     holder: dict[str, Any] = {"runtime": runtime}
+    served = {"batches": 0}
     server: TLSFrameServer | None = None
     if config.role != "P0":
-        server = _serve_share_channel(config, holder, stop_event)
+        server = _serve_share_channel(config, holder, stop_event, served)
 
     started = time.monotonic()
     runtime.start()
@@ -466,7 +469,28 @@ def run_node(config: NodeConfig) -> int:
         if server is not None:
             server.close()
             server.wait(timeout_seconds=2.0)
-        runtime.stop()
+        teardown_finished = runtime.stop()
+        if not teardown_finished:
+            _log(
+                f"{config.role}: the collective link teardown did not finish; "
+                "a peer left early or the stop timed out"
+            )
+        # The acceptance reads one status document per role: P1/P2 report what
+        # they served rather than a verdict, because they never hold an input
+        # or an expected output to compare against.
+        write_json(
+            config.out_dir / "node-status.json",
+            {
+                "run_id": config.run_id,
+                "role": config.role,
+                "verdicts": "served",
+                "batches_served": served["batches"],
+                "identity_sha256": runtime.identity_fingerprint["sha256"],
+                "peer_certificates": peer_fingerprints,
+                "link_seconds": link_seconds,
+                "teardown_finished": teardown_finished,
+            },
+        )
         _log(f"{SHUTDOWN_MARKER} {config.role}")
         return 0
 
@@ -605,7 +629,12 @@ def run_node(config: NodeConfig) -> int:
                 session.run_batch({"type": "shutdown"})
             except Exception:  # pragma: no cover - best effort shutdown
                 _log(f"shutdown of {role} failed")
-        runtime.stop()
+        teardown_finished = runtime.stop()
+        if not teardown_finished:
+            _log(
+                f"{config.role}: the collective link teardown did not finish; "
+                "a peer left early or the stop timed out"
+            )
 
     vector_document = {
         "run_id": config.run_id,
@@ -659,6 +688,7 @@ def run_node(config: NodeConfig) -> int:
             "grid_digest": vector_document["grid_digest"],
             "identity_sha256": runtime.identity_fingerprint["sha256"],
             "peer_certificates": peer_fingerprints,
+            "teardown_finished": teardown_finished,
             "batch_share_digest": sha256_bytes(
                 json.dumps(batch_trace, sort_keys=True).encode("utf-8")
             ),

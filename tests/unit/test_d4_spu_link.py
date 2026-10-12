@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 import numpy as np
 import pytest
 
@@ -248,11 +250,26 @@ def _runtime_with(context: _RecordingContext) -> SpuNodeRuntime:
 def test_runtime_stop_is_a_collective_teardown() -> None:
     """The barrier and the link stop only finish once every party arrives."""
     context = _RecordingContext()
-    _runtime_with(context).stop()
+    assert _runtime_with(context).stop() is True
     assert context.calls == ["barrier", "stop_link"]
 
 
 def test_a_peer_that_left_early_does_not_stop_the_local_teardown() -> None:
     context = _RecordingContext(barrier_error=RuntimeError("peer left"))
-    _runtime_with(context).stop()
+    assert _runtime_with(context).stop() is False
+    # The barrier broke, but the node still has to leave the link.
     assert context.calls == ["barrier", "stop_link"]
+
+
+def test_an_unresponsive_peer_cannot_hold_the_teardown_open() -> None:
+    class _StalledContext:
+        def barrier(self) -> None:
+            return None
+
+        def stop_link(self) -> None:
+            time.sleep(5.0)
+
+    runtime = _runtime_with(_StalledContext())
+    started = time.monotonic()
+    assert runtime.stop(timeout_seconds=0.5) is False
+    assert time.monotonic() - started < 3.0

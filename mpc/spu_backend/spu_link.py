@@ -26,6 +26,7 @@ import importlib.util
 import json
 import os
 import sys
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -40,6 +41,8 @@ from mpc.spu_backend.spu_ops import (
 MIN_TLS_VERSION = "TLS1.3"
 SERVER_VERIFY_DEPTH = 4
 CLIENT_VERIFY_DEPTH = 4
+TEARDOWN_TIMEOUT_SECONDS = 20.0
+"""How long the node waits for the collective link teardown to finish."""
 """BRPC treats a negative verify depth as "do not check the peer certificate".
 
 The D4 link therefore always uses a non-negative depth on both sides: a peer
@@ -528,27 +531,47 @@ class SpuNodeRuntime:
     def barrier(self) -> None:
         self.context.barrier()
 
-    def stop(self) -> None:
-        # The barrier and the link stop are collective: they only complete once
-        # the other parties arrive too, which is why the node tells its peers
-        # the grid is over before it calls this. A peer that has already left
-        # turns the barrier into a bounded retry storm, so a failure there is
-        # logged and the local teardown still runs.
-        with_barrier = getattr(self.context, "barrier", None)
-        if with_barrier is not None:
-            try:
-                with_barrier()
-            except Exception:  # pragma: no cover - peer left early
-                pass
-        stop = getattr(self.context, "stop_link", None)
-        if stop is not None:
-            try:
-                stop()
-            except Exception:
-                # A peer that already left makes the final link teardown
-                # noisy; the grid is finished by then, so the error is not
-                # allowed to change the verdict.
-                pass
+    def stop(self, *, timeout_seconds: float = TEARDOWN_TIMEOUT_SECONDS) -> bool:
+        """Tear the link down without letting a peer hold the process open.
+
+        The barrier and the link stop are collective: they complete once every
+        party arrives, which is why the node tells its peers the grid is over
+        before it calls this. A peer that crashed, or that is stuck, must still
+        not turn the local shutdown into an unbounded wait, so the teardown
+        runs on a helper thread and reports whether it finished in the budget.
+        """
+        outcome = {"finished": False, "error": None}
+        done = threading.Event()
+
+        def _teardown() -> None:
+            error: Exception | None = None
+            # Both steps run even if the first one fails: a peer that left
+            # early breaks the barrier, but this side should still come off
+            # the link so the process can exit.
+            with_barrier = getattr(self.context, "barrier", None)
+            if with_barrier is not None:
+                try:
+                    with_barrier()
+                except Exception as exc:  # noqa: BLE001 - reported to the caller
+                    error = exc
+            stop = getattr(self.context, "stop_link", None)
+            if stop is not None:
+                try:
+                    stop()
+                except Exception as exc:  # noqa: BLE001 - reported to the caller
+                    error = error or exc
+            outcome["error"] = error
+            outcome["finished"] = error is None
+            done.set()
+
+        worker = threading.Thread(
+            target=_teardown,
+            name="a122-spu-teardown",
+            daemon=True,
+        )
+        worker.start()
+        done.wait(timeout=timeout_seconds)
+        return bool(outcome["finished"])
 
 
 def split_inputs(
@@ -580,6 +603,7 @@ __all__ = [
     "CLIENT_VERIFY_DEPTH",
     "MIN_TLS_VERSION",
     "SERVER_VERIFY_DEPTH",
+    "TEARDOWN_TIMEOUT_SECONDS",
     "NodeIdentity",
     "SpuBackendError",
     "SpuEndpoint",

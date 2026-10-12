@@ -255,11 +255,15 @@ class TLSFrameServer:
                         raw_socket,
                         server_side=True,
                     )
-                except (ssl.SSLEOFError, ConnectionResetError):
-                    # A caller that only probed the port, or that gave up
-                    # during the handshake, never claimed to be a peer. That is
-                    # not a handler failure; a certificate or protocol error
-                    # still is, and keeps raising below.
+                except (ssl.SSLError, ConnectionError):
+                    # The peer never completed a TLS handshake: a bare port
+                    # probe, a plaintext request (the D4 acceptance sends one
+                    # on purpose), or a client that fails certificate
+                    # verification. Those connections are refused, which is
+                    # the wanted outcome; they are not handler failures, and
+                    # treating them as such used to kill the peer before the
+                    # collective link teardown. A peer that completes the
+                    # handshake and then misbehaves still raises below.
                     continue
                 with tls_socket:
                     peer_role = _peer_role(
