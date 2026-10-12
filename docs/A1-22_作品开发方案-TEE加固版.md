@@ -6,9 +6,11 @@
 
 ### 1.1 最终要交付的系统
 
-交付部署在 `C + KAS/Audit + P0/P1/P2` 上的软件：用户 `C` 在本地完成 tokenizer 与 RSS 输入拆分；三个 SGX enclave 节点在 KAS 远程证明和密钥放行后加载各自模型份额，以 3PC RSS 执行中文 Decoder 的完整自回归推理；节点间协议流量在 enclave 内终止的 mTLS 中传输；用户仅在本地校验并重构输出；系统提供完整的性能记录与安全负例证据。
+交付部署在 `C + KAS/Audit + P0/P1/P2` 上的软件：用户 `C` 在本地完成 tokenizer 与 RSS 输入拆分；三个 SGX enclave 节点在 KAS 远程证明和密钥放行后加载各自模型份额，以 3PC RSS 执行英文 GPT-2 Decoder 的完整自回归推理；节点间协议流量在 enclave 内终止的 mTLS 中传输；用户仅在本地校验并重构输出；系统提供完整的性能记录与安全负例证据。
 
-最终演示模型固定为中文 GPT-2 级 Decoder（约 100M 参数），演示参数固定为 `batch=1`、输入长度桶 `8/16`、`max_new_tokens<=4`、固定上下文窗口 `16`。交付必须真实运行这套闭环；Tiny 模型和同机三进程仅用于缩小调试变量，不替代最终三节点 SGX 演示。
+最终演示模型固定为英文 GPT-2 Decoder（`gpt2` / GPT-2 small，约 124M 参数），演示参数固定为 `batch=1`、输入长度桶 `8/16`、`max_new_tokens<=4`、固定上下文窗口 `16`。交付必须真实运行这套闭环；Tiny 模型和同机三进程仅用于缩小调试变量，不替代最终三节点 SGX 演示。
+
+> 决策记录（2026-10-12）：正式模型由「中文 GPT-2 级」改为**英文 GPT-2**，理由和冻结参数见 [`interface-freeze.md`](interface-freeze.md) 第 5 节。
 
 ### 1.2 最终验收定义
 
@@ -119,7 +121,7 @@ privacy-llm/
 
 实现事项：
 
-- 选择许可清晰的中文 GPT-2 级模型及 tokenizer，记录来源、许可证、权重 hash、tokenizer hash、层数/隐藏维度/词表和测试 Prompt 集。
+- 固定英文 GPT-2（`gpt2`）权重与 GPT-2 BPE tokenizer，记录来源、Modified MIT 许可证、权重 hash、tokenizer hash、层数/隐藏维度/词表和测试 Prompt 集。
 - 实现 `forward_reference()`、单 token decode、固定窗口 KV cache；冻结至少 20 条非敏感 Prompt 的 logits、argmax、逐 block 激活范围与输出 token fixture。
 - 实现明文环上固定点模拟器：`Z_(2^64)` 运算、符号编码、dyadic scale、舍入、溢出检测与 secure truncate 语义。
 - 写出 Tiny Decoder（2 层、词表 256）以隔离模型导出复杂性，并用同一 ABI 运行。
@@ -205,7 +207,7 @@ privacy-llm/
 
 **验收门 D6：** 连续生成至少 2 token；重复 ResultFrame、篡改 `decode_step`、混用模型 manifest、重放输入或 Ticket 均被拒绝；会话结束后对 `/run/session` 和进程临时目录扫描不发现 Prompt share、KV cache 或会话密钥。
 
-### D7：中文 GPT-2 级模型迁移与模型份额导入（第 6 周）
+### D7：英文 GPT-2 模型迁移与模型份额导入（第 6 周）
 
 **目标：** 将经 Tiny 验证的接口迁移到最终比赛模型，而不改动安全协议与 TEE 生命周期。
 
@@ -216,7 +218,7 @@ privacy-llm/
 - 逐 block 执行“浮点—固定点—RSS”对齐，记录 token 一致率、P99 logit 误差、激活范围和溢出计数；定位首个误差超标层后再继续。
 - 固定 `8/16 token` 桶、`max_new_tokens<=4`、`context_window=16` 与公开评测 Prompt，避免性能数据随配置漂移。
 
-**验收门 D7：** 中文 GPT-2 级模型在三节点 enclave 中完成至少 1 token 生成；模型份额、配置、tokenizer、epoch 与会话绑定无误；模型更换、旧 share、旧 Ticket、旧材料均不能被混用。
+**验收门 D7：** 英文 GPT-2 模型在三节点 enclave 中完成至少 1 token 生成；模型份额、配置、tokenizer、epoch 与会话绑定无误；模型更换、旧 share、旧 Ticket、旧材料均不能被混用。
 
 ### D8：性能优化、消融与资源剖析（第 7 周）
 
@@ -419,7 +421,7 @@ RSS reconstruct-for-test result
 | SPU 不支持某 secret 算子 | D4/D5 | 基于已支持固定长度图重写；不回退到客户端明文回调 |
 | 私有 embedding 过慢 | D5 | 独立 profile，优先批量 Idx2v 与固定长度；不降低 token 保护要求 |
 | Softmax/Norm 溢出或 token 跳变 | D5/D7 | 回退范围/clip/scale/迭代，先修 fixed-point 再调 RSS |
-| 100M 模型时间或内存超预算 | D7 | 根据 trace 定位算子后调整长度桶、生成数、量化与布局；不删除完整安全链路 |
+| 正式模型时间或内存超预算 | D7 | 根据 trace 定位算子后调整长度桶、生成数、量化与布局；不删除完整安全链路 |
 | TCB 构建变更导致 measurement 漂移 | D1 起 | release pipeline 生成新 measurement、KAS 双版本审批、fixtures 同步；禁止手改 allowlist |
 | 三人并行改坏协议 schema | 全程 | schema 变更必须评审；兼容性测试和版本递增为合并前条件 |
 | 数据/日志泄密 | 全程 | 立即轮换测试密钥，删除泄漏制品，执行扫描并补充 CI 规则 |
@@ -433,7 +435,7 @@ RSS reconstruct-for-test result
 | 第 3 周 | D4 | 3PC RSS 小算子；enclave mTLS BRPC | 小算子对照、pcap、明文拒绝 |
 | 第 4 周 | D5 | Tiny Decoder Block、非线性、误差 trace | 私有 Block 演示与算子 profile |
 | 第 5 周 | D6 | KV cache、ResultFrame、会话清理 | Prompt 到 2 token 的端到端演示 |
-| 第 6 周 | D7 | 中文 GPT-2 导出、量化、份额模型导入 | 100M 模型 1 token 闭环 |
+| 第 6 周 | D7 | 英文 GPT-2 导出、量化、份额模型导入 | 124M 模型 1 token 闭环 |
 | 第 7 周 | D8 | StagePlanner、精度计划、性能消融 | 同条件优化表和原始 trace |
 | 第 8 周 | D9 + D10 | 三域部署、攻击演示、文档/PPT | 冻结交付包和答辩演练录像 |
 

@@ -38,7 +38,7 @@
 
 ## D7-D8 模型与指标
 
-- [ ] 正式中文 GPT-2 级模型完成至少 1 token 生成。
+- [ ] 正式英文 GPT-2（`gpt2`）模型完成至少 1 token 生成。
 - [ ] `model_hash`、tokenizer、`precision_plan`、epoch、Ticket 全部绑定。
 - [ ] 每项优化有开/关对照，报告 token 一致率、误差、延迟、通信量、内存和安全回归。
 - [ ] 原始 trace 可由固定脚本重算图表。

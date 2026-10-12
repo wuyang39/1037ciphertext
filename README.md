@@ -4,7 +4,7 @@
 
 - 客户端 `C` 在本地完成 tokenizer 与 RSS 输入拆分，并仅在本地校验和重构输出。
 - 三个 SGX 节点通过 KAS 远程证明和密钥放行后，加载各自的模型份额。
-- 三个 enclave 使用 3PC RSS 执行中文 GPT-2 级 Decoder 的完整自回归推理。
+- 三个 enclave 使用 3PC RSS 执行英文 GPT-2 Decoder 的完整自回归推理。
 - 节点协议由 enclave 内终止的 mTLS 承载；明文 BRPC、debug enclave 和未证明节点均 fail-closed。
 - 性能记录、攻击负例、审计记录和原始 trace 必须可由固定版本和脚本复现。
 

@@ -21,13 +21,14 @@
 - D6 的两 token 会话态和结果帧测试。
 - D7 的导出、量化、静态图转换和模型份额拆分接口。
 
-不用于质量、事实准确性、生产安全或真实中文生成能力的对外结论。
+不用于质量、事实准确性、生产安全或真实生成能力的对外结论。
 
 ## 最终模型迁移要求
 
-正式中文 GPT-2 级模型必须另行冻结：
+正式模型已定为英文 GPT-2（`gpt2` / GPT-2 small，约 124M 参数，OpenAI
+Modified MIT）。D7 必须另行冻结：
 
-- HuggingFace 权重版本和 tokenizer 版本
+- 权重下载来源、许可证文本和 GPT-2 BPE tokenizer 版本（`vocab_size=50257`）
 - 导出后的 `model_hash` 和每个张量 hash
 - `precision_plan`、层级 dyadic scale 和签名
 - `share_epoch`、目标角色和三份模型份额

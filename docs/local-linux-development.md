@@ -108,7 +108,7 @@ python -m infra.build_model_package \
 ```
 
 生成内容包括模型导出、量化 payload、precision plan、P0/P1/P2 份额、可选加密
-份额和 package manifest。正式中文模型仍需在选定模型和许可证后运行同一流程。
+份额和 package manifest。正式英文 GPT-2 权重在 D7 冻结后运行同一流程。
 
 ### 4.5 Gramine manifest
 
@@ -156,7 +156,7 @@ python -m infra.attack_matrix \
 ## 5. WSL 使用建议
 
 当前 WSL 约 7.5 GiB 内存适合 Tiny Decoder、三个轻量进程和模型工具。运行正式
-100M 级模型前应关闭不必要进程，必要时在 `.wslconfig` 中适度增加内存。不要
+正式 GPT-2（约 124M）前应关闭不必要进程，必要时在 `.wslconfig` 中适度增加内存。不要
 为模型运行删除 TLS、证明或 Ticket 检查。
 
 建议的开发顺序：

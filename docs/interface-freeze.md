@@ -15,7 +15,7 @@
 | 2 | Python / SPU-YACL-BRPC / Gramine 版本 | 部分冻结 | Python 全量 pin；外部组件已定目标版本，commit 待镜像构建时登记 |
 | 3 | 三节点启动命令、端口、配置格式 | 已冻结 | 端口表、启动入口和 JSON 配置 schema 已落库并可校验 |
 | 4 | KAS 部署位置、证明与密钥接口 | 已冻结 | 接口以 `protocol-baseline.md` 为准；传输通道待服务器阶段替换 |
-| 5 | GPT-2 模型份额文件格式与加载 | 格式已冻结，模型待定 | 文件格式和加载校验已实现；正式模型与语言口径见 5.5 |
+| 5 | GPT-2 模型份额文件格式与加载 | 已冻结 | 正式模型定为英文 GPT-2（见 5.4/5.5）；权重 hash 待 D7 冻结 |
 
 ## 1. Linux 发行版与 CPU 架构
 
@@ -240,31 +240,37 @@ KAS_CHALLENGE_TTL_SECONDS   KAS_NODE_LEASE_TTL_SECONDS
   hash/epoch/长度一致。
 - `infra.build_model_package --verify`：文件集、hash、份额重建和 precision plan 一致性。
 
-### 5.4 正式模型参数
+### 5.4 正式模型（已定）
 
 | 项目 | 冻结值 |
 | --- | --- |
-| 规模 | GPT-2 级 Decoder，约 100M 参数 |
+| 模型 | 英文 GPT-2，`gpt2`（GPT-2 small），约 124M 参数 |
+| 许可证 | OpenAI Modified MIT（`openai/gpt-2` LICENSE，1403 字节） |
+| 权重来源 | OpenAI 官方 GPT-2 small 权重；D7 冻结下载来源与逐张量 hash |
+| tokenizer | GPT-2 BPE，`vocab_size=50257`，`max_context=1024` |
 | 演示参数 | `batch=1`、输入长度桶 `8/16`、`max_new_tokens<=4`、`context_window=16` |
 | 绑定 | `model_manifest{model_hash,tokenizer_hash,precision_plan_hash,model_version,operator_version}` |
 
-### 5.5 待确认：模型语言口径
+演示参数中 `context_window=16` 是 TEE 侧的固定窗口，与 GPT-2 原生 1024 上下文
+无关；节点只处理窗口内的 token。
 
-开发方案文档写"**中文** GPT-2 级 Decoder"，接口清单写"**英文** GPT-2"。两者不同，
-必须三方拍板后填入最终权重与 tokenizer：
+### 5.5 决策记录：模型语言
 
-- 若选英文 GPT-2：权重与 tokenizer 公开、许可证为 MIT，可直接下载并 hash。
-- 若选中文 GPT-2 级：需选定许可清晰的中文权重与 tokenizer，并记录来源、许可证、
-  权重 hash、tokenizer hash。
+2026-10-12 三方确认正式模型为**英文 GPT-2**，取代开发方案文档原先的"中文 GPT-2
+级"表述。理由：权重与 tokenizer 公开、许可证明确（Modified MIT）、可直接下载并
+hash，无需额外的中文语料与许可证审查。
 
-无论选哪种，5.1-5.3 的文件格式与加载方式不变；变更的是 `model_hash`、
-`tokenizer_hash` 和 `operator_version` 取值。
+5.1-5.3 的文件格式与加载方式不因该决定改变。受影响的是 `model_hash`、
+`tokenizer_hash` 和 `operator_version` 的取值，在 D7 冻结正式权重后填入本表。
 
 ### 5.6 tokenizer 加载
 
-tokenizer 在客户端 `C` 本地运行，节点只接收已拆分的 RSS 输入份额。
+tokenizer 在客户端 `C` 本地运行，节点只接收已拆分的 RSS 输入份额。实现固定为
+GPT-2 BPE：客户端先用 GPT-2 BPE 把提示编码为 token id，再按 `8/16` 长度桶补齐并
+拆分份额；节点侧不接触原始文本。
+
 `tokenizer_hash` 写入 `model_manifest` 并与会话绑定；tokenizer 替换后旧 share、
-旧 Ticket、旧材料均不得复用。tokenizer 的具体实现和份额化方式待 5.5 定稿后补充。
+旧 Ticket、旧材料均不得复用。
 
 ## 6. 变更流程
 
@@ -281,11 +287,13 @@ tokenizer 在客户端 `C` 本地运行，节点只接收已拆分的 RSS 输入
 
 ## 7. 待三方确认项
 
-1. 正式模型语言：中文 GPT-2 级 vs 英文 GPT-2（见 5.5）。
-2. 目标地域与可用区（影响 PCCS endpoint 和 DCAP QVL 版本）。
-3. 三节点最终规格是否维持 `g7t.2xlarge`，或根据 profile 调整。
-4. KAS 独立控制面的实例规格与域名。
-5. 端口表 47100-47112 与 8443/8444 是否与团队其他服务冲突。
+已确认：正式模型为英文 GPT-2（见 5.4/5.5）。以下仍需确认：
+
+1. 目标地域与可用区（影响 PCCS endpoint 和 DCAP QVL 版本）。
+2. 三节点最终规格是否维持 `g7t.2xlarge`，或根据 profile 调整。
+3. KAS 独立控制面的实例规格与域名。
+4. 端口表 47100-47112 与 8443/8444 是否与团队其他服务冲突。
+5. SPU/YACL 的具体 commit 与 DCAP QVL 版本，在镜像构建时登记。
 
 ## 8. 证据
 
