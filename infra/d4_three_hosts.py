@@ -753,18 +753,23 @@ def probe_live_listeners(
     repo: str,
     python: str,
     run_id: str,
-    node_timeout: float,
+    probe_timeout: float = 45.0,
+    poll: float = 2.0,
 ) -> list[dict[str, Any]]:
-    """Send plaintext at every peer listener while the mesh is really up.
+    """Send plaintext at every peer listener while it is really serving.
 
-    All three ranks start together because a link only comes up once every
-    rank is running; the probes then leave P0 for the peers' private
-    addresses.
+    Only P1 and P2 run: each opens its BRPC and share listeners and then waits
+    for the rest of the mesh, so the listeners are up and idle while the
+    driver stays out of the way and the probes cannot race the grid. A probe
+    that the peer refuses is recorded as it is, and the run waits for the
+    ports to accept a connection first so a refusal is not credited to a node
+    that had not finished starting.
     """
-    logs = {role: f"/tmp/{run_id}-probe-{role}.log" for role in ROLES}
+    peers = ("P1", "P2")
+    logs = {role: f"/tmp/{run_id}-probe-{role}.log" for role in peers}
     kill_nodes(transport, role_routes)
     try:
-        for role in ("P1", "P2", DRIVER):
+        for role in (peers[1], peers[0]):
             transport.start_background(
                 role_routes[role],
                 node_command(
@@ -774,41 +779,46 @@ def probe_live_listeners(
                     log=logs[role],
                 ),
             )
-            time.sleep(1.0)
-        for role in ("P1", "P2"):
-            wait_for_marker(
-                transport,
-                role_routes[role],
-                log=logs[role],
-                marker=READY_MARKER,
-                timeout=node_timeout,
-            )
+            time.sleep(0.5)
+        deadline = time.monotonic() + probe_timeout
         probes: list[dict[str, Any]] = []
-        for role in ("P1", "P2"):
+        for role in peers:
             for kind, key in (("brpc", "brpc_port"), ("share", "share_port")):
                 port = int(cluster[role][key])
-                _status, out, _err = transport.run(
-                    role_routes[DRIVER],
-                    probe_command(
-                        python=python,
-                        repo=repo,
-                        host=str(cluster[role]["host"]),
-                        port=port,
-                    ),
-                    timeout=60,
+                command = probe_command(
+                    python=python,
+                    repo=repo,
+                    host=str(cluster[role]["host"]),
+                    port=port,
                 )
-                try:
-                    probe = json.loads(out.strip().splitlines()[-1])
-                except (IndexError, json.JSONDecodeError) as exc:
-                    raise ThreeHostError(
-                        f"the probe of {role} port {port} returned nothing usable: "
-                        f"{out.strip()[-200:]!r}"
-                    ) from exc
+                probe = _probe_once(transport, role_routes[DRIVER], command, role, port)
+                while not probe.get("connected") and time.monotonic() < deadline:
+                    time.sleep(poll)
+                    probe = _probe_once(
+                        transport, role_routes[DRIVER], command, role, port
+                    )
                 probes.append({**probe, "role": role, "listener": kind})
         return probes
     finally:
         kill_nodes(transport, role_routes)
         time.sleep(1.0)
+
+
+def _probe_once(
+    transport: Transport,
+    route: SSHRoute,
+    command: str,
+    role: str,
+    port: int,
+) -> dict[str, Any]:
+    _status, out, _err = transport.run(route, command, timeout=60)
+    try:
+        return json.loads(out.strip().splitlines()[-1])
+    except (IndexError, json.JSONDecodeError) as exc:
+        raise ThreeHostError(
+            f"the probe of {role} port {port} returned nothing usable: "
+            f"{out.strip()[-200:]!r}"
+        ) from exc
 
 
 def run_one_negative_case(
@@ -938,6 +948,7 @@ def run_negative_cases(
     workspace: str = DEFAULT_WORKSPACE,
     cases: Sequence[str] = CONFIGURED_CASES,
     node_timeout: float = 300.0,
+    probe_timeout: float = 45.0,
     expect_commit: str | None = None,
     include_probes: bool = True,
 ) -> dict[str, Any]:
@@ -985,7 +996,7 @@ def run_negative_cases(
                 repo=repo,
                 python=python,
                 run_id=run_id,
-                node_timeout=node_timeout,
+                probe_timeout=probe_timeout,
             )
             if include_probes
             else []
@@ -1011,6 +1022,8 @@ def run_negative_cases(
         "marker": "A1-22-PLAINTEXT-PROBE",
         "driver": DRIVER,
         "probes": probes,
+        "all_listeners_connected": bool(probes)
+        and all(probe.get("connected") for probe in probes),
         "any_plaintext_service": any(
             probe.get("outcome") == "plaintext_service_answered" for probe in probes
         ),
@@ -1097,6 +1110,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     negatives.add_argument("--workspace", default=DEFAULT_WORKSPACE)
     negatives.add_argument("--node-timeout", type=float, default=300.0)
     negatives.add_argument(
+        "--probe-timeout",
+        type=float,
+        default=45.0,
+        help="how long to wait for the peers' listeners to accept a connection",
+    )
+    negatives.add_argument(
         "--no-probes",
         action="store_true",
         help="skip the plaintext probe of the live listeners",
@@ -1132,6 +1151,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 python=args.python,
                 workspace=args.workspace,
                 node_timeout=args.node_timeout,
+                probe_timeout=args.probe_timeout,
                 expect_commit=expect_commit or None,
                 include_probes=not args.no_probes,
             )
