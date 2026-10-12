@@ -56,7 +56,9 @@ def collect_environment(
     enclave_device = (dev_root / "sgx_enclave").exists()
     provision_device = (dev_root / "sgx_provision").exists()
     qcnl = _read_text(qcnl_path) if linux else ""
-    pccs_configured = "PCCS_URL" in qcnl
+    # Real DCAP QCNL configs (including the Aliyun-provided default) use the
+    # lowercase key ``pccs_url``; older docs show ``PCCS_URL``. Match either.
+    pccs_configured = "pccs_url" in qcnl.lower()
     aesmd_ok, aesmd_detail = (
         command_runner(["systemctl", "is-active", "aesmd"])
         if linux
