@@ -55,3 +55,14 @@ python -m infra.d1_environment_check --require-hardware \
 该命令只有同时检测到 Linux、CPU SGX、`/dev/sgx_enclave`、
 `/dev/sgx_provision`、`aesmd` 和 PCCS 配置时才会返回成功。环境检查成功仍
 不代表 Quote 和 KAS 闭环完成。
+
+## D1 服务器脚本
+
+```bash
+sudo bash deploy/install_gramine_server.sh   # 配置 packages.gramineproject.io 并安装 Gramine
+bash deploy/run_d1_gramine.sh                # 最小 Gramine-SGX 程序 + DCAP Quote 校验
+bash deploy/run_d1_server.sh                 # 三种 Quote 探针 + KAS 闭环与四项拒绝负例
+```
+
+`run_d1_gramine.sh` 与 `run_d1_server.sh` 都写入
+`artifacts/server/<run-id>/d1/`，只用一次性签名密钥，不把私钥放进证据目录。

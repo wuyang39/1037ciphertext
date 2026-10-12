@@ -1,0 +1,19 @@
+# gramine packages
+gramine 1.9
+gramine-ratls-dcap 1.9
+
+# gramine-sgx version
+Gramine 1.9 (0d1a4b7607592dab4c8a720c962acee3de6b4ca8)
+
+# sgx devices
+crw-rw---- 1 root sgx     10, 125 Oct 12 17:08 /dev/sgx_enclave
+crw-rw---- 1 root sgx_prv 10, 126 Oct 12 17:08 /dev/sgx_provision
+
+# aesmd
+active
+
+# dcap qcnl
+{
+  "pccs_url": "https://sgx-dcap-server-vpc.cn-shanghai.aliyuncs.com/sgx/certification/v4/",
+  "use_secure_cert": true
+}

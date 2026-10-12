@@ -1,0 +1,21 @@
+{
+  "command": "/home/jiahao/1037ciphertext/tee/attestation/dcap_verifier/a122_dcap_verify --quote gramine-quote.bin --json",
+  "document": {
+    "attributes_flags": "0x0000000000000005",
+    "collateral_expiration_status": 0,
+    "dcap_result_prefix": "0xa000",
+    "dcap_verification_result": "0x0000a008",
+    "dcap_verify_status": "0x0000",
+    "debug": false,
+    "isv_prod_id": 0,
+    "isvsvn": 0,
+    "mrenclave": "0427d1eb51730429ff03239e6c5998a667cec38e1d938d2401a7309212b612b0",
+    "mrsigner": "4a5a7e01f7d5c187345ad38d1a50a41e3a95a1c75f63c383ef16517cb0453292",
+    "quote_size": 4734,
+    "report_data_b64": "oaCjoqWkp6apqKuqrayvrrGws7K1tLe2ubi7ur28v76BgIOChYSHhomIi4qNjI+OkZCTkpWUl5aZmJuanZyfng==",
+    "signature_data_len": 4298,
+    "supplemental_data_version": 327683
+  },
+  "returncode": 0,
+  "stderr": ""
+}

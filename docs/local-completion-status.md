@@ -3,9 +3,9 @@
 本文只记录不依赖真实 SGX/多节点服务器的内容。`本地完成` 表示代码、mock、
 拒绝路径和测试已经可运行；`服务器待办` 表示必须在真实 enclave 上重新验收。
 
-> 服务器阶段进展：D1 证明闭环已在真实 SGX 实例上通过（运行
-> `d1-20261012T1810`），见 [d1-server-acceptance.md](d1-server-acceptance.md)。
-> D3 及之后仍待执行。
+> 服务器阶段进展：D1 已在真实 SGX 实例上通过，包括证明闭环（运行
+> `d1-20261012T1810`）和最小 Gramine-SGX 程序（运行 `d1-20261012T1830`），
+> 见 [d1-server-acceptance.md](d1-server-acceptance.md)。D3 及之后仍待执行。
 
 ## 状态矩阵
 

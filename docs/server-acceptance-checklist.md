@@ -11,10 +11,13 @@
 - [x] 替换临时公钥被拒绝。
 - [x] 保存 Quote、验证报告、measurement、CSR/report-data 和拒绝日志。
 
-已完成项见 [d1-server-acceptance.md](d1-server-acceptance.md)（运行
-`d1-20261012T1810`），证据在
-[docs/evidence/d1-20261012T1810](evidence/d1-20261012T1810)。
-计划第 5 节的“最小 Gramine-SGX 程序”因实例账号无提权权限而未执行。
+- [x] 运行一个最小 SGX enclave 程序（`SampleEnclave`）。
+- [x] 运行一个最小 Gramine-SGX 程序（Gramine 1.9，`sgx.debug=false`，取得 DCAP Quote）。
+
+已完成项见 [d1-server-acceptance.md](d1-server-acceptance.md)。证明闭环运行
+`d1-20261012T1810`，证据在 [docs/evidence/d1-20261012T1810](evidence/d1-20261012T1810)；
+Gramine 运行 `d1-20261012T1830`，证据在
+[docs/evidence/d1-20261012T1830](evidence/d1-20261012T1830)。
 
 ## D2 协议
 

@@ -1,0 +1,52 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "file_count": 9,
+  "files": [
+    {
+      "bytes": 825,
+      "path": "gramine-dcap-verify.json",
+      "sha256": "f61daa4d12411629e520f897e4cb9cfe9bc4c856899e41ecabb747bf99b67d2a"
+    },
+    {
+      "bytes": 428,
+      "path": "gramine-env.txt",
+      "sha256": "37a3ee44412caba573e1025441c352d124307f5a275f252d60b9628e603dd465"
+    },
+    {
+      "bytes": 9797,
+      "path": "gramine-hello.manifest",
+      "sha256": "dc156cf18abc601e7dd936091e8f09d44cb048a778432b4d6e25ce3e6cbe5074"
+    },
+    {
+      "bytes": 76,
+      "path": "gramine-hello.stderr.txt",
+      "sha256": "2e82446329a4dcf06b6ecb8caf498e4d060911b63241d628b8d5d23f442f1009"
+    },
+    {
+      "bytes": 9718,
+      "path": "gramine-hello.txt",
+      "sha256": "86b031697fb474cb53ba564d8ee4a8243412c7ae551d07a7bc98843c3d902143"
+    },
+    {
+      "bytes": 1030,
+      "path": "gramine-quote-report.json",
+      "sha256": "2a9d7a8104643785592573586afabbfbe17ce872de2a45d25894c66b722b42bd"
+    },
+    {
+      "bytes": 4734,
+      "path": "gramine-quote.bin",
+      "sha256": "388d80ceb613658f4453b9e5995e579f98a8bad369f05f369839afac5cf29087"
+    },
+    {
+      "bytes": 638,
+      "path": "gramine-summary.json",
+      "sha256": "e6105847a9c1f6560c7ae12a05bd1ec6289890bd9ce46415a3497eb84de1f40c"
+    },
+    {
+      "bytes": 2341,
+      "path": "README.md",
+      "sha256": "65429a8b9b25af9e5136ecac741e72248d495c6f397553569abba9025782b212"
+    }
+  ],
+  "root": "d1-20261012T1830"
+}

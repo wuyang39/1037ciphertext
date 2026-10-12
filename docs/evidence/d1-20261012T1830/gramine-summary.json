@@ -1,0 +1,16 @@
+{
+  "cloud_region": "cn-shanghai",
+  "dcap_verification_result": "0x0000a008",
+  "dcap_verify_status": "0x0000",
+  "debug_enclave": false,
+  "gramine_quote_accepted": true,
+  "hello_marker_present": true,
+  "image_id": "unknown",
+  "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+  "mrenclave": "0427d1eb51730429ff03239e6c5998a667cec38e1d938d2401a7309212b612b0",
+  "mrsigner": "4a5a7e01f7d5c187345ad38d1a50a41e3a95a1c75f63c383ef16517cb0453292",
+  "phase": "D1-gramine",
+  "quote_sha256": "388d80ceb613658f4453b9e5995e579f98a8bad369f05f369839afac5cf29087",
+  "run_id": "d1-20261012T1830",
+  "timestamp_utc": "2026-10-12T10:29:15.809788+00:00"
+}

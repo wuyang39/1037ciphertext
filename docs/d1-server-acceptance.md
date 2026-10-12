@@ -1,11 +1,12 @@
 # D1 单机真实 SGX 证明验收记录
 
-> 运行编号：`d1-20261012T1810`
+> 运行编号：`d1-20261012T1810`（证明闭环）、`d1-20261012T1830`（Gramine）
 >
-> 结论：**D1 证明闭环通过**（正确 release 放行，四项拒绝负例全部拒绝）。
+> 结论：**D1 通过**。正确 release 放行，四项拒绝负例全部拒绝，最小
+> Gramine-SGX 程序在 `sgx.debug=false` 下取得可用 DCAP Quote。
 
-本记录只覆盖 [后续开发总计划.md](后续开发总计划.md) 第 5 节的 D1 证明闭环。
-D3 及之后阶段尚未执行。
+本记录覆盖 [后续开发总计划.md](后续开发总计划.md) 第 5 节的 D1 证明闭环和最小
+Gramine-SGX 程序。D3 及之后阶段尚未执行。
 
 ## 1. 验收环境
 
@@ -87,16 +88,44 @@ print(verify_directory(Path('docs/evidence/d1-20261012T1810'))['file_count'])"
 四项 `deny-*.json`，以及 `instance-check.txt`、`cpuinfo-and-devices.txt`、
 `d1-environment.json`、`sample-enclave.txt` 和 `evidence.sha256`。
 
-## 5. 本轮未完成
+## 5. 最小 Gramine-SGX 程序
 
-1. 计划第 5 节还要求“运行一个最小 Gramine-SGX 程序”。本实例的 `jiahao`
-   账号不在 `sudoers` 中（`sudo` 组为空），无法安装系统级 Gramine，
-   因此该项未执行。
-2. `MRSIGNER` 由每次运行新生成的 enclave 签名密钥决定；本记录中 Quote 与
-   当次 release policy 自洽。冻结发布时应改用固定的发布签名密钥。
+计划的第 5 节第 4 项要求先跑通一个最小 Gramine-SGX 程序。实例账号最初不在
+`sudoers` 中，2026-10-12 取得提权后补充执行：
+
+```bash
+sudo bash deploy/install_gramine_server.sh   # packages.gramineproject.io，Gramine 1.9
+bash deploy/run_d1_gramine.sh d1-20261012T1830
+```
+
+`deploy/run_d1_gramine.sh` 构建 [tee/gramine/hello](../tee/gramine/hello) 探针，
+渲染并用一次性密钥签名 manifest，运行 `gramine-sgx ./hello` 取 enclave 内的
+DCAP Quote，再交给 `a122_dcap_verify` 校验。
+
+| 项目 | 值 |
+| --- | --- |
+| Gramine | 1.9（`gramine`、`gramine-ratls-dcap`） |
+| `sgx.debug` | `false` |
+| Quote | ECDSA/DCAP，4734 字节，`ATTRIBUTES.DEBUG=false`（flags `0x0000000000000005`） |
+| DCAP 校验状态 | `0x0000`，结果 `0x0000a008` |
+| `MRENCLAVE` | `0427d1eb51730429ff03239e6c5998a667cec38e1d938d2401a7309212b612b0` |
+| `MRSIGNER` | `4a5a7e01f7d5c187345ad38d1a50a41e3a95a1c75f63c383ef16517cb0453292` |
+| REPORTDATA 绑定 | 探针写入的 64 字节与 Quote 报告体一致 |
+
+证据目录：[docs/evidence/d1-20261012T1830](evidence/d1-20261012T1830)。
+
+## 6. 本轮未完成
+
+1. `MRSIGNER` 由每次运行新生成的 enclave 签名密钥决定；两条 D1 记录中的
+   Quote 都与当次 release policy 自洽。冻结发布时应改用固定的发布签名密钥。
+2. 生产模板 `tee/gramine/a122.manifest.template` 与 Gramine 1.9 的 schema 不兼容，
+   已实测定位到三处，需在 D3 修正后才能作为生产入口：
+   `loader.entrypoint` 在 1.9 中必须是 TOML 表（应用入口应写
+   `libos.entrypoint`）；`sgx.attestation_quote_type` 在 1.9 中不存在；
+   `fs.allowed_files` 应为 `sgx.allowed_files`。
 3. D3–D10 的全部内容仍未开始。
 
-## 6. 复现
+## 7. 复现
 
 ```bash
 git clone https://github.com/wuyang39/1037ciphertext.git

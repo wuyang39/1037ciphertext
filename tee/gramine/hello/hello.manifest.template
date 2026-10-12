@@ -1,0 +1,25 @@
+# A1-22 minimal Gramine-SGX probe manifest.
+#
+# Rendered by gramine-manifest and signed by gramine-sgx-sign. sgx.debug is
+# pinned to false so the loader refuses to start a debug enclave here; the D1
+# plan forbids loading any model material into an unmeasured environment.
+
+libos.entrypoint = "/hello"
+
+loader.log_level = "error"
+loader.env.LD_LIBRARY_PATH = "/lib"
+
+sgx.debug = false
+sgx.enclave_size = "1G"
+sgx.max_threads = 4
+sgx.remote_attestation = "dcap"
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "/hello", uri = "file:hello" },
+]
+
+sgx.trusted_files = [
+  "file:{{ gramine.runtimedir() }}/",
+  "file:hello",
+]
