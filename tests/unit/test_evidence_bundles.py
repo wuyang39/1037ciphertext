@@ -142,3 +142,17 @@ def test_committed_evidence_contains_no_private_key_material() -> None:
         for path in bundle.rglob("*"):
             if path.is_file():
                 assert marker not in path.read_bytes(), path
+
+
+def test_committed_evidence_uses_lf_line_endings() -> None:
+    """A seal is over bytes, so a text file has to be the bytes git restores.
+
+    ``.gitattributes`` pins ``docs/evidence/**`` to LF. A file written with the
+    platform default newline would still verify in the working tree that
+    produced it and mismatch in every fresh checkout.
+    """
+    text_suffixes = {".md", ".txt", ".json", ".log", ".pem", ".sha256", ".jsonl"}
+    for bundle in _bundles():
+        for path in bundle.rglob("*"):
+            if path.is_file() and path.suffix in text_suffixes:
+                assert b"\r\n" not in path.read_bytes(), path

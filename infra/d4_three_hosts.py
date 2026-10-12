@@ -604,8 +604,11 @@ def run_three_hosts(
                 _status, body, _err = transport.run(
                     role_routes[role], analysis, timeout=1800
                 )
+                # The bundle is sealed over these bytes, so they have to be
+                # the same bytes a checkout hands back: write LF, not the
+                # platform default newline.
                 (out_dir / f"d4-three-{role}-tls-summary.txt").write_text(
-                    header + body, encoding="utf-8"
+                    header + body, encoding="utf-8", newline="\n"
                 )
                 # Every rank reports its own link facts, but a rank only
                 # writes them once its share channel and collective teardown

@@ -90,7 +90,9 @@ def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if not text.endswith("\n"):
         text = text + "\n"
-    path.write_text(text, encoding="utf-8")
+    # Sealed evidence has to be byte-identical to what a checkout restores,
+    # which means LF whatever the platform default would be.
+    path.write_text(text, encoding="utf-8", newline="\n")
 
 
 def write_document(path: Path, document: Mapping[str, Any]) -> None:

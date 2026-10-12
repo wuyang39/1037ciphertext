@@ -18,9 +18,9 @@
       "sha256": "7a20795a94548720b2ae46125b75982f42f63cb1be2c1cc7706994a7942c07a2"
     },
     {
-      "bytes": 32931,
+      "bytes": 32759,
       "path": "d4-three-P0-tls-summary.txt",
-      "sha256": "646c91d5608ca729fb7a1d8ac5bec3eb1518a7e9c8e39430e3081fac6caa292d"
+      "sha256": "e40e84d31bf21402fb785b31d9db4690efa115700e461e5cd8ce85fe5709d65a"
     },
     {
       "bytes": 436,
@@ -33,9 +33,9 @@
       "sha256": "f30469b43afbd1615eaea8179048ff5e0fd0bcfbb71e03a865f33a82ceec828b"
     },
     {
-      "bytes": 18388,
+      "bytes": 18282,
       "path": "d4-three-P1-tls-summary.txt",
-      "sha256": "65d05924489520549d070d521f26a15862976f44c23641e2c2e4738177589cac"
+      "sha256": "030bb4cd03a9595f45f269e5ea4b3c90515e44700db85d1428db1e431920f535"
     },
     {
       "bytes": 436,
@@ -48,9 +48,9 @@
       "sha256": "d857dcaabbad35783f1650895064fb24ddd341ab5018d14f81fb8e69ae607149"
     },
     {
-      "bytes": 18388,
+      "bytes": 18282,
       "path": "d4-three-P2-tls-summary.txt",
-      "sha256": "d3f04d3761789cf2abc6f154a6df1e071a74ed48c803aa7ae597c0793e55d6c7"
+      "sha256": "276b2b95740c119c6255df46c0ff296787c21709044121db48dd59e5d356450c"
     },
     {
       "bytes": 311911,

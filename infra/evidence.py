@@ -201,7 +201,9 @@ def seal_directory(
     }
     write_json(root / INDEX_NAME, index)
     index_hash = sha256_file(root / INDEX_NAME)
-    (root / SEAL_NAME).write_text(f"{index_hash}  {INDEX_NAME}\n", encoding="ascii")
+    (root / SEAL_NAME).write_text(
+        f"{index_hash}  {INDEX_NAME}\n", encoding="ascii", newline="\n"
+    )
     return index
 
 
