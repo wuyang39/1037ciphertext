@@ -409,6 +409,22 @@ def _verdicts(
     return results, summary
 
 
+def runtime_label(
+    attestation_root: Path = Path("/dev/attestation"),
+) -> tuple[str, bool]:
+    """Say where the node is really running.
+
+    The trace must not claim more than it measured. The same module runs as a
+    plain host process during the loopback acceptance and inside a Gramine
+    enclave once the manifests are in play, so only the second case may say
+    "enclave". Gramine exposes its attestation pseudo-files at
+    ``/dev/attestation``, which is the marker used here.
+    """
+    inside_enclave = Path(attestation_root).is_dir()
+    where = "inside a Gramine-SGX enclave" if inside_enclave else "in a host process"
+    return f"SPU/YACL/BRPC over TLS 1.3 {where}", inside_enclave
+
+
 def run_node(config: NodeConfig) -> int:
     config.out_dir.mkdir(parents=True, exist_ok=True)
     policy = config.policy()
@@ -656,13 +672,16 @@ def run_node(config: NodeConfig) -> int:
         "vectors": verdict_entries,
     }
     write_json(config.out_dir / "rss-vectors.json", vector_document)
+    transport_label, inside_enclave = runtime_label()
     write_json(
         config.out_dir / "communication-trace.json",
         {
             "run_id": config.run_id,
             "partition_id": config.partition_id,
             "role": config.role,
-            "transport": "SPU/YACL/BRPC over TLS 1.3 inside Gramine-SGX",
+            "transport": transport_label,
+            "inside_enclave": inside_enclave,
+            "attestation_available": Path("/dev/attestation/quote").is_file(),
             "link": policy.to_dict(),
             "share_channel": {
                 "host": config.share_host,

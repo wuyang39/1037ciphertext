@@ -519,6 +519,12 @@ def assemble(
     }
     details = {
         "verdicts": verdicts,
+        # Record where the nodes really ran: the same runner is used for the
+        # host-process loopback and, later, the enclave run.
+        "runtime": {
+            "transport": positive["trace"].get("transport"),
+            "inside_enclave": positive["trace"].get("inside_enclave"),
+        },
         "grid": {
             "count": vectors.get("count"),
             "digest": vectors.get("grid_digest"),
