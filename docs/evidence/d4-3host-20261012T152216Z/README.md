@@ -1,7 +1,8 @@
-# D4 cross-host evidence (2026-10-12T14:31:39Z)
+# D4 cross-host evidence (2026-10-12T15:22:16Z)
 
-Sealed evidence directory for the D4 run that put P0, P1 and P2 on three
-separate instances at commit `d048827`:
+Sealed evidence directory for the D4 run driven by
+[infra/d4_three_hosts.py](../../../infra/d4_three_hosts.py) at commit
+`bcd8935`, with P0, P1 and P2 on three separate instances:
 
 | Role | Instance | Private | Public |
 | --- | --- | --- | --- |
@@ -27,23 +28,25 @@ own leg. The conclusions and the limits are in
 | `evidence-index.json`, `evidence.sha256` | The seal over the directory |
 
 The three captures are indexed but not shipped, so the bundle also names them
-in [../d4-3host-20261012T143139Z.exclusions.json](../d4-3host-20261012T143139Z.exclusions.json):
+in
+[../d4-3host-20261012T152216Z.exclusions.json](../d4-3host-20261012T152216Z.exclusions.json):
 
 | Capture | Bytes | SHA-256 |
 | --- | --- | --- |
-| `d4-three-P0.pcap` | 144,791,448 | `4e73cabdb4cd6bdc0cdd597d87bcc326881d0d318457029e1ba09894539f656a` |
-| `d4-three-P1.pcap` | 143,211,316 | `557b2b67a5901426a77f11029d47a5c6ebfba23799ca3bf91b0215f3ae159979` |
-| `d4-three-P2.pcap` | 143,195,726 | `24d3170021874e747f98d3104e7f5af3ddf4ad0805b4da3544a333509d27e1c1` |
+| `d4-three-P0.pcap` | 144,817,498 | `1d62c96516c56c62bf2881892ae23dd2632efa465b137beb4a09f23ce08120e5` |
+| `d4-three-P1.pcap` | 143,226,938 | `6fe69e52756137608bdc43924e3ffc69ca26df7581ffba9041c40ac4a260d549` |
+| `d4-three-P2.pcap` | 143,216,390 | `9739bb92af40cc06cc3836023bd6a90fcdf57207fcd8f5417eab0cfd16cff9b8` |
 
-They stay in `/tmp/d4-three-P{0,1,2}.pcap` on their own instance because GitHub
-rejects blobs above 100 MB. Each capture is checked against the index if it is
-present, so copying one back can only tighten the check:
+They stay in `/tmp/d4-3host-20261012T152216Z-P{0,1,2}.pcap` on their own
+instance because GitHub rejects blobs above 100 MB. Each capture is checked
+against the index if it is present, so copying one back can only tighten the
+check:
 
 ```bash
 python -c "
 from pathlib import Path
 from infra.evidence import load_exclusions, verify_directory
-root = Path('docs/evidence/d4-3host-20261012T143139Z')
+root = Path('docs/evidence/d4-3host-20261012T152216Z')
 index = verify_directory(root, exclusions=load_exclusions(root))
 print(index['file_count'], index['excluded'])
 "
@@ -51,15 +54,28 @@ print(index['file_count'], index['excluded'])
 
 ## How the run was driven
 
+One command produced the whole bundle:
+
+```bash
+python -m infra.d4_three_hosts run \
+  --cluster deploy/d4-three-hosts.example.json \
+  --out-dir docs/evidence/d4-3host-20261012T152216Z \
+  --run-id d4-3host-20261012T152216Z \
+  --ssh-key <key> --ssh-user jiahao
+```
+
 The instances have no key to each other, so the operator host provisioned the
 workspace on P0, shipped the same tar to P1 and P2 at the same absolute path,
-started `tcpdump -i eth0` on all three, then started P1/P2 before P0. Only
-byte counts, roles, digests and timings left the hosts. `deploy/run_d4_three_hosts.sh`
-is the scripted form of the same sequence.
+checked every instance out at the expected commit, started `tcpdump -i eth0` on
+all three, started P1/P2 before P0, waited for the driver's completion marker,
+then collected the per-role summaries. `deploy/run_d4_three_hosts.sh` is the
+scripted form of the same sequence.
+
+Only byte counts, roles, digests and timings left the hosts.
 
 To re-derive one host's verdict from its capture, run the analyser on that
 instance:
 
 ```bash
-python -m infra.pcap_tls /tmp/d4-three-P0.pcap --d4-ports
+python -m infra.pcap_tls /tmp/d4-3host-20261012T152216Z-P0.pcap --d4-ports
 ```

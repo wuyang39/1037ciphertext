@@ -1,0 +1,13 @@
+{
+  "batch_share_digest": "3518f52e68f20eb51a410b31ab8bc69343d77f11f4ebaed048c0b3d6fb5530c5",
+  "grid_digest": "96b6c83502203292840fd9836f0efbe6f5fe49225aa5b110a6f2b3c27f3695d5",
+  "identity_sha256": "bc1ab72602644fbd3779dfc2a537485b3e5b66931874560ac83cc96ea83a2c6f",
+  "peer_certificates": {
+    "P1": "04d383c1d26f16e7394b22246d97225141b9d3b2ccddb4f1e7ec38d72acd6188",
+    "P2": "b698f3a4b9a111f8999f0bad68640239b8a893d19113fc19526f56c79c5320f6"
+  },
+  "role": "P0",
+  "run_id": "d4-3host-20261012T152216Z",
+  "teardown_finished": true,
+  "verdicts": "passed"
+}

@@ -1,7 +1,8 @@
 # D4 三节点通信与 3PC RSS 验收记录
 
-> 运行编号：单实例 `d4-20261012T143111Z`，三实例 `d4-3host-20261012T143139Z`，
-> 两者都在提交 `d048827` 上产生。
+> 运行编号：单实例 `d4-20261012T143111Z`（提交 `d048827`），三实例
+> `d4-3host-20261012T152216Z`（提交 `bcd8935`，由 `infra.d4_three_hosts`
+> 一条命令驱动）。
 >
 > 结论：**D4 传输层与算子网格通过，且已在三台独立实例上复跑**。1,024 组向量
 > 全部与固定点参考一致，协议端口上的抓包只出现 TLS 1.3 记录，五类
@@ -15,7 +16,8 @@
 
 ## 1. 验收环境
 
-单实例运行在三台机器中的 SGX2 上，三实例运行把 P0/P1/P2 分到三台：
+单实例运行在三台机器中的 SGX2 上，三实例运行把 P0/P1/P2 分到三台，并且在
+每台上各自启动一个节点进程：
 
 | 角色 | 实例 | 私网 | 公网 | SGX2 单实例运行 |
 | --- | --- | --- | --- | --- |
@@ -36,7 +38,8 @@
 | OpenSSL | 3.0.2 |
 | 抓包 | tcpdump 4.99.1（`cap_net_raw,cap_net_admin`） |
 | 单实例运行时长 | 14:31:11Z 起，14:32:19Z 写出 `d4-summary.json`，约 68 秒 |
-| 三实例运行时长 | 14:31:39Z 起，14:35 前完成收尾，约 4 分钟（含建链路重试） |
+| 三实例运行时长 | 15:22:16Z 起，15:23Z 封存，约 2 分钟（含三份抓包各自解析） |
+| 三实例链路建立 | P0 2.882 s、P1 5.338 s、P2 4.146 s（BRPC 建连跨主机） |
 
 ## 2. 使用的工具
 
@@ -55,6 +58,11 @@
   重组 TCP 流并走 TLS 记录层；`python -m infra.pcap_tls` 可在任一台实例上
   只用自己的抓包复算判决。
 - [infra/d4_evidence.py](../infra/d4_evidence.py)：证据装配、跨机封存与哈希。
+- [infra/d4_three_hosts.py](../infra/d4_three_hosts.py)：三实例运行的操作机
+  入口。校验每台实例的提交、发工作区、三台各自抓包与起节点、等驱动节点完成、
+  收回各角色的摘要与状态，并调用 `finalise_cross_host` 封存。
+- [deploy/run_d4_three_hosts.sh](../deploy/run_d4_three_hosts.sh)：上一个入口的
+  脚本化包装，读 `deploy/d4-three-hosts.json` 作为集群描述。
 
 ## 3. 流程
 
@@ -69,17 +77,19 @@
 6. 停止抓包，依次跑四个 fail-closed 负例，每一步都要求子进程非零退出。
 7. 解析抓包、写入 `tls-summary.txt`，装配并封存证据目录。
 
-三实例运行：
+三实例运行（`python -m infra.d4_three_hosts run`，操作机上一条命令）：
 
-1. 在 P0 上用同一份 cluster 文件描述三个私网地址，`--mode provision` 生成本次
-   工作区；P1/P2 得到**同一绝对路径**下的同一份工作区。
-2. 三台各自 `tcpdump -i eth0` 抓六个端口，P0 的一份是操作机转发过去的，P1/P2
-   的一份直接落在各自实例上。
-3. 先启动 P1、P2，再启动 P0；每个进程读自己那份配置里的私网地址，链路因此
+1. 读集群描述，逐台 `git rev-parse HEAD` 校验三台都在本次提交上，不一致就
+   直接停下，不产生证据。
+2. 在 P0 上 `--mode provision` 生成本次工作区，打成 tar；P1/P2 解到**同一
+   绝对路径**下，三份工作区逐字节同源。
+3. 三台各自 `tcpdump -i eth0` 抓六个协议端口，每份抓包都留在本机 `/tmp`。
+4. 先启动 P1、P2，再启动 P0；每个进程读自己那份配置里的私网地址，链路因此
    跨越 VPC 私网而不是 loopback。
-4. 等 P0 打出完成标记，停止三份抓包，各自解析出本机的 TLS 摘要。
-5. 把三份摘要、三份 `node-status.json`、三份节点日志、向量结果和通信 trace
-   收集到一个目录，做跨机证书互校并封存。
+5. 等 P0 打出完成标记，停三份抓包；每个角色各自解析本机抓包，得出一份带
+   本机摘要头的 TLS 摘要。
+6. 逐个角色等它对端写完 `node-status.json` 再取回，连同节点日志、向量结果和
+   通信 trace 收进同一个目录，做跨机证书互校、封存索引与排除清单。
 
 ## 4. 结果
 
@@ -92,7 +102,7 @@
 | 算子 | `add`、`mul`、`matmul`、`truncate`、`compare`、`reciprocal` | 同左 |
 | 网格摘要 | `96b6c83502203292840fd9836f0efbe6f5fe49225aa5b110a6f2b3c27f3695d5` | 同左 |
 | P0 / P1 / P2 状态 | `passed` / `served`（16 批）/ `served`（16 批） | 同左 |
-| 链路建立耗时 | P1 4.147 s，P2 3.986 s | P1 19.131 s，P2 13.646 s |
+| 链路建立耗时 | P1 4.147 s，P2 3.986 s | P0 2.882 s，P1 5.338 s，P2 4.146 s |
 | teardown | 三个节点均 `teardown_finished: true` | 同左 |
 
 两次运行的网格摘要完全相同，说明向量生成与算子结果在 loopback 和跨机两种
@@ -118,9 +128,9 @@
 
 | 角色 | 报文 | TCP 流 | TLS 1.3 流 | TLS 1.2 或更低 | 会话 | 握手消息 | application_data | 非 TLS 字节 | 判决 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| P0 | 71026 | 112 | 42 | 0 | 56 | 96 | 123104 | 0 | `tls13_only` |
-| P1 | 70292 | 62 | 23 | 0 | 31 | 56 | 122765 | 0 | `tls13_only` |
-| P2 | 70083 | 58 | 23 | 0 | 29 | 56 | 122765 | 0 | `tls13_only` |
+| P0 | 71278 | 96 | 42 | 0 | 48 | 96 | 123098 | 0 | `tls13_only` |
+| P1 | 70360 | 52 | 23 | 0 | 26 | 56 | 122766 | 0 | `tls13_only` |
+| P2 | 70271 | 52 | 23 | 0 | 26 | 56 | 122776 | 0 | `tls13_only` |
 
 三份抓包合起来覆盖完整三角：P0 看到 P0↔P1 与 P0↔P2，P1 看到 P1↔P0 与
 P1↔P2，P2 看到 P2↔P0 与 P2↔P1。没有任何一份出现低于 TLS 1.3 的流量。
@@ -163,20 +173,22 @@ P1↔P2，P2 看到 P2↔P0 与 P2↔P1。没有任何一份出现低于 TLS 1.3
 | 单实例节点证书 P0 | sha256 `1c4ed3b2c2caad70bd7acc603e80fa3716493500d0b145323e36e627d2f42b79` |
 | 单实例节点证书 P1 | sha256 `d44739a89f6fc2e85e62f4951b885e3e1b1e5a3d3a426dc696e0d673262a6659` |
 | 单实例节点证书 P2 | sha256 `0a1629ee201652d4b2fc3a05dfc8d2d5de638f90f99a01f3802b5c170a8a798a` |
-| 三实例身份摘要 P0 | sha256 `276ea1220c0c7e41b205e43e549139878623180bb796d4911b75578006663319` |
-| 三实例身份摘要 P1 | sha256 `277ecc89b01d3b99e5ce864e6b378b1da89a8240bbe07af86f897e3fc532a3fe` |
-| 三实例身份摘要 P2 | sha256 `771d2ad53c407589549fe250169327b0704bdd229f6bfc5d0b7cbf8e7685350b` |
+| 三实例身份摘要 P0 | sha256 `bc1ab72602644fbd3779dfc2a537485b3e5b66931874560ac83cc96ea83a2c6f` |
+| 三实例身份摘要 P1 | sha256 `04d383c1d26f16e7394b22246d97225141b9d3b2ccddb4f1e7ec38d72acd6188` |
+| 三实例身份摘要 P2 | sha256 `b698f3a4b9a111f8999f0bad68640239b8a893d19113fc19526f56c79c5320f6` |
+| 三实例 P0 批次份额摘要 | sha256 `3518f52e68f20eb51a410b31ab8bc69343d77f11f4ebaed048c0b3d6fb5530c5` |
 | 单实例 `tls-pcap.pcap` | 216264133 字节，sha256 `f0b06cbcb38bd7afe92ec466d0b1c318bf8ee16e93f314414f508d2ef114fbd5` |
-| 三实例 `d4-three-P0.pcap` | 144791448 字节，sha256 `4e73cabdb4cd6bdc0cdd597d87bcc326881d0d318457029e1ba09894539f656a` |
-| 三实例 `d4-three-P1.pcap` | 143211316 字节，sha256 `557b2b67a5901426a77f11029d47a5c6ebfba23799ca3bf91b0215f3ae159979` |
-| 三实例 `d4-three-P2.pcap` | 143195726 字节，sha256 `24d3170021874e747f98d3104e7f5af3ddf4ad0805b4da3544a333509d27e1c1` |
+| 三实例 `d4-three-P0.pcap` | 144817498 字节，sha256 `1d62c96516c56c62bf2881892ae23dd2632efa465b137beb4a09f23ce08120e5` |
+| 三实例 `d4-three-P1.pcap` | 143226938 字节，sha256 `6fe69e52756137608bdc43924e3ffc69ca26df7581ffba9041c40ac4a260d549` |
+| 三实例 `d4-three-P2.pcap` | 143216390 字节，sha256 `9739bb92af40cc06cc3836023bd6a90fcdf57207fcd8f5417eab0cfd16cff9b8` |
 | 单实例 evidence-index.json | sha256 `e01ecec23b29c735ee1873cb9d1e3aeabebdd7f21c86cdafc01ec46e9f353c7e` |
+| 三实例 evidence-index.json | sha256 `f03efb634c850939d699f8db8fc6d8791944b4c2501f22696a347a0552e30621` |
 
 ## 6. 证据位置
 
 单实例运行证据在
 [docs/evidence/d4-20261012T143111Z](evidence/d4-20261012T143111Z)，三实例运行
-证据在 [docs/evidence/d4-3host-20261012T143139Z](evidence/d4-3host-20261012T143139Z)；
+证据在 [docs/evidence/d4-3host-20261012T152216Z](evidence/d4-3host-20261012T152216Z)；
 两个目录各有一份 `README.md` 说明每个文件的含义。
 
 四份原始抓包都超过 GitHub 单文件上限，未随仓库提交：入库目录与封存索引
@@ -207,9 +219,9 @@ P1↔P2，P2 看到 P2↔P0 与 P2↔P1。没有任何一份出现低于 TLS 1.3
 cd ~/1037ciphertext
 PYTHON=~/a122-venv311/bin/python bash deploy/run_d4_accept.sh
 
-# 三实例（操作机上，cluster 文件指向三个私网地址）
-cd ~/1037ciphertext
-CLUSTER=deploy/d4-three-hosts.example.json python -m infra.d4_three_hosts run
+# 三实例（操作机上，cluster 文件给出三个私网地址与各自的 ssh 公网地址）
+CLUSTER=deploy/d4-three-hosts.json SSHK=~/.ssh/a122_id_sgx \
+  ./deploy/run_d4_three_hosts.sh
 ```
 
 ## 8. 跨机复跑留下的环境结论（2026-10-12）
@@ -221,3 +233,9 @@ CLUSTER=deploy/d4-three-hosts.example.json python -m infra.d4_three_hosts run
   [deploy/install_spu_server.sh](../deploy/install_spu_server.sh)。
 - 三台实例之间没有装互信密钥，跨机分发因此由操作机转发：工作区打成 tar
   后落到三台的同一绝对路径，节点进程仍各自在本机启动。
+- 节点在**集体 teardown** 阶段踩到过一次第三方库竞态：2026-10-12 的一次运行里
+  P2 在自己的 `runtime.stop()`（yacl 的 barrier + `stop_link`）中由 brpc 报
+  `Check failed: false. error_code is 0` 后 abort，没写出 `node-status.json`；
+  同一次运行的正向网格已经 1024/1024 通过，重启三台重跑即恢复正常。这条路径
+  由 yacl/brpc 决定，本仓库现在只能做到"等对端写完状态再收集"和"缺文件时报出
+  是哪个角色缺"，尚未从根上消除该竞态。

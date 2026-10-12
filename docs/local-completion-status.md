@@ -13,7 +13,8 @@
 > [d3-kas-release-acceptance.md](d3-kas-release-acceptance.md)。D4 的传输层、
 > 1,024 组 RSS 向量、抓包判决和五类 fail-closed 场景在 SGX2 上以三进程形式
 > 通过（运行 `d4-20261012T143111Z`），随后 P0/P1/P2 又分到三台独立实例上
-> 复跑正向网格与抓包（运行 `d4-3host-20261012T143139Z`），见
+> 复跑正向网格与抓包（运行 `d4-3host-20261012T152216Z`，由
+> `infra.d4_three_hosts` 一条命令驱动），见
 > [d4-acceptance.md](d4-acceptance.md)。D5 及之后仍待执行；D4 还差三个
 > `gramine-sgx` enclave 内的执行、真实 attestation 放行，以及跨机复跑负例。
 
