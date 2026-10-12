@@ -1,0 +1,33 @@
+{
+  "key_id": "c9eca76f72b4c3261f91164bb7e4c0a7a6b9e0d19a175ac66d2009aca721bd24",
+  "plaintext_dir": "/home/jiahao/1037ciphertext/artifacts/server/d3-kas-20261012T115025Z/work/d3-kas/plain",
+  "plaintext_files": [
+    {
+      "bytes": 46080,
+      "name": "model-share-P0.bin",
+      "sha256": "e4150b9bc6d172cb4b7e81c332f3d994c3116488175fa9b6901c013de7fa095b"
+    },
+    {
+      "bytes": 1152,
+      "name": "precision-plan-P0.json",
+      "sha256": "34608db5527d50df514ab95fd8f7a5e77823976f1fc5b9bf7c4e6e8077c9ad1e"
+    }
+  ],
+  "purpose": "model-store",
+  "release_id": "a122-d3-kas-v1",
+  "role": "P0",
+  "share_epoch": 1,
+  "store_dir": "/home/jiahao/1037ciphertext/artifacts/server/d3-kas-20261012T115025Z/work/d3-kas/store",
+  "store_files": [
+    {
+      "bytes": 53248,
+      "name": "model-share-P0.bin",
+      "sha256": "1b28b56e94b4586d1a4ab6c5267aef9239c793c9d25119df93e18fa811abafbe"
+    },
+    {
+      "bytes": 4096,
+      "name": "precision-plan-P0.json",
+      "sha256": "28d3cd973f315a0c566e58df1dc5d184f29ed7f067aee8253472af6ec34a46a0"
+    }
+  ]
+}

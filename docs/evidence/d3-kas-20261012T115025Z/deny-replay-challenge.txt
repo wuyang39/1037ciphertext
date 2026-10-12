@@ -1,0 +1,39 @@
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+A1_22_ENCFS_BEGIN
+bundle_open_ok=1
+content_len=46080
+content_prefix_sha256=14cd7bb478ee7ee9be85f7bc184a84e11369c76349c4f9c1ccf286cbdc1a1d37
+content_sha256=e4150b9bc6d172cb4b7e81c332f3d994c3116488175fa9b6901c013de7fa095b
+enclave_public_key=ae6bb346584842972f448bb0b0161aaa5867ba4dd205e4988c6173d65a571895acd3c8edc88bf1525f32c9c7a1e8d466c964d4c3003a35a6437d9b505d07c23e
+host_now_unix=1791805883
+key_id_match=1
+key_installed=1
+lease_fresh_ok=1
+model_version=tiny-local-v1
+pf_key_bytes=16
+quote_bytes=4734
+quote_sha256=69c93d9507d549692e76b2a06da46601a612836da517e7a4fab4c73acf632286
+read_ok=1
+release_expires_at_unix=1791809482
+release_id=a122-d3-kas-v1
+report_data_len=64
+report_data_sha256=9ad9c128048f88ceb2b4abf2d3e602e86e6551099a12f759461e190fc4b1fc54
+role=P0
+sealed_bytes=224
+sealed_seen=1
+share_epoch=1
+share_epoch_ok=1
+startup_hash=42748f8b5597654dea6bbcd009546c8d557ef40ff6a4c8b17c7f75b2740f09a7
+startup_hash_ok=1
+worker_started=1
+A1_22_ENCFS_END
+# gramine-sgx exit status: 0

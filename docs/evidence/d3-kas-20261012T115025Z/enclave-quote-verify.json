@@ -1,0 +1,16 @@
+{
+  "mrenclave": "88e73d97fe87362eac096f44df23ffd2b271cb8de7b99fa4c13d6c118a2f5cd2",
+  "mrsigner": "4296167eed40572682c03bd4dba260ff16383d7299117d0de8ec22f52dc329b7",
+  "isvsvn": 0,
+  "isv_prod_id": 0,
+  "debug": false,
+  "report_data_b64": "+aFJQX8ifeKK4W9FvjWind6XIPPlRUZI1yAOE6Hs6ocAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+  "attributes_flags": "0x0000000000000005",
+  "quote_size": 4734,
+  "signature_data_len": 4298,
+  "dcap_verify_status": "0x0000",
+  "dcap_verification_result": "0x0000a008",
+  "dcap_result_prefix": "0xa000",
+  "collateral_expiration_status": 0,
+  "supplemental_data_version": 327683
+}

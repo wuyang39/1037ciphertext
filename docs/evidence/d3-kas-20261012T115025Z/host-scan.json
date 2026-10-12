@@ -1,0 +1,11 @@
+{
+  "hits": [],
+  "needle_bytes": 46080,
+  "plaintext_share_found_on_host": false,
+  "roots": [
+    "/home/jiahao/1037ciphertext/artifacts/server/d3-kas-20261012T115025Z",
+    "/tmp",
+    "/var/log",
+    "/home/jiahao"
+  ]
+}

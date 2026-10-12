@@ -1,0 +1,25 @@
+{
+  "enclave": {
+    "bundle_error": "sealed bundle could not be opened: SM2 ciphertext integrity check failed",
+    "bundle_open_ok": 0,
+    "enclave_public_key": "264459b33634638ef603b92c31916f1edcd1f7771854319cad99e0797c38cda5b7c658e95cc106682dc441968a3488b5546fda23153ee08c455a47653bfbadb2",
+    "key_installed": 0,
+    "model_version": "tiny-local-v1",
+    "quote_bytes": 4734,
+    "quote_sha256": "41c474988d7e32fb42ebeb9ac153f266109c9c100599fbb655b1f340c7266816",
+    "read_ok": 0,
+    "reject_reason": "EnclaveWorkerRejected: the sealed storage-key bundle was refused",
+    "release_id": "a122-d3-kas-v1",
+    "report_data_len": 64,
+    "report_data_sha256": "4b47a036bd2e42e97d055a5f58edc1d218d7f66807a1238370666d508f89929d",
+    "role": "P0",
+    "sealed_bytes": 224,
+    "sealed_seen": 1,
+    "share_epoch": 1
+  },
+  "enclave_complete": true,
+  "enclave_exit_status": 3,
+  "seal_status": 200,
+  "sealed_delivered": true,
+  "tampered": true
+}

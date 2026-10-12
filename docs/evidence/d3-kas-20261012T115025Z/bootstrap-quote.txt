@@ -1,0 +1,25 @@
+A1_22_ENCFS_BEGIN
+enclave_public_key=d2d3f4c1c6205850f1035de1c2552312c2ad9cc67b294643fbf6da5169d0032543b3312a7704f3ed93059502e3df4c1c2f011b37a4c179fd3df2e2b26ecaf801
+key_installed=0
+model_version=tiny-local-v1
+quote_bytes=4734
+quote_sha256=57a470dc302383700de8189f20e9d7e639d8032de60ee0bc14b1baed3560bf03
+read_ok=0
+reject_reason=EnclaveWorkerRejected: the sealed storage key never arrived
+release_id=a122-d3-kas-v1
+report_data_len=64
+report_data_sha256=93067c33dc787118ba99363f01a7d265c31c681c2b5d00006e34c9aa88bae9b7
+role=P0
+sealed_seen=0
+share_epoch=1
+A1_22_ENCFS_END
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+

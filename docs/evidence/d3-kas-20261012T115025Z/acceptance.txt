@@ -1,0 +1,8 @@
+==> case case_accept
+==> case case_missing_sealed
+==> case case_tampered_sealed
+==> case case_wrong_epoch
+==> case case_wrong_startup
+==> case case_replay_challenge
+==> case case_second_seal
+==> case case_wrong_measurement

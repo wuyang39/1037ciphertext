@@ -1,0 +1,39 @@
+# store listing
+total 56
+-rw-rw-r-- 1 jiahao jiahao 53248 Oct 12 19:50 model-share-P0.bin
+-rw-rw-r-- 1 jiahao jiahao  4096 Oct 12 19:50 precision-plan-P0.json
+
+# host cat of the encrypted share (first 256 bytes, xxd)
+00000000: 4752 4146 535f 5046 0200 4e97 1d00 de56  GRAFS_PF..N....V
+00000010: 3edd a75c bfe6 4e15 00d5 81ad 356b 17d0  >..\..N.....5k..
+00000020: 88c6 853b d936 7409 bf11 4397 8afb 4c2d  ...;.6t...C...L-
+00000030: 2eca 01b3 816d 3fc1 630f 00c4 9bd3 f4cf  .....m?.c.......
+00000040: 38ae 320c 7601 b147 5839 c2ee 2e04 b0ad  8.2.v..GX9......
+00000050: 98c0 f538 a91e 7e30 9eaa 0834 966b bcd6  ...8..~0...4.k..
+00000060: ee69 16ec 5e35 6e02 07b7 29df 803f 91d2  .i..^5n...)..?..
+00000070: 3372 0b1a 145b 5a2d b071 4a12 71e0 5edb  3r...[Z-.qJ.q.^.
+00000080: cf4a 668f 65e5 680a ef6c 1a6d cf59 4a09  .Jf.e.h..l.m.YJ.
+00000090: b85c 51b8 0dd5 5cff 6b94 767e 08ba 6bee  .\Q...\.k.v~..k.
+000000a0: d7c3 0f93 3add ab5c fd41 5373 2833 20a1  ....:..\.ASs(3 .
+000000b0: ba2f 82c0 3ddc d284 1877 525b b974 0b5c  ./..=....wR[.t.\
+000000c0: 2de1 fe9c 3f2a 257e 3276 0ed3 a50a 5f22  -...?*%~2v...._"
+000000d0: 35cd 590f 6b84 6ed6 888d 3a89 d7fe 70b0  5.Y.k.n...:...p.
+000000e0: a5b8 eb34 9edc dbf3 e27d 3e0e 20f7 8963  ...4.....}>. ..c
+000000f0: 1054 b26e b030 2098 2eaf 5c5a a8f1 5e92  .T.n.0 ...\Z..^.
+
+# host strings of the encrypted share
+GRAFS_PF
+]6'?go^)\
+Fagb+r%uzAS
+x*4+~;US}&
+Gz|^.kF4
+('9:Vpy0_
+e6^)/kDT=h
+JH8zFm[|
+{#vLT@md
+
+# plaintext share directory after packaging (expected to be scrubbed)
+total 0
+
+# packager key files left behind (expected: none)
+none

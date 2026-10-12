@@ -85,16 +85,19 @@ python -m infra.seal_evidence verify docs/evidence/d3-20261012T1930
 3. 缺密钥、错误密钥、篡改和复制存储四种 fail-closed 情形。
 4. 生产 manifest 模板按实机 Gramine 1.9 schema 改写并实测通过
    （见第 7 节），同时补齐静态校验规则。
+5. 后续运行 `d3-kas-20261012T115025Z` 把宿主生成的 KDK 换成 KAS 证明后放行
+   的 `K_disk_P0`，并把固定 Worker 入口接上真实启动条件，见
+   [d3-kas-release-acceptance.md](d3-kas-release-acceptance.md)。
 
 遗留：
 
-1. KDK 仍由宿主生成。把 `K_disk_i` 的放行绑定到 KAS 的证明结论，需要
-   enclave 内的可信通道（RA-TLS 或 Secret Provisioning），属于 D3 剩余项。
-2. 固定 Worker 入口只在 active Lease、正确 epoch 和正确 startup hash 下启动
-   这一条尚未接入真实入口。
-3. 镜像、环境变量和 core dump 扫描本轮覆盖到 `artifacts/`、`/tmp`、
+1. 镜像、环境变量和 core dump 扫描本轮覆盖到 `artifacts/`、`/tmp`、
    `/var/log` 与 `$HOME`；容器镜像与 core dump 采集待 D9。
-4. D4–D10 尚未开始。
+2. D4–D10 尚未开始。
+
+本节原先的两项遗留（KDK 由宿主生成、固定 Worker 入口未接入真实入口）已由
+运行 `d3-kas-20261012T115025Z` 关闭，见
+[d3-kas-release-acceptance.md](d3-kas-release-acceptance.md)。
 
 ## 7. 生产 manifest 修正
 

@@ -1,0 +1,31 @@
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+A1_22_ENCFS_BEGIN
+bundle_open_ok=1
+enclave_public_key=81c2af1e9bce877802501bd236695addfe4ce7e0f5671b1ed29b4ca900fa517c3eb6616651af8d3876064de7fa4273a14cfcc29742fee85c9544f905ebc6ab50
+key_id_match=1
+key_installed=0
+model_version=tiny-local-v1
+quote_bytes=4734
+quote_sha256=0440f1b1e015464063fccc55642d2b11b3c5aa6173e73530301fdf79d90cfbe7
+read_ok=0
+reject_reason=EnclaveWorkerRejected: the KAS did not authorize this Worker startup configuration
+release_id=a122-d3-kas-v1
+report_data_len=64
+report_data_sha256=e7cdc4e7c3986ec4e0a71c1b981b82c50f376db38b58a2c5f13b1a1f7a6f2a3e
+role=P0
+sealed_bytes=224
+sealed_seen=1
+share_epoch=2
+startup_hash=3093f6664db5905438472c29913d9a6bae351f80c8d382fd556fbcda56efc7b6
+startup_hash_ok=0
+A1_22_ENCFS_END
+# gramine-sgx exit status: 3

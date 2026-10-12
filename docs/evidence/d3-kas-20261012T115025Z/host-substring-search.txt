@@ -1,0 +1,5 @@
+full_share: length=46080 found_in_store=False
+first_64_bytes: length=64 found_in_store=False
+last_64_bytes: length=64 found_in_store=False
+plaintext_share_on_host=False
+plaintext_bytes=46080 stored_bytes=53248

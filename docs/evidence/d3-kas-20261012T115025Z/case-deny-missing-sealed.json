@@ -1,0 +1,22 @@
+{
+  "enclave": {
+    "enclave_public_key": "6ef4e905d2fb130a530848ed6968b03b297a4feed23e4eb5e358896ce2bb54b46a352b2d46fe2568c0d7b8f595b45d669fc1a74f1fb3c560ca87e3de8bb2f285",
+    "key_installed": 0,
+    "model_version": "tiny-local-v1",
+    "quote_bytes": 4734,
+    "quote_sha256": "fe920a8b8572cf719d24cddd8794fd9e9deb5eb8c4843d0c914b7c0f7b0292c8",
+    "read_ok": 0,
+    "reject_reason": "EnclaveWorkerRejected: the sealed storage key never arrived",
+    "release_id": "a122-d3-kas-v1",
+    "report_data_len": 64,
+    "report_data_sha256": "084d6e66d49abaa7a5feaf487f674d29222454b24ced7637f415594f294a72bc",
+    "role": "P0",
+    "sealed_seen": 0,
+    "share_epoch": 1
+  },
+  "enclave_complete": true,
+  "enclave_exit_status": 3,
+  "key_id": "c9eca76f72b4c3261f91164bb7e4c0a7a6b9e0d19a175ac66d2009aca721bd24",
+  "seal_status": 200,
+  "sealed_delivered": false
+}

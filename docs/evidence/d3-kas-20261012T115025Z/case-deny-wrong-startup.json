@@ -1,0 +1,27 @@
+{
+  "enclave": {
+    "bundle_open_ok": 1,
+    "enclave_public_key": "f8357bdecd18830e835379681aca047cccc2468bb883d1cf509ded4709f7b108b42e3f482a40855dcdcbc124be32bfa7b0b4ed811c3f269587fb92d5176e4b26",
+    "key_id_match": 1,
+    "key_installed": 0,
+    "model_version": "unregistered-model",
+    "quote_bytes": 4734,
+    "quote_sha256": "2dd1aedb62b2684508293277c474eb9355ca0e3f65f579c533f6a801fd54e8ae",
+    "read_ok": 0,
+    "reject_reason": "EnclaveWorkerRejected: the KAS did not authorize this Worker startup configuration",
+    "release_id": "a122-d3-kas-v1",
+    "report_data_len": 64,
+    "report_data_sha256": "91771ada263f6ca146628fe3e809b9f29ac6277489b431470b2380a2d97a1069",
+    "role": "P0",
+    "sealed_bytes": 224,
+    "sealed_seen": 1,
+    "share_epoch": 1,
+    "startup_hash": "e9ac982bf291656b24454fdf4a7c0e13cfe40121eae125763501b3646ad6dd70",
+    "startup_hash_ok": 0
+  },
+  "enclave_claimed_model_version": "unregistered-model",
+  "enclave_complete": true,
+  "enclave_exit_status": 3,
+  "seal_status": 200,
+  "sealed_delivered": true
+}

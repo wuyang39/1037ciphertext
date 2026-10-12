@@ -1,0 +1,16 @@
+{
+  "releases": [
+    {
+      "debug_allowed": false,
+      "expires_at": "2026-10-12T17:50:40+00:00",
+      "min_isvsvn": 0,
+      "model_manifest_hash": "33b1459be3cafda7967332232f5e6795348ee30114600d5f2a6ffb7c1cc9b9a7",
+      "model_version": "tiny-local-v1",
+      "mrenclave": "88e73d97fe87362eac096f44df23ffd2b271cb8de7b99fa4c13d6c118a2f5cd2",
+      "mrsigner": "4296167eed40572682c03bd4dba260ff16383d7299117d0de8ec22f52dc329b7",
+      "precision_plan_hash": "553e030db54423a25af39740c8461fd74f121077e96f073b3f2b899d79a7659b",
+      "release_id": "a122-d3-kas-v1",
+      "spu_build_hash": "88e73d97fe87362eac096f44df23ffd2b271cb8de7b99fa4c13d6c118a2f5cd2"
+    }
+  ]
+}

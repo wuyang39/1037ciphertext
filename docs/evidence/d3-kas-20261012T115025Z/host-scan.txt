@@ -1,0 +1,8 @@
+{"hits": 0}
+# needle bytes: 46080
+# host scan status: 0 (0 means no plaintext share on the host)
+
+# files on the host whose name matches the share
+/home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/secure/model-share-P0.bin
+/home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/secure-copy/model-share-P0.bin
+/home/jiahao/1037ciphertext/artifacts/server/d3-kas-20261012T115025Z/work/d3-kas/store/model-share-P0.bin
