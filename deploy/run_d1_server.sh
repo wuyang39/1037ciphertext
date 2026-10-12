@@ -41,6 +41,52 @@ echo "evidence    : $OUT"
 echo "secrets     : $SECRETS"
 echo "instance_id : $INSTANCE_ID"
 
+echo "==> capturing environment evidence"
+{
+    echo "# host"
+    uname -a
+    echo
+    echo "# os-release"
+    head -5 /etc/os-release 2>&1
+    echo
+    echo "# cpu"
+    lscpu 2>/dev/null | sed -n '1,20p'
+    echo
+    echo "# memory"
+    free -m 2>&1
+    echo
+    echo "# disk"
+    df -h / 2>&1
+} > "$OUT/instance-check.txt" 2>&1
+
+{
+    echo "# SGX flags in /proc/cpuinfo"
+    grep -o -E "sgx[a-z_]*" /proc/cpuinfo 2>/dev/null | sort -u
+    echo
+    echo "# SGX devices"
+    ls -l /dev/sgx_enclave /dev/sgx_provision 2>&1
+    echo
+    echo "# aesmd"
+    systemctl is-active aesmd 2>&1
+    echo
+    echo "# /etc/sgx_default_qcnl.conf"
+    cat /etc/sgx_default_qcnl.conf 2>&1
+} > "$OUT/cpuinfo-and-devices.txt" 2>&1
+
+PYTHONPATH="$ROOT" "$PYTHON" -m infra.d1_environment_check \
+    --output "$OUT/d1-environment.json" >/dev/null 2>&1 || true
+
+if [ "${CAPTURE_SAMPLE_ENCLAVE:-1}" = "1" ]; then
+    echo "==> running Intel SGX SampleEnclave"
+    SAMPLE_WORK="$WORK/sample-enclave"
+    rm -rf "$SAMPLE_WORK"
+    mkdir -p "$SAMPLE_WORK"
+    cp -r "$SGX_SDK/SampleCode/SampleEnclave" "$SAMPLE_WORK/"
+    (
+        cd "$SAMPLE_WORK/SampleEnclave" && make >/dev/null 2>&1 && ./app < /dev/null
+    ) > "$OUT/sample-enclave.txt" 2>&1 || true
+fi
+
 echo "==> building DCAP verifier"
 make -C "$ROOT/tee/attestation/dcap_verifier" >/dev/null
 
