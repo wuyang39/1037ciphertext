@@ -200,18 +200,78 @@ class Transport:
         timeout: float | None = None,
         check: bool = True,
     ) -> tuple[int, str, str]:
+        """Run a command to completion and return its output.
+
+        The exit status decides when the command is done, not end of file: a
+        command that leaves a detached process behind keeps the channel open
+        long after it has returned, so waiting for EOF would hang here.
+        """
         client = self._connect(route)
-        _stdin, stdout, stderr = client.exec_command(
-            command, timeout=timeout or self.timeout
-        )
-        out = stdout.read().decode("utf-8", "replace")
-        err = stderr.read().decode("utf-8", "replace")
-        status = stdout.channel.recv_exit_status()
+        seconds = timeout or self.timeout
+        _stdin, stdout, _stderr = client.exec_command(command, timeout=seconds)
+        channel = stdout.channel
+        out = bytearray()
+        err = bytearray()
+        deadline = time.monotonic() + seconds
+        quiet_since = time.monotonic()
+        while True:
+            if channel.recv_ready():
+                out += channel.recv(65536)
+                quiet_since = time.monotonic()
+                continue
+            if channel.recv_stderr_ready():
+                err += channel.recv_stderr(65536)
+                quiet_since = time.monotonic()
+                continue
+            if time.monotonic() > deadline:
+                channel.close()
+                raise ThreeHostError(
+                    f"{route.role}: command did not finish within {seconds:.0f}s: "
+                    f"{command}"
+                )
+            # Exit status can be ready before the last bytes are readable.
+            if channel.exit_status_ready() and time.monotonic() - quiet_since > 0.3:
+                break
+            time.sleep(0.05)
+        status = channel.recv_exit_status()
+        channel.close()
+        text_out = out.decode("utf-8", "replace")
+        text_err = err.decode("utf-8", "replace")
         if check and status != 0:
             raise ThreeHostError(
-                f"{route.role}: command failed with {status}: {command}\n{err.strip()}"
+                f"{route.role}: command failed with {status}: {command}\n"
+                f"{text_err.strip()}"
             )
-        return status, out, err
+        return status, text_out, text_err
+
+    def start_background(
+        self,
+        route: SSHRoute,
+        command: str,
+        *,
+        settle: float = 3.0,
+    ) -> str:
+        """Start a detached process and stop reading as soon as it is up.
+
+        The process is ``setsid``-ed with its own stdio, so closing the channel
+        ends this shell session without touching it. Whether the shell itself
+        exits immediately is not worth waiting for; the caller confirms the
+        process came up by watching its log.
+        """
+        client = self._connect(route)
+        _stdin, stdout, _stderr = client.exec_command(command, timeout=settle)
+        channel = stdout.channel
+        collected = bytearray()
+        deadline = time.monotonic() + settle
+        while time.monotonic() < deadline:
+            if channel.recv_ready():
+                collected += channel.recv(65536)
+            elif channel.exit_status_ready():
+                break
+            else:
+                time.sleep(0.05)
+        channel.close()
+        return collected.decode("utf-8", "replace")
 
     def get(self, route: SSHRoute, remote: str, local: Path) -> None:
         sftp = self._connect(route).open_sftp()
@@ -434,17 +494,16 @@ def run_three_hosts(
                     f"sudo -n setcap cap_net_raw,cap_net_admin+eip $(command -v tcpdump)",
                     check=False,
                 )
-                transport.run(
+                transport.start_background(
                     role_routes[role],
                     capture_command(
                         iface=iface, pcap=pcaps[role], log=cap_logs[role]
                     ),
-                    check=False,
                 )
             time.sleep(2.0)
 
             for role in ("P1", "P2"):
-                transport.run(
+                transport.start_background(
                     role_routes[role],
                     node_command(
                         python=python,
@@ -452,7 +511,6 @@ def run_three_hosts(
                         config=f"{workspace}/configs/{role}.json",
                         log=node_logs[role],
                     ),
-                    check=False,
                 )
             for role in ("P1", "P2"):
                 wait_for_marker(
@@ -462,7 +520,7 @@ def run_three_hosts(
                     marker=READY_MARKER,
                     timeout=node_timeout,
                 )
-            transport.run(
+            transport.start_background(
                 role_routes["P0"],
                 node_command(
                     python=python,
@@ -470,7 +528,6 @@ def run_three_hosts(
                     config=f"{workspace}/configs/P0.json",
                     log=node_logs["P0"],
                 ),
-                check=False,
             )
             wait_for_marker(
                 transport,

@@ -201,6 +201,10 @@ class FakeTransport:
     def put(self, route: SSHRoute, local: Path, remote: str) -> None:
         self.uploads.append((route.role, str(local), remote))
 
+    def start_background(self, route: SSHRoute, command: str, *, settle: float = 3.0):
+        self.commands.append((route.role, command))
+        return "started\n"
+
     def close(self) -> None:
         self.closed = True
 
