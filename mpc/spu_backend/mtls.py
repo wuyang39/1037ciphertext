@@ -1,8 +1,15 @@
-"""Fail-closed TLS policy checks for the SPU/BRPC boundary.
+"""Fail-closed TLS policy for the SPU/BRPC boundary.
 
-This is not an implementation of TLS. It is a deterministic policy model that
-rejects missing certificates, wrong CAs, wrong role SANs, and configured
-downgrades before a real YACL/BRPC channel is allowed to start.
+The D4 link terminates real TLS inside the enclave: the SPU runtime owns the
+BRPC/OpenSSL context, and a second mutually authenticated channel moves input
+and output shares between the parties. This module holds the policy both paths
+share.
+
+``MockTLSChannel`` is the original in-process model. It stays as the unit-test
+double for the policy itself, but it is no longer the D4 acceptance path:
+``verify_live_peer`` checks the certificate the peer actually presented on a
+real handshake, and ``verify_session_version`` refuses any negotiated version
+below TLS 1.3.
 """
 
 from __future__ import annotations
@@ -123,7 +130,7 @@ def _verify_leaf(
 
 
 class MockTLSChannel:
-    """Validate two endpoint configurations before returning a TLS session."""
+    """Test-only: validate two endpoint configurations without a socket."""
 
     @staticmethod
     def connect(
@@ -184,9 +191,61 @@ class MockTLSChannel:
         )
 
 
+def verify_session_version(negotiated_version: str) -> str:
+    """Normalise and enforce the negotiated TLS version."""
+    normalised = negotiated_version.replace("v", "").replace("V", "")
+    if normalised not in {"TLS1.3"}:
+        raise TLSPolicyError(
+            f"the channel negotiated {negotiated_version!r}; TLS 1.3 is required"
+        )
+    return "TLS1.3"
+
+
+def verify_live_peer(
+    config: TLSConfig,
+    *,
+    peer_role: str,
+    peer_certificate_der: bytes,
+    negotiated_version: str,
+    now: dt.datetime | None = None,
+) -> TLSSession:
+    """Validate the certificate a peer presented on a real TLS handshake.
+
+    The check refuses a peer that is not on the role allowlist, negotiated
+    anything below TLS 1.3, presented no certificate, or presented a leaf that
+    does not chain to the configured CA with the expected role SAN.
+    """
+    if peer_role not in {"P0", "P1", "P2"}:
+        raise TLSPolicyError("peer role is not an SPU node")
+    if f"spiffe://a122/{peer_role}" != config.expected_peer_san:
+        raise TLSPolicyError("live peer role is outside the configured allowlist")
+    version = verify_session_version(negotiated_version)
+    if not peer_certificate_der:
+        raise TLSPolicyError("the live peer presented no certificate")
+    try:
+        peer_certificate = x509.load_der_x509_certificate(peer_certificate_der)
+    except ValueError as exc:
+        raise TLSPolicyError("the live peer certificate is not valid DER") from exc
+    current = now or dt.datetime.now(dt.timezone.utc)
+    _verify_leaf(
+        peer_certificate,
+        ca=_load_ca(config.ca_bundle_pem),
+        expected_san=config.expected_peer_san,
+        now=current,
+    )
+    return TLSSession(
+        local_role=config.role,
+        peer_role=peer_role,
+        peer_san=config.expected_peer_san,
+        tls_version=version,
+    )
+
+
 __all__ = [
     "MockTLSChannel",
     "TLSSession",
     "TLSPolicyError",
     "TLSConfig",
+    "verify_live_peer",
+    "verify_session_version",
 ]
