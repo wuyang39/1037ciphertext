@@ -30,6 +30,7 @@ PCAP_MAGIC_NS_BE = 0x4D3CB2A1
 LINKTYPE_ETHERNET = 1
 LINKTYPE_RAW = 101
 LINKTYPE_LINUX_SLL = 113
+LINKTYPE_LINUX_SLL2 = 276
 
 TLS_CONTENT_TYPES = {
     20: "change_cipher_spec",
@@ -139,6 +140,15 @@ def _iter_packets(path: Path) -> Iterable[bytes]:
                 if len(payload) < 16:
                     continue
                 yield payload[16:]
+            elif host == LINKTYPE_LINUX_SLL2:
+                # "any" device captures on modern Linux use the cooked v2
+                # header: a 20-byte preamble in front of the IPv4 packet.
+                if len(payload) < 20:
+                    continue
+                protocol = struct.unpack("!H", payload[:2])[0]
+                if protocol != 0x0800:
+                    continue
+                yield payload[20:]
             else:
                 raise PcapError(f"unsupported pcap link type: {host}")
 

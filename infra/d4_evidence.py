@@ -88,7 +88,10 @@ def copy_pcap(source: Path, out_dir: Path) -> str:
     if not source.is_file():
         raise D4EvidenceError(f"the capture is missing: {source}")
     target = Path(out_dir) / "tls-pcap.pcap"
-    shutil.copyfile(source, target)
+    # A live capture already writes into the evidence directory, so the source
+    # and the target are often the same file; that is not a copy failure.
+    if source.resolve() != target.resolve():
+        shutil.copyfile(source, target)
     return sha256_file(target)
 
 

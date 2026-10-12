@@ -11,7 +11,7 @@ from infra.pcap_tls import PcapError, analyse_capture, render_summary
 PCAP_PORTS = (47100, 47101)
 
 
-def _ethernet_ipv4_tcp(
+def _ipv4_tcp(
     *,
     source: str,
     source_port: int,
@@ -36,8 +36,19 @@ def _ethernet_ipv4_tcp(
         bytes(int(part) for part in source.split(".")),
         bytes(int(part) for part in destination.split(".")),
     )
+    return ipv4 + tcp
+
+
+def _ethernet_ipv4_tcp(**kwargs) -> bytes:
     ethernet = b"\x02\x00\x00\x00\x00\x01\x02\x00\x00\x00\x00\x02\x08\x00"
-    return ethernet + ipv4 + tcp
+    return ethernet + _ipv4_tcp(**kwargs)
+
+
+def _sll2_ipv4_tcp(**kwargs) -> bytes:
+    """A frame as ``tcpdump -i any`` writes it: a 20-byte cooked v2 header."""
+    sll2 = struct.pack("!HHIHBB", 0x0800, 0, 1, 1, 0, 6) + b"\x00" * 8
+    assert len(sll2) == 20
+    return sll2 + _ipv4_tcp(**kwargs)
 
 
 def _pcap(packets: list[bytes], linktype: int = 1) -> bytes:
@@ -83,23 +94,24 @@ def _server_hello(version: int = 0x0304) -> bytes:
 def _handshake_packets(
     client_versions: tuple[int, ...] = (0x0304,),
     server_version: int = 0x0304,
+    frame=_ethernet_ipv4_tcp,
 ) -> list[bytes]:
     return [
-        _ethernet_ipv4_tcp(
+        frame(
             source="10.0.0.1",
             source_port=47100,
             destination="10.0.0.2",
             destination_port=47101,
             payload=_record(22, _handshake(1, _client_hello(client_versions))),
         ),
-        _ethernet_ipv4_tcp(
+        frame(
             source="10.0.0.2",
             source_port=47101,
             destination="10.0.0.1",
             destination_port=47100,
             payload=_record(22, _handshake(2, _server_hello(server_version))),
         ),
-        _ethernet_ipv4_tcp(
+        frame(
             source="10.0.0.1",
             source_port=47100,
             destination="10.0.0.2",
@@ -119,6 +131,19 @@ def test_capture_with_tls13_records_only_is_green(tmp_path: Path) -> None:
     assert summary["tls12_or_lower_flows"] == 0
     assert summary["verdict"] == "tls13_only"
     assert "tls13_only" in render_summary(summary)
+
+
+def test_cooked_v2_capture_from_tcpdump_any_is_parsed(tmp_path: Path) -> None:
+    """``tcpdump -i any`` writes Linux SLL2 frames, not Ethernet ones."""
+    capture = tmp_path / "any.pcap"
+    capture.write_bytes(
+        _pcap(_handshake_packets(frame=_sll2_ipv4_tcp), linktype=276)
+    )
+    summary = analyse_capture(capture, expected_ports=PCAP_PORTS)
+    assert summary["packets_on_expected_ports"] == 3
+    assert summary["tls_only"] is True
+    assert summary["non_tls_payload_bytes"] == 0
+    assert summary["verdict"] == "tls13_only"
 
 
 def test_plaintext_payload_fails_the_capture(tmp_path: Path) -> None:

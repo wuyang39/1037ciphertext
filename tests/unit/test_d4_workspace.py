@@ -7,6 +7,7 @@ import pytest
 from infra.d4_evidence import (
     REQUIRED_FILES,
     copy_certificates,
+    copy_pcap,
     finalise,
     missing_required,
     write_document,
@@ -19,6 +20,7 @@ from infra.d4_workspace import (
     load_workspace,
     loopback_cluster,
 )
+from infra.evidence import sha256_file
 
 
 def _small_workspace(tmp_path):
@@ -124,3 +126,13 @@ def test_evidence_writer_refuses_sensitive_text(tmp_path) -> None:
 
     with pytest.raises(EvidenceError):
         write_text(tmp_path / "leak.txt", "-----BEGIN PRIVATE KEY-----\n")
+
+
+def test_copy_pcap_accepts_a_capture_taken_in_place(tmp_path) -> None:
+    """tcpdump writes straight into the evidence directory during a live run."""
+    out = tmp_path / "d4"
+    out.mkdir()
+    capture = out / "tls-pcap.pcap"
+    capture.write_bytes(b"\xd4\xc3\xb2\xa1not-really-a-pcap")
+    assert copy_pcap(capture, out) == sha256_file(capture)
+    assert capture.read_bytes().startswith(b"\xd4\xc3\xb2\xa1")
