@@ -277,16 +277,23 @@ class Transport:
         sftp = self._connect(route).open_sftp()
         try:
             Path(local).parent.mkdir(parents=True, exist_ok=True)
-            sftp.get(remote, str(local))
+            sftp.get(self._expand(sftp, remote), str(local))
         finally:
             sftp.close()
 
     def put(self, route: SSHRoute, local: Path, remote: str) -> None:
         sftp = self._connect(route).open_sftp()
         try:
-            sftp.put(str(local), remote)
+            sftp.put(str(local), self._expand(sftp, remote))
         finally:
             sftp.close()
+
+    @staticmethod
+    def _expand(sftp: Any, remote: str) -> str:
+        """Resolve a leading ``~``: sftp itself does not understand it."""
+        if remote == "~" or remote.startswith("~/"):
+            return sftp.normalize(".") + remote[1:]
+        return remote
 
     def close(self) -> None:
         for client in self._clients.values():

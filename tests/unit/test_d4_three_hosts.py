@@ -11,6 +11,7 @@ import pytest
 from infra.d4_three_hosts import (
     SSHRoute,
     ThreeHostError,
+    Transport,
     capture_command,
     endpoints,
     load_cluster,
@@ -108,6 +109,20 @@ def test_capture_and_node_commands_quote_their_paths() -> None:
     )
     assert "cd /home/u/repo" in node
     assert "-m tee.enclave.spu_node --config /home/u/ws/configs/P1.json" in node
+
+
+def test_transport_expands_a_home_relative_sftp_path() -> None:
+    """sftp does not understand `~`, so the transport resolves it first."""
+
+    class FakeSFTP:
+        def normalize(self, path: str) -> str:
+            assert path == "."
+            return "/home/jiahao"
+
+    sftp = FakeSFTP()
+    assert Transport._expand(sftp, "~/a/b.txt") == "/home/jiahao/a/b.txt"
+    assert Transport._expand(sftp, "~") == "/home/jiahao"
+    assert Transport._expand(sftp, "/tmp/x") == "/tmp/x"
 
 
 def test_summary_header_records_the_capture_digest() -> None:
