@@ -10,6 +10,12 @@ each TCP flow in capture order, walks the TLS record layer, and reports:
 * the versions offered and negotiated in the hello messages, and
 * any TCP payload that is not a well-formed TLS record.
 
+The D4 run deliberately fires a plaintext probe at each listener to show it is
+refused, so the capture always contains a few bytes that are not TLS. The
+analyser is told which endpoints were probed and what marker the probe sends;
+those bytes are attributed separately as ``expected_probe_bytes``, and only
+*unexplained* non-TLS payload fails the verdict.
+
 Only the summary leaves the runner; the capture itself stays in the evidence
 directory as the raw artifact.
 """
@@ -73,6 +79,7 @@ class TlsFlow:
     malformed_bytes: int = 0
     payload_bytes: int = 0
     alerts: list[int] = field(default_factory=list)
+    malformed_prefix: bytes = b""
     _buffer: bytearray = field(default_factory=bytearray, repr=False)
 
     def to_dict(self) -> dict[str, Any]:
@@ -96,6 +103,7 @@ class TlsFlow:
             ),
             "alerts": self.alerts,
             "malformed_bytes": self.malformed_bytes,
+            "malformed_prefix": self.malformed_prefix.hex(),
         }
 
 
@@ -184,6 +192,8 @@ def _parse_tls_records(flow: TlsFlow) -> None:
     while len(buffer) >= 5:
         content_type, version, length = struct.unpack("!BHH", bytes(buffer[:5]))
         if content_type not in TLS_CONTENT_TYPES:
+            if not flow.malformed_prefix:
+                flow.malformed_prefix = bytes(buffer[:64])
             flow.malformed_bytes += len(buffer)
             buffer.clear()
             return
@@ -283,9 +293,41 @@ def _parse_server_hello(flow: TlsFlow, message: bytes) -> None:
             flow.negotiated_version = struct.unpack("!H", data[:2])[0]
 
 
-def analyse_capture(path: Path, *, expected_ports: Sequence[int]) -> dict[str, Any]:
-    """Summarise a capture, restricted to the expected TCP ports."""
+def _is_expected_probe(
+    key: tuple[str, int, str, int],
+    flow: TlsFlow,
+    endpoints: frozenset[tuple[str, int]],
+    marker: bytes,
+) -> bool:
+    """Say whether a flow's non-TLS bytes are the deliberate plaintext probe."""
+    if not marker or not endpoints or not flow.malformed_prefix:
+        return False
+    if (key[2], key[3]) not in endpoints:
+        return False
+    # The probe may be split across segments, so accept a leading fragment of
+    # the marker rather than requiring the whole thing in one record.
+    return marker.startswith(flow.malformed_prefix)
+
+
+def analyse_capture(
+    path: Path,
+    *,
+    expected_ports: Sequence[int],
+    expected_probe_endpoints: Sequence[tuple[str, int]] = (),
+    probe_marker: bytes = b"",
+) -> dict[str, Any]:
+    """Summarise a capture, restricted to the expected TCP ports.
+
+    ``expected_probe_endpoints`` names the ``(host, port)`` listeners the run
+    deliberately probed with ``probe_marker``. Non-TLS bytes on those flows
+    that are a leading fragment of the marker are reported as
+    ``expected_probe_bytes``; everything else counts as an unexplained
+    plaintext violation.
+    """
     wanted = set(int(port) for port in expected_ports)
+    endpoints = frozenset(
+        (str(host), int(port)) for host, port in expected_probe_endpoints
+    )
     flows: dict[tuple[str, int, str, int], TlsFlow] = {}
     packet_count = 0
     for packet in _iter_packets(Path(path)):
@@ -314,6 +356,12 @@ def analyse_capture(path: Path, *, expected_ports: Sequence[int]) -> dict[str, A
     tls13 = sessions["tls13_sessions"]
     tls12_only = sessions["tls12_or_lower_sessions"]
     malformed = sum(flow.malformed_bytes for flow in flows.values())
+    expected_probe_bytes = sum(
+        flow.malformed_bytes
+        for key, flow in flows.items()
+        if _is_expected_probe(key, flow, endpoints, probe_marker)
+    )
+    unexplained = malformed - expected_probe_bytes
     application_records = sum(
         flow.record_types.get("application_data", 0) for flow in flows.values()
     )
@@ -329,10 +377,13 @@ def analyse_capture(path: Path, *, expected_ports: Sequence[int]) -> dict[str, A
         "tls12_or_lower_flows": tls12_only,
         "handshake_messages": handshakes,
         "application_data_records": application_records,
-        "non_tls_payload_bytes": malformed,
+        "non_tls_payload_bytes": unexplained,
+        "expected_probe_bytes": expected_probe_bytes,
+        "probe_marker": probe_marker.hex() if probe_marker else None,
+        "probe_endpoints": sorted(f"{host}:{port}" for host, port in endpoints),
         "sessions": sessions,
-        "tls_only": bool(flows) and malformed == 0,
-        "ciphertext_only": bool(flows) and malformed == 0,
+        "tls_only": bool(flows) and unexplained == 0,
+        "ciphertext_only": bool(flows) and unexplained == 0,
     }
     summary["verdict"] = (
         "tls13_only"
@@ -407,6 +458,12 @@ def render_summary(summary: dict[str, Any]) -> str:
         f"non-TLS payload bytes: {summary['non_tls_payload_bytes']}",
         f"verdict: {summary['verdict']}",
         "",
+        "# deliberate plaintext probes",
+        f"probe endpoints: {summary.get('probe_endpoints') or []}",
+        f"probe marker: {summary.get('probe_marker')}",
+        f"expected probe bytes: {summary.get('expected_probe_bytes', 0)}",
+        "those bytes are the refused probe itself and are not a protocol leak",
+        "",
         "# flows",
     ]
     for flow in summary["flows"]:
@@ -419,7 +476,9 @@ def render_summary(summary: dict[str, Any]) -> str:
             f"handshakes={flow['handshake_types']} "
             f"offered={flow['offered_versions']} "
             f"negotiated={flow['negotiated_version']} "
-            f"alerts={flow['alerts']}"
+            f"alerts={flow['alerts']} "
+            f"non_tls={flow['malformed_bytes']} "
+            f"non_tls_prefix={flow['malformed_prefix']}"
         )
     lines.append("")
     lines.append("# sessions")

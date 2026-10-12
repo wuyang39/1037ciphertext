@@ -194,6 +194,58 @@ def test_capture_outside_the_expected_ports_is_ignored(tmp_path: Path) -> None:
     assert summary["verdict"] == "tls_or_plaintext_violation"
 
 
+def test_deliberate_plaintext_probe_is_attributed_not_flagged(tmp_path: Path) -> None:
+    """The refused probe is expected bytes, not evidence of a plaintext leak."""
+    marker = b"A1-22-PLAINTEXT-PROBE\r\n"
+    packets = _handshake_packets()
+    packets.append(
+        _ethernet_ipv4_tcp(
+            source="10.0.0.1",
+            source_port=50001,
+            destination="10.0.0.2",
+            destination_port=47101,
+            payload=marker,
+        )
+    )
+    capture = tmp_path / "probe.pcap"
+    capture.write_bytes(_pcap(packets))
+    summary = analyse_capture(
+        capture,
+        expected_ports=PCAP_PORTS,
+        expected_probe_endpoints=[("10.0.0.2", 47101)],
+        probe_marker=marker,
+    )
+    assert summary["expected_probe_bytes"] == len(marker)
+    assert summary["non_tls_payload_bytes"] == 0
+    assert summary["tls_only"] is True
+    assert summary["verdict"] == "tls13_only"
+    assert "expected probe bytes" in render_summary(summary)
+
+
+def test_plaintext_that_is_not_the_probe_still_fails(tmp_path: Path) -> None:
+    packets = _handshake_packets()
+    packets.append(
+        _ethernet_ipv4_tcp(
+            source="10.0.0.1",
+            source_port=50002,
+            destination="10.0.0.2",
+            destination_port=47101,
+            payload=b"GET /status HTTP/1.1\r\n\r\n",
+        )
+    )
+    capture = tmp_path / "smuggled.pcap"
+    capture.write_bytes(_pcap(packets))
+    summary = analyse_capture(
+        capture,
+        expected_ports=PCAP_PORTS,
+        expected_probe_endpoints=[("10.0.0.2", 47101)],
+        probe_marker=b"A1-22-PLAINTEXT-PROBE\r\n",
+    )
+    assert summary["expected_probe_bytes"] == 0
+    assert summary["non_tls_payload_bytes"] > 0
+    assert summary["verdict"] == "tls_or_plaintext_violation"
+
+
 def test_bad_magic_is_rejected(tmp_path: Path) -> None:
     capture = tmp_path / "broken.pcap"
     capture.write_bytes(b"\x00\x01\x02\x03" + b"\x00" * 20)

@@ -64,6 +64,9 @@ DONE_MARKER = "A122-D4-NODE-DONE"
 REFUSED_MARKER = "A122-D4-NODE-REFUSED"
 DEFAULT_NODE_TIMEOUT = 900.0
 LOOPBACK_HOST = "127.0.0.1"
+# The bytes the plaintext probe puts on the wire; the capture analyser uses the
+# same constant to tell the deliberate probe apart from a real protocol leak.
+PLAINTEXT_PROBE_MARKER = b"A1-22-PLAINTEXT-PROBE\r\n"
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -188,7 +191,7 @@ def _plaintext_probe(host: str, port: int, *, timeout: float = 5.0) -> dict[str,
         with socket.create_connection((host, port), timeout=timeout) as probe:
             result["connected"] = True
             probe.settimeout(timeout)
-            probe.sendall(b"A1-22-PLAINTEXT-PROBE\r\n")
+            probe.sendall(PLAINTEXT_PROBE_MARKER)
             try:
                 data = probe.recv(4096)
             except socket.timeout:
@@ -482,6 +485,11 @@ def assemble(
         summary = analyse_capture(
             out_dir / "tls-pcap.pcap",
             expected_ports=_expected_ports(workspace),
+            expected_probe_endpoints=[
+                (probe["host"], int(probe["port"]))
+                for probe in positive.get("probes", [])
+            ],
+            probe_marker=PLAINTEXT_PROBE_MARKER,
         )
         write_text(out_dir / "tls-summary.txt", render_summary(summary))
     else:
