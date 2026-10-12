@@ -529,9 +529,17 @@ class SpuNodeRuntime:
         self.context.barrier()
 
     def stop(self) -> None:
-        # No barrier here: a peer that already left would turn teardown into an
-        # unbounded wait, and nothing is left to synchronise once the grid is
-        # finished.
+        # The barrier and the link stop are collective: they only complete once
+        # the other parties arrive too, which is why the node tells its peers
+        # the grid is over before it calls this. A peer that has already left
+        # turns the barrier into a bounded retry storm, so a failure there is
+        # logged and the local teardown still runs.
+        with_barrier = getattr(self.context, "barrier", None)
+        if with_barrier is not None:
+            try:
+                with_barrier()
+            except Exception:  # pragma: no cover - peer left early
+                pass
         stop = getattr(self.context, "stop_link", None)
         if stop is not None:
             try:

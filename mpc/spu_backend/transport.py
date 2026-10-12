@@ -25,6 +25,16 @@ class TLSChannelError(RuntimeError):
     """A TLS channel could not be established or violated its policy."""
 
 
+class TLSChannelClosed(TLSChannelError):
+    """The peer hung up between frames.
+
+    The integration transport opens one connection per request, so a peer that
+    closed the socket after its reply is normal traffic rather than a failed
+    handler. Subclassing keeps every existing ``except TLSChannelError`` guard
+    working while letting the server tell the two apart.
+    """
+
+
 @dataclass(frozen=True)
 class TLSIdentity:
     """One local endpoint identity and its allowed peer roles."""
@@ -126,9 +136,12 @@ class TLSFrameChannel:
     def _recv_exact(tls_socket: ssl.SSLSocket, length: int) -> bytes:
         chunks = bytearray()
         while len(chunks) < length:
-            chunk = tls_socket.recv(length - len(chunks))
+            try:
+                chunk = tls_socket.recv(length - len(chunks))
+            except (ssl.SSLEOFError, ConnectionResetError) as exc:
+                raise TLSChannelClosed("TLS peer closed the connection") from exc
             if not chunk:
-                raise TLSChannelError("TLS peer closed the connection")
+                raise TLSChannelClosed("TLS peer closed the connection")
             chunks.extend(chunk)
         return bytes(chunks)
 
@@ -237,10 +250,18 @@ class TLSFrameServer:
                 return
             try:
                 raw_socket.settimeout(10.0)
-                with self._context.wrap_socket(
-                    raw_socket,
-                    server_side=True,
-                ) as tls_socket:
+                try:
+                    tls_socket = self._context.wrap_socket(
+                        raw_socket,
+                        server_side=True,
+                    )
+                except (ssl.SSLEOFError, ConnectionResetError):
+                    # A caller that only probed the port, or that gave up
+                    # during the handshake, never claimed to be a peer. That is
+                    # not a handler failure; a certificate or protocol error
+                    # still is, and keeps raising below.
+                    continue
+                with tls_socket:
                     peer_role = _peer_role(
                         tls_socket,
                         self.identity.allowed_peer_roles,
@@ -250,6 +271,10 @@ class TLSFrameServer:
                         peer_role=peer_role,
                     ) as channel:
                         self.handler(channel)
+            except TLSChannelClosed:
+                # The client hung up between frames: normal for this
+                # one-connection-per-request transport, not a handler failure.
+                continue
             except BaseException as exc:
                 self._record_error(exc)
             finally:
@@ -291,6 +316,7 @@ class TLSFrameServer:
 
 __all__ = [
     "MAX_FRAME_BYTES",
+    "TLSChannelClosed",
     "TLSChannelError",
     "TLSFrameChannel",
     "TLSFrameServer",

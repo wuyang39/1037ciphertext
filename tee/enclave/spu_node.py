@@ -54,6 +54,7 @@ from mpc.spu_backend.spu_link import (
 )
 from mpc.spu_backend.spu_ops import SPU_OPERATORS, DEFAULT_TOLERANCE, reference_outputs
 from mpc.spu_backend.transport import (
+    TLSChannelClosed,
     TLSChannelError,
     TLSFrameChannel,
     TLSFrameServer,
@@ -276,6 +277,10 @@ def _serve_share_channel(
         while not stop_event.is_set():
             try:
                 request = _decode(channel.receive_frame())
+            except TLSChannelClosed:
+                # P0 opens one connection per request; a close between frames
+                # is the end of that request, not a broken handler.
+                return
             except (TLSChannelError, NodeError) as exc:
                 last_error = str(exc)
                 return
@@ -593,14 +598,14 @@ def run_node(config: NodeConfig) -> int:
             )
     finally:
         pool.shutdown(wait=True)
-        # The local link is torn down before the peers are told to stop: a peer
-        # that leaves first turns the final barrier into a retry storm.
-        runtime.stop()
+        # BRPC's barrier and link stop are collective, so the peers have to
+        # learn that the grid is over before this side waits on them.
         for role, session in sessions.items():
             try:
                 session.run_batch({"type": "shutdown"})
             except Exception:  # pragma: no cover - best effort shutdown
                 _log(f"shutdown of {role} failed")
+        runtime.stop()
 
     vector_document = {
         "run_id": config.run_id,

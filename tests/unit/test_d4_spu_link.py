@@ -10,6 +10,7 @@ from mpc.spu_backend.spu_link import (
     SpuBackendError,
     SpuEndpoint,
     SpuLinkPolicy,
+    SpuNodeRuntime,
     certificate_role,
     decode_share,
     encode_share,
@@ -220,3 +221,38 @@ def test_share_encoding_round_trips() -> None:
     assert decoded.share_chunks == [b"a", b"b"]
     with pytest.raises(SpuBackendError, match="malformed"):
         decode_share(_FakeLibspu, "{not json")
+
+
+class _RecordingContext:
+    """A BRPC context that records the collective teardown order."""
+
+    def __init__(self, barrier_error: Exception | None = None) -> None:
+        self.calls: list[str] = []
+        self._barrier_error = barrier_error
+
+    def barrier(self) -> None:
+        self.calls.append("barrier")
+        if self._barrier_error is not None:
+            raise self._barrier_error
+
+    def stop_link(self) -> None:
+        self.calls.append("stop_link")
+
+
+def _runtime_with(context: _RecordingContext) -> SpuNodeRuntime:
+    runtime = object.__new__(SpuNodeRuntime)
+    runtime._executor = context
+    return runtime
+
+
+def test_runtime_stop_is_a_collective_teardown() -> None:
+    """The barrier and the link stop only finish once every party arrives."""
+    context = _RecordingContext()
+    _runtime_with(context).stop()
+    assert context.calls == ["barrier", "stop_link"]
+
+
+def test_a_peer_that_left_early_does_not_stop_the_local_teardown() -> None:
+    context = _RecordingContext(barrier_error=RuntimeError("peer left"))
+    _runtime_with(context).stop()
+    assert context.calls == ["barrier", "stop_link"]
