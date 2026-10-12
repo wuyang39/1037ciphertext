@@ -240,6 +240,14 @@ P1↔P2，P2 看到 P2↔P0 与 P2↔P1。没有任何一份出现低于 TLS 1.3
 `<bundle>.exclusions.json` 记录被排除文件的路径、字节数和 sha256，把原件放回
 目录只会收紧校验，不会绕过校验。
 
+释放实例前，三份三实例抓包已从各自主机取回到操作机的
+`artifacts/server/d4-3host-20261012T152216Z/d4-three-P{0,1,2}.pcap`
+（`artifacts/` 不进仓库），逐个复算 sha256 与索引一致，并在操作机上用
+`python -m infra.pcap_tls <pcap> --d4-ports` 复跑判决，三份仍是 `tls13_only`
+（P0 42 条 TLS 1.3 流，P1/P2 各 23 条）。把这三个文件放回
+`docs/evidence/d4-3host-20261012T152216Z/` 就能让封存目录重新完整，校验只会
+更严。
+
 ## 7. 尚未覆盖
 
 以下内容未被以上运行证明，不得按已通过计：
