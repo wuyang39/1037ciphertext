@@ -61,5 +61,9 @@ sgx.trusted_files = [
 sgx.allowed_files = [
   "file:/lib64/ld-linux-x86-64.so.2",
   "file:/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
-  "file:@CONTROL_GUEST_DIR@/",
+  # The control directory is the only path the host and the enclave share by
+  # design: the challenge nonce and the Quote cross it, and the sealed bundle
+  # is an SM2 ciphertext the host cannot open. Gramine resolves trusted and
+  # allowed files against the host, so this entry needs the host path.
+  "file:@CONTROL_HOST_DIR@/",
 ]
