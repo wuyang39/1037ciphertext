@@ -41,6 +41,13 @@ def test_program_contains_the_six_operators() -> None:
     assert "mhlo.compare" in program
     assert "mhlo.divide" in program
     assert "tensor<8x4x4xf64>" in program
+    # The batched contraction must keep the batching and contracting axes
+    # disjoint: dim 0 batches, the last lhs axis contracts with the rhs rows.
+    assert (
+        "#mhlo.dot<lhs_batching_dimensions = [0], rhs_batching_dimensions = [0], "
+        "lhs_contracting_dimensions = [3], rhs_contracting_dimensions = [1]>"
+        in program
+    )
     with pytest.raises(ValueError):
         build_program(batch=0, rows=4, cols=4)
 
