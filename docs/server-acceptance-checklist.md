@@ -28,10 +28,15 @@ Gramine 运行 `d1-20261012T1830`，证据在
 
 ## D3 受保护文件
 
-- [ ] encrypted FS 由 `K_disk_i` 挂载。
-- [ ] 宿主直接读取、复制、篡改得不到明文。
+- [x] encrypted FS 由 16 字节 KDK 挂载，enclave 内整份读取加密份额。
+- [x] 宿主直接读取、复制、字符串与字节搜索、篡改都得不到明文。
 - [ ] 错误 measurement、缺失 Lease 时 Worker 不启动。
-- [ ] 镜像、环境变量、host 日志和 core dump 扫描无敏感材料。
+- [ ] `K_disk_i` 的放行由 KAS 证明结论驱动（当前 KDK 由宿主生成）。
+- [x] host 日志、`/tmp`、`$HOME` 和证据目录扫描无敏感材料；镜像与 core dump 待 D9。
+
+已完成项见 [d3-encfs-acceptance.md](d3-encfs-acceptance.md)（运行
+`d3-20261012T1930`），证据在
+[docs/evidence/d3-20261012T1930](evidence/d3-20261012T1930)。
 
 ## D4-D6 三节点
 

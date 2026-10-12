@@ -20,11 +20,8 @@ REQUIRED_VALUES = {
     "share_epoch",
     "enclave_size",
     "lib_dir",
-    "run_tee_dir",
-    "run_session_dir",
     "secure_fs_dir",
-    "model_share_path",
-    "preprocessing_package_path",
+    "key_name",
     "python_runtime_path",
 }
 
@@ -84,8 +81,20 @@ def validate_manifest_text(manifest: str) -> None:
         raise ManifestValidationError("encrypted FS mount is required")
     if 'sgx.remote_attestation = "dcap"' not in normalized:
         raise ManifestValidationError("DCAP remote attestation is required")
-    if 'sgx.attestation_quote_type = "ecdsa"' not in normalized:
-        raise ManifestValidationError("ECDSA Quote type is required")
+    if 'libos.entrypoint = "' not in normalized:
+        raise ManifestValidationError("libos.entrypoint is required by Gramine 1.9")
+    if "loader.entrypoint" in normalized:
+        raise ManifestValidationError(
+            "loader.entrypoint must hold the signed libsys, not the application"
+        )
+    if "sgx.attestation_quote_type" in normalized:
+        raise ManifestValidationError(
+            "sgx.attestation_quote_type is not part of the Gramine 1.9 schema"
+        )
+    if "fs.allowed_files" in normalized or "fs.allowed_dirs" in normalized:
+        raise ManifestValidationError(
+            "extra file allowlists belong to sgx.allowed_files in Gramine 1.9"
+        )
     if "{{" in normalized or "}}" in normalized:
         raise ManifestValidationError("manifest contains unresolved placeholders")
 

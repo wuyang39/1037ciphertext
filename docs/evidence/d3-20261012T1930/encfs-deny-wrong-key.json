@@ -1,0 +1,14 @@
+{
+  "case": "encfs-deny-wrong-key",
+  "cloud_region": "cn-shanghai",
+  "image_id": "unknown",
+  "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+  "key_installed": 1,
+  "key_status": 0,
+  "marker_complete": true,
+  "phase": "D3-encfs",
+  "read_errno": 13,
+  "read_ok": 0,
+  "run_id": "d3-20261012T1930",
+  "timestamp_utc": "2026-10-12T10:56:39.153613+00:00"
+}

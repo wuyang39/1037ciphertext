@@ -1,0 +1,21 @@
+# gramine packages
+gramine 1.9
+gramine-ratls-dcap 1.9
+
+# encrypted-files tools
+
+Usage: gramine-sgx-pf-crypt mode [options]
+Available modes:
+  gen-key                 Generate and save wrap key to file
+  encrypt                 Encrypt plaintext files
+  decrypt                 Decrypt encrypted files
+
+# sgx devices
+crw-rw---- 1 root sgx     10, 125 Oct 12 17:08 /dev/sgx_enclave
+crw-rw---- 1 root sgx_prv 10, 126 Oct 12 17:08 /dev/sgx_provision
+
+# aesmd
+active
+
+# argv
+Linux iZuf6bjvfplpwleemaipwmZ 5.15.0-191-generic #201-Ubuntu SMP Fri Aug 7 18:39:04 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux

@@ -1,0 +1,37 @@
+# store listing
+total 56
+-rw-rw-r-- 1 jiahao jiahao 53248 Oct 12 18:55 model-share-P0.bin
+-rw-rw-r-- 1 jiahao jiahao  4096 Oct 12 18:55 precision-plan-P0.json
+
+# host cat of the encrypted share (first 256 bytes, xxd)
+00000000: 4752 4146 535f 5046 0200 438a d812 8ab2  GRAFS_PF..C.....
+00000010: 1901 8f0f a471 a1aa f5c9 1951 9c9e 3d1a  .....q.....Q..=.
+00000020: 5ea4 694d 3a97 a16e 7a35 3cf8 e0b0 413e  ^.iM:..nz5<...A>
+00000030: d565 cead 4ede 824f 4be9 00c5 3172 6cc2  .e..N..OK...1rl.
+00000040: 3b26 6c9f ae9c ff50 2506 33fe a7c3 511b  ;&l....P%.3...Q.
+00000050: 2402 79f4 5bb0 1e19 cd38 3539 4503 31cc  $.y.[....859E.1.
+00000060: ecfc 8497 56fb 0dba 1c2c 2864 5cbb 8098  ....V....,(d\...
+00000070: a446 2db6 964e 0fa8 33f9 07e4 823c da90  .F-..N..3....<..
+00000080: 3737 075d 8992 3335 ac2b 08e9 2f59 14cb  77.]..35.+../Y..
+00000090: 35ea 4f07 c745 5f83 d106 a481 d60f 5a4a  5.O..E_.......ZJ
+000000a0: ba03 7ad9 5609 4c63 20d6 b01f fefa a799  ..z.V.Lc .......
+000000b0: 1f75 1692 7e02 a4be 4d74 1a3b d71d 231c  .u..~...Mt.;..#.
+000000c0: 1d74 b0c9 03d0 1c2f 79d5 5bce bf30 e95c  .t...../y.[..0.\
+000000d0: a412 4323 c524 befc 6ece 6874 c041 1c16  ..C#.$..n.ht.A..
+000000e0: b382 86ca 2e4d 6998 ab0f ab24 a15c ad85  .....Mi....$.\..
+000000f0: 4eec d8af b8f7 feeb 7e4d b8e5 3009 3d79  N.......~M..0.=y
+
+# host strings of the encrypted share
+GRAFS_PF
+6pLnO(ah
+V"O0R+jpX
+OVUKr@*I
+{sDKXwZk
+!7:O:!e$
+,=3<F%kvYO
+
+# plaintext share kept for comparison only, then removed
+total 52
+-rw-rw-r-- 1 jiahao jiahao 46080 Oct 12 18:55 model-share-P0.bin
+-rw------- 1 jiahao jiahao  1152 Oct 12 18:55 precision-plan-P0.json
+plaintext P0 share files left under work: 1

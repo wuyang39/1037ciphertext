@@ -62,7 +62,9 @@ python -m infra.d1_environment_check --require-hardware \
 sudo bash deploy/install_gramine_server.sh   # 配置 packages.gramineproject.io 并安装 Gramine
 bash deploy/run_d1_gramine.sh                # 最小 Gramine-SGX 程序 + DCAP Quote 校验
 bash deploy/run_d1_server.sh                 # 三种 Quote 探针 + KAS 闭环与四项拒绝负例
+bash deploy/run_d3_encfs.sh                  # Gramine encrypted FS 挂载、明文删除与宿主侧拒绝
 ```
 
-`run_d1_gramine.sh` 与 `run_d1_server.sh` 都写入
-`artifacts/server/<run-id>/d1/`，只用一次性签名密钥，不把私钥放进证据目录。
+`run_d1_gramine.sh` 与 `run_d1_server.sh` 写入 `artifacts/server/<run-id>/d1/`；
+`run_d3_encfs.sh` 写入 `artifacts/server/<run-id>/d3/`。三个脚本都只用一次性
+签名密钥，不把私钥或 `K_disk_i` 放进证据目录。

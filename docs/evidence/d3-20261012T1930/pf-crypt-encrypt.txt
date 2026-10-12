@@ -1,0 +1,4 @@
+Encrypting: /home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/plain/precision-plan-P0.json -> /home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/secure/precision-plan-P0.json
+            (Gramine's encrypted files must contain this exact path: "/home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/secure/precision-plan-P0.json")
+Encrypting: /home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/plain/model-share-P0.bin -> /home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/secure/model-share-P0.bin
+            (Gramine's encrypted files must contain this exact path: "/home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/secure/model-share-P0.bin")

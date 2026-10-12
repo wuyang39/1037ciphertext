@@ -119,10 +119,8 @@ DCAP Quote，再交给 `a122_dcap_verify` 校验。
 1. `MRSIGNER` 由每次运行新生成的 enclave 签名密钥决定；两条 D1 记录中的
    Quote 都与当次 release policy 自洽。冻结发布时应改用固定的发布签名密钥。
 2. 生产模板 `tee/gramine/a122.manifest.template` 与 Gramine 1.9 的 schema 不兼容，
-   已实测定位到三处，需在 D3 修正后才能作为生产入口：
-   `loader.entrypoint` 在 1.9 中必须是 TOML 表（应用入口应写
-   `libos.entrypoint`）；`sgx.attestation_quote_type` 在 1.9 中不存在；
-   `fs.allowed_files` 应为 `sgx.allowed_files`。
+   已实测定位到三处；这三处在 D3 中按 1.9 schema 修正并通过实机校验，见
+   [d3-encfs-acceptance.md](d3-encfs-acceptance.md) 第 7 节。
 3. D3–D10 的全部内容仍未开始。
 
 ## 7. 复现

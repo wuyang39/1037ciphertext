@@ -1,0 +1,18 @@
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+A1_22_ENCFS_BEGIN
+key_name=a122_disk
+guest_file=/home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/secure-copy/model-share-P0.bin
+key_installed=1
+key_status=0
+read_ok=0
+read_errno=13
+read_error=Permission denied
+A1_22_ENCFS_END

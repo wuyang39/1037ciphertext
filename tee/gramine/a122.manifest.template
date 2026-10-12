@@ -1,9 +1,14 @@
-# A1-22 Gramine manifest template.
+# A1-22 Gramine manifest template, written for the Gramine 1.9 manifest schema.
 #
 # The build process substitutes {{ ... }} values from a signed release
 # manifest. Production refuses this file when sgx.debug is true.
+#
+# Two schema details are easy to get wrong and were confirmed against Gramine
+# 1.9 on the D1 instance: the LibOS entrypoint is ``libos.entrypoint``
+# (``loader.entrypoint`` is a TOML table holding the signed libsys), and the
+# extra-file allowlist is ``sgx.allowed_files`` rather than ``fs.allowed_files``.
 
-loader.entrypoint = "file:{{ entrypoint }}"
+libos.entrypoint = "{{ entrypoint }}"
 loader.insecure__use_cmdline_argv = false
 loader.env.LD_LIBRARY_PATH = "/lib:/usr/lib:/usr/local/lib"
 loader.env.A1_22_RELEASE_ID = "{{ release_id }}"
@@ -14,7 +19,6 @@ sgx.debug = false
 sgx.enclave_size = "{{ enclave_size }}"
 sgx.max_threads = 32
 sgx.remote_attestation = "dcap"
-sgx.attestation_quote_type = "ecdsa"
 
 sys.stack.size = "8M"
 sys.enable_sigterm_injection = true
@@ -23,22 +27,13 @@ fs.mounts = [
   { path = "/lib", uri = "file:{{ lib_dir }}" },
   { path = "/usr/lib", uri = "file:{{ lib_dir }}" },
   { path = "/usr/local/lib", uri = "file:{{ lib_dir }}" },
-  { path = "/run/tee", uri = "file:{{ run_tee_dir }}", type = "tmpfs" },
-  { path = "/run/session", uri = "file:{{ run_session_dir }}", type = "tmpfs" },
-  { path = "/secure", uri = "file:{{ secure_fs_dir }}", type = "encrypted" },
+  { type = "tmpfs", path = "/run/tee" },
+  { type = "tmpfs", path = "/run/session" },
+  { type = "encrypted", path = "/secure", uri = "file:{{ secure_fs_dir }}", key_name = "{{ key_name }}" },
 ]
 
-fs.allowed_files = [
-  "{{ entrypoint }}",
-  "{{ model_share_path }}",
-  "{{ preprocessing_package_path }}",
-]
-
-fs.allowed_dirs = [
-  "{{ lib_dir }}",
-  "{{ run_tee_dir }}",
-  "{{ run_session_dir }}",
-  "{{ secure_fs_dir }}",
+sgx.allowed_files = [
+  "{{ python_runtime_path }}",
 ]
 
 sgx.trusted_files = [

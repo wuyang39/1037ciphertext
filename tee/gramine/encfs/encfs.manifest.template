@@ -1,0 +1,26 @@
+# A1-22 Gramine encrypted-FS probe manifest.
+#
+# @PLACEHOLDERS@ are substituted by deploy/run_d3_encfs.sh; the remaining
+# Jinja values come from gramine-manifest. sgx.debug stays false.
+
+libos.entrypoint = "/encfs_probe"
+
+loader.log_level = "error"
+loader.env.LD_LIBRARY_PATH = "/lib"
+loader.insecure__use_cmdline_argv = true
+
+sgx.debug = false
+sgx.enclave_size = "@ENCLAVE_SIZE@"
+sgx.max_threads = 4
+sgx.remote_attestation = "dcap"
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "/encfs_probe", uri = "file:encfs_probe" },
+  { type = "encrypted", path = "@SECURE_GUEST_DIR@", uri = "file:@SECURE_HOST_DIR@", key_name = "@KEY_NAME@" },
+]
+
+sgx.trusted_files = [
+  "file:{{ gramine.runtimedir() }}/",
+  "file:encfs_probe",
+]

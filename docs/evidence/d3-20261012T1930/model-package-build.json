@@ -1,0 +1,9 @@
+{
+  "encrypted_share_count": 0,
+  "manifest": "package-manifest.json",
+  "model_hash": "601d1f80c21086d67f115f21e77d79f2ac5e6d0f9a1dd98e4cf6e7430524ab0f",
+  "output_dir": "/home/jiahao/1037ciphertext/artifacts/server/d3-20261012T1930/work/d3-encfs/package",
+  "precision_plan_hash": "553e030db54423a25af39740c8461fd74f121077e96f073b3f2b899d79a7659b",
+  "share_count": 3,
+  "share_epoch": 1
+}

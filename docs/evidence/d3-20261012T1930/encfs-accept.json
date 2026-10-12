@@ -1,0 +1,17 @@
+{
+  "case": "encfs-accept",
+  "cloud_region": "cn-shanghai",
+  "content_len": 46080,
+  "content_prefix_bytes": 4096,
+  "content_prefix_len": 4096,
+  "content_prefix_sha256": "14cd7bb478ee7ee9be85f7bc184a84e11369c76349c4f9c1ccf286cbdc1a1d37",
+  "image_id": "unknown",
+  "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+  "key_installed": 1,
+  "key_status": 0,
+  "marker_complete": true,
+  "phase": "D3-encfs",
+  "read_ok": 1,
+  "run_id": "d3-20261012T1930",
+  "timestamp_utc": "2026-10-12T10:56:39.153613+00:00"
+}

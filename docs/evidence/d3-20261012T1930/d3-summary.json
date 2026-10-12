@@ -1,0 +1,82 @@
+{
+  "accepted": true,
+  "cloud_region": "cn-shanghai",
+  "command": "deploy/run_d3_encfs.sh",
+  "host_scan_roots": [
+    "/home/jiahao/1037ciphertext/artifacts/server",
+    "/tmp",
+    "/var/log",
+    "/home/jiahao"
+  ],
+  "image_id": "unknown",
+  "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+  "kdk_sha256": "af60382f98e640e385632817f4fca75a6b71c63bd0c8a1d70ace5effbe4d94ab",
+  "phase": "D3-encfs",
+  "plan_sha256": "34608db5527d50df514ab95fd8f7a5e77823976f1fc5b9bf7c4e6e8077c9ad1e",
+  "probe_cases": {
+    "encfs-accept": {
+      "content_len": 46080,
+      "content_prefix_bytes": 4096,
+      "content_prefix_len": 4096,
+      "content_prefix_sha256": "14cd7bb478ee7ee9be85f7bc184a84e11369c76349c4f9c1ccf286cbdc1a1d37",
+      "key_installed": 1,
+      "key_status": 0,
+      "marker_complete": true,
+      "read_ok": 1
+    },
+    "encfs-deny-copied-store": {
+      "key_installed": 1,
+      "key_status": 0,
+      "marker_complete": true,
+      "read_errno": 13,
+      "read_ok": 0
+    },
+    "encfs-deny-missing-key": {
+      "key_installed": 0,
+      "key_status": -1,
+      "marker_complete": true,
+      "read_errno": 13,
+      "read_ok": 0
+    },
+    "encfs-deny-tampered-store": {
+      "key_installed": 1,
+      "key_status": 0,
+      "marker_complete": true,
+      "read_errno": 13,
+      "read_ok": 0
+    },
+    "encfs-deny-wrong-key": {
+      "key_installed": 1,
+      "key_status": 0,
+      "marker_complete": true,
+      "read_errno": 13,
+      "read_ok": 0
+    }
+  },
+  "run_id": "d3-20261012T1930",
+  "share_bytes": 46080,
+  "share_prefix_sha256": "14cd7bb478ee7ee9be85f7bc184a84e11369c76349c4f9c1ccf286cbdc1a1d37",
+  "share_sha256": "e4150b9bc6d172cb4b7e81c332f3d994c3116488175fa9b6901c013de7fa095b",
+  "store_files": [
+    {
+      "bytes": 53248,
+      "name": "model-share-P0.bin",
+      "sha256": "9e963ebcb24afb272910695098f9e5520aa26e1d804fd7e9326bd69add79ef2f"
+    },
+    {
+      "bytes": 4096,
+      "name": "precision-plan-P0.json",
+      "sha256": "1472c70bca1985fabf64c1e02b9a1352c7f57807c433205f85b5c16d296b7e4a"
+    }
+  ],
+  "timestamp_utc": "2026-10-12T10:56:39.153613+00:00",
+  "verdicts": {
+    "accept-encrypted-share": true,
+    "deny-copied-store": true,
+    "deny-host-plaintext-anywhere": true,
+    "deny-host-plaintext-in-store": true,
+    "deny-missing-key": true,
+    "deny-tampered-store": true,
+    "deny-wrong-key": true
+  }
+}
