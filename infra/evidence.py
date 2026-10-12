@@ -15,6 +15,7 @@ from typing import Any, Iterable, Mapping
 EVIDENCE_VERSION = "a122-evidence-v1"
 INDEX_NAME = "evidence-index.json"
 SEAL_NAME = "evidence.sha256"
+EXCLUSIONS_SUFFIX = ".exclusions.json"
 SENSITIVE_PATTERNS = {
     "private_key": re.compile(r"-----BEGIN (?:RSA |EC |ENCRYPTED )?PRIVATE KEY-----"),
     "session_key_field": re.compile(r'"(?:session_key|storage_key|disk_key)"\s*:'),
@@ -159,9 +160,52 @@ def seal_directory(root: Path) -> dict[str, Any]:
     return index
 
 
-def verify_directory(root: Path, *, require_seal: bool = True) -> dict[str, Any]:
-    """Verify every indexed file and, by default, the detached seal."""
+def exclusions_path(root: Path) -> Path:
+    """Where a bundle records the artifacts it deliberately leaves out."""
     root = Path(root)
+    return root.with_name(root.name + EXCLUSIONS_SUFFIX)
+
+
+def load_exclusions(root: Path) -> list[dict[str, Any]]:
+    """Read the exclusion list for a bundle, or return an empty one.
+
+    A bundle whose raw artifacts are too large to commit (a pcap, a disk
+    image) names them in ``<bundle>.exclusions.json`` next to the directory.
+    The list stays next to the bundle rather than inside it so the sealed
+    directory is still exactly the set of files the index describes.
+    """
+    path = exclusions_path(Path(root))
+    if not path.is_file():
+        return []
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise EvidenceError(f"evidence exclusions are invalid: {path}") from exc
+    entries = document.get("excluded")
+    if not isinstance(entries, list):
+        raise EvidenceError(f"evidence exclusions lack an 'excluded' list: {path}")
+    for entry in entries:
+        if not isinstance(entry, Mapping) or not str(entry.get("path", "")):
+            raise EvidenceError(f"evidence exclusion entry is invalid: {path}")
+    return entries
+
+
+def verify_directory(
+    root: Path,
+    *,
+    require_seal: bool = True,
+    exclusions: Iterable[Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Verify every indexed file and, by default, the detached seal.
+
+    ``exclusions`` names indexed artifacts the caller expects to be absent
+    (see :func:`load_exclusions`). An excluded file that is present is still
+    verified, so restoring a raw capture only ever tightens the check.
+    """
+    root = Path(root)
+    excluded = {
+        str(entry["path"]): entry for entry in (exclusions or [])
+    }
     index_path = root / INDEX_NAME
     try:
         index = json.loads(index_path.read_text(encoding="utf-8"))
@@ -172,7 +216,23 @@ def verify_directory(root: Path, *, require_seal: bool = True) -> dict[str, Any]
     files = index.get("files")
     if not isinstance(files, list):
         raise EvidenceError("evidence index files field is invalid")
+    # Validate the exclusion list before trusting it to excuse a missing file.
+    indexed_by_path = {str(entry.get("path")): entry for entry in files
+                       if isinstance(entry, Mapping)}
+    unknown = set(excluded) - set(indexed_by_path)
+    if unknown:
+        raise EvidenceError(
+            "evidence exclusions name files that are not indexed: "
+            + ", ".join(sorted(unknown))
+        )
+    for relative, entry in excluded.items():
+        for field in ("bytes", "sha256"):
+            if field in entry and entry[field] != indexed_by_path[relative].get(field):
+                raise EvidenceError(
+                    f"evidence exclusion disagrees with the index on {field}: {relative}"
+                )
     expected_paths: set[str] = set()
+    skipped: set[str] = set()
     for entry in files:
         if not isinstance(entry, Mapping):
             raise EvidenceError("evidence index entry is invalid")
@@ -181,12 +241,16 @@ def verify_directory(root: Path, *, require_seal: bool = True) -> dict[str, Any]
             raise EvidenceError("evidence index contains an unsafe path")
         path = root / relative
         if not path.is_file():
+            if relative in excluded:
+                skipped.add(relative)
+                continue
             raise EvidenceError(f"evidence file is missing: {relative}")
         if path.stat().st_size != int(entry.get("bytes", -1)):
             raise EvidenceError(f"evidence size mismatch: {relative}")
         if sha256_file(path) != entry.get("sha256"):
             raise EvidenceError(f"evidence hash mismatch: {relative}")
         expected_paths.add(relative)
+    expected_paths -= skipped
     actual_paths = {
         path.relative_to(root).as_posix() for path in iter_evidence_files(root)
     }
@@ -204,18 +268,21 @@ def verify_directory(root: Path, *, require_seal: bool = True) -> dict[str, Any]
             raise EvidenceError("evidence seal format is invalid")
         if seal[0] != sha256_file(index_path):
             raise EvidenceError("evidence seal does not match the index")
-    return index
+    return {**index, "excluded": sorted(skipped)}
 
 
 __all__ = [
     "EVIDENCE_VERSION",
+    "EXCLUSIONS_SUFFIX",
     "INDEX_NAME",
     "SEAL_NAME",
     "EvidenceError",
     "assert_no_sensitive_text",
     "assert_redacted",
     "build_record",
+    "exclusions_path",
     "iter_evidence_files",
+    "load_exclusions",
     "seal_directory",
     "sha256_bytes",
     "sha256_file",

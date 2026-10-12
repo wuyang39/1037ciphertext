@@ -1,0 +1,8 @@
+{
+  "case": "tls-disabled",
+  "elapsed_seconds": 0.214,
+  "exit_status": 3,
+  "expected": "must not run without TLS",
+  "output_tail": "A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS",
+  "verdict": "refused"
+}

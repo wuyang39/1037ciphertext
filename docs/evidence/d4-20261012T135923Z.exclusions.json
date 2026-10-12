@@ -1,0 +1,13 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "run_id": "d4-20261012T135923Z",
+  "note": "Raw artifacts too large to commit are named here. Every excluded file still has to match the sealed index if it is present, so restoring the original capture tightens the check instead of bypassing it.",
+  "excluded": [
+    {
+      "path": "tls-pcap.pcap",
+      "bytes": 216345087,
+      "sha256": "bf3ef5f57aab6dd8012d73b3356e5877567ec129a23e191bb589da17981197f9",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on the instance under artifacts/server/d4-20261012T135923Z/d4/ and only its digest and derived summary are committed"
+    }
+  ]
+}

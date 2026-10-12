@@ -1,0 +1,8 @@
+{
+  "case": "no-client-cert",
+  "elapsed_seconds": 57.132,
+  "exit_status": 3,
+  "expected": "certificate",
+  "output_tail": "#4 pybind11::cpp_function::initialize<>()::{lambda()#3}::operator()()+0x7fa5b46e9171\n#5 pybind11::cpp_function::initialize<>()::{lambda()#3}::_FUN()+0x7fa5b46e9205\n#6 pybind11::cpp_function::dispatcher()+0x7fa5b470b8ef\n#7 cfunction_call+0x5587b6a798f5\n#8 _PyEval_EvalFrameDefault+0x5587b6aead6c\n#9 _PyEval_Vector+0x5587b6ac1ff6\n#10 builtin_exec+0x5587b6c0686b\n#11 cfunction_vectorcall_FASTCALL_KEYWORDS+0x5587b6a7936b\n#12 _PyEval_EvalFrameDefault+0x5587b6aea9a9\n#13 _PyFunction_Vectorcall+0x5587b6a4c1f9\n#14 pymain_run_module+0x5587b6c4562a\n#15 Py_RunMain+0x5587b6c44e47",
+  "verdict": "refused"
+}

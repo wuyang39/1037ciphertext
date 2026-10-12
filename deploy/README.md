@@ -64,12 +64,24 @@ bash deploy/run_d1_gramine.sh                # 最小 Gramine-SGX 程序 + DCAP 
 bash deploy/run_d1_server.sh                 # 三种 Quote 探针 + KAS 闭环与四项拒绝负例
 bash deploy/run_d3_encfs.sh                  # Gramine encrypted FS 挂载、明文删除与宿主侧拒绝
 bash deploy/run_d3_kas_release.sh            # KAS 放行 K_disk_i + 固定 Worker 入口的真实启动条件
+bash deploy/run_d4_accept.sh                 # D4 三节点传输、1,024 组 RSS 向量、抓包与五类 fail-closed
 ```
 
 `run_d1_gramine.sh` 与 `run_d1_server.sh` 写入 `artifacts/server/<run-id>/d1/`；
 `run_d3_encfs.sh` 写入 `artifacts/server/<run-id>/d3/`；`run_d3_kas_release.sh`
-写入 `artifacts/server/<run-id>/d3-kas/`。四个脚本都只用一次性签名密钥，不把
-私钥或 `K_disk_i` 放进证据目录。
+写入 `artifacts/server/<run-id>/d3-kas/`；`run_d4_accept.sh` 写入
+`artifacts/server/<run-id>/d4/`。五个脚本都只用一次性签名密钥，不把私钥或
+`K_disk_i` 放进证据目录。
+
+`run_d4_accept.sh` 需要带 `spu` 的 3.11 解释器和 tcpdump 的抓包权限：
+
+```bash
+sudo setcap cap_net_raw,cap_net_admin+eip "$(command -v tcpdump)"
+PYTHON=~/a122-venv311/bin/python bash deploy/run_d4_accept.sh
+```
+
+它默认把 P0/P1/P2 跑成同机三进程，是跨三台实例、三个 `gramine-sgx` 节点前
+的固定彩排入口；结论与范围限定见 [d4-acceptance.md](../docs/d4-acceptance.md)。
 
 `run_d3_kas_release.sh` 需要两个解释器：`PYTHON`（KAS 侧，带 `cryptography`
 的 3.12 venv）与 `SYSTEM_PYTHON`（enclave 内加载的 `/usr/bin/python3`，需要

@@ -44,14 +44,25 @@ Gramine 运行 `d1-20261012T1830`，证据在
 
 ## D4-D6 三节点
 
-- [ ] YACL/BRPC 仅 TLS records，明文连接失败。
-- [ ] 错误 CA、SAN、无客户端证书不能执行算子。
-- [ ] 关闭 TLS 时 Worker 启动失败，不回退。
-- [ ] 至少 1,000 组 RSS 向量与固定点参考一致。
+- [x] YACL/BRPC 仅 TLS records，明文连接失败。（单实例三进程，运行
+  `d4-20261012T135923Z`：六个协议端口 108677 报文、41 条 TLS 1.3 流、
+  0 字节无法归属的非 TLS 载荷）
+- [x] 错误 CA、SAN、无客户端证书不能执行算子。（同上，三类负例均以退出码 3
+  拒绝）
+- [x] 关闭 TLS 时 Worker 启动失败，不回退。（同上，`the SPU link must not run
+  without TLS`）
+- [x] 至少 1,000 组 RSS 向量与固定点参考一致。（同上，1024 组全过，
+  网格摘要 `96b6c835...`）
+- [ ] 同一套 runner 在三台独立实例、三个 enclave 内复跑上述四项。
 - [ ] Tiny Decoder Block 在三个 enclave 完成。
 - [ ] 连续生成至少 2 token。
 - [ ] ResultFrame 重复、篡改 `decode_step`、模型混用、输入/Ticket 重放均被拒绝。
 - [ ] 会话结束后 `/run/session`、临时目录和进程扫描无 Prompt share、KV、会话密钥。
+
+D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
+[docs/evidence/d4-20261012T135923Z](evidence/d4-20261012T135923Z)。该轮仍是
+同机三进程：链路、证书、抓包和拒绝路径是真的，`gramine-sgx` 内的执行与跨机
+私网尚未验证。
 
 ## D7-D8 模型与指标
 

@@ -1,0 +1,8 @@
+{
+  "case": "wrong-san",
+  "elapsed_seconds": 0.214,
+  "exit_status": 3,
+  "expected": "SAN does not match its role",
+  "output_tail": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate SAN does not match its role",
+  "verdict": "refused"
+}

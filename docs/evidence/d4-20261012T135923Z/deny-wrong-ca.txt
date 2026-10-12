@@ -1,0 +1,7 @@
+# case: wrong-ca
+expected refusal: was not signed by the KAS CA
+verdict: refused
+exit status: 3
+elapsed seconds: 0.214
+
+A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA

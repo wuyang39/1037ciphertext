@@ -1,0 +1,8 @@
+# plaintext probe against the live SPU listeners
+
+127.0.0.1:47201 connected=True reply_bytes=0 outcome=connection_reset
+127.0.0.1:47101 connected=True reply_bytes=0 outcome=closed_or_tls_only
+127.0.0.1:47202 connected=False reply_bytes=0 outcome=connection_refused
+127.0.0.1:47102 connected=True reply_bytes=0 outcome=closed_or_tls_only
+
+verdict: refused
