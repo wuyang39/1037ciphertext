@@ -63,8 +63,40 @@ sudo bash deploy/install_gramine_server.sh   # 配置 packages.gramineproject.io
 bash deploy/run_d1_gramine.sh                # 最小 Gramine-SGX 程序 + DCAP Quote 校验
 bash deploy/run_d1_server.sh                 # 三种 Quote 探针 + KAS 闭环与四项拒绝负例
 bash deploy/run_d3_encfs.sh                  # Gramine encrypted FS 挂载、明文删除与宿主侧拒绝
+bash deploy/run_d3_kas_release.sh            # KAS 放行 K_disk_i + 固定 Worker 入口的真实启动条件
 ```
 
 `run_d1_gramine.sh` 与 `run_d1_server.sh` 写入 `artifacts/server/<run-id>/d1/`；
-`run_d3_encfs.sh` 写入 `artifacts/server/<run-id>/d3/`。三个脚本都只用一次性
-签名密钥，不把私钥或 `K_disk_i` 放进证据目录。
+`run_d3_encfs.sh` 写入 `artifacts/server/<run-id>/d3/`；`run_d3_kas_release.sh`
+写入 `artifacts/server/<run-id>/d3-kas/`。四个脚本都只用一次性签名密钥，不把
+私钥或 `K_disk_i` 放进证据目录。
+
+`run_d3_kas_release.sh` 需要两个解释器：`PYTHON`（KAS 侧，带 `cryptography`
+的 3.12 venv）与 `SYSTEM_PYTHON`（enclave 内加载的 `/usr/bin/python3`，需要
+能 `import gmssl`）。用法：
+
+```bash
+export PYTHON=~/a122-venv/bin/python
+export SYSTEM_PYTHON=/usr/bin/python3
+bash deploy/run_d3_kas_release.sh            # 运行号取 UTC 时间戳
+```
+
+## 本机与服务器之间的代码同步
+
+仓库里的证据目录包含运行产物，直接 clone 或 pull 即可；如果服务器到 GitHub
+不稳，用 bundle 离线同步：
+
+```powershell
+git bundle create "$env:TEMP\a122-sync.bundle" main
+scp "$env:TEMP\a122-sync.bundle" jiahao@<server>:~/
+```
+
+```bash
+cd ~/1037ciphertext
+git bundle unbundle ~/a122-sync.bundle          # 只打印 ref 与提交号
+git update-ref refs/heads/a122-incoming <提交号>
+git merge --ff-only a122-incoming
+```
+
+Ubuntu 22.04 自带 git 2.34，`git fetch <bundle> main:<新分支>` 会误报
+`[up to date]`，所以这里用 `bundle unbundle` 加 `update-ref` 两步。
