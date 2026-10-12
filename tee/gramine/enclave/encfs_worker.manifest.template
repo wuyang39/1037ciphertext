@@ -1,0 +1,60 @@
+# A1-22 enclave Worker manifest for the D3 KAS-sealed disk key run.
+#
+# @PLACEHOLDERS@ are substituted by deploy/run_d3_kas_release.sh; the Jinja
+# values come from gramine-manifest. sgx.debug stays false, and the Python
+# interpreter the LibOS loads is the same system interpreter the run records
+# in the evidence bundle.
+#
+# The ELF interpreter must be listed under sgx.allowed_files: Gramine resolves
+# PIE interpreters outside the mounted runtime directory, and an unlisted
+# interpreter makes libos_init fail with EACCES before the app starts.
+
+libos.entrypoint = "@PYTHON@"
+
+loader.log_level = "error"
+loader.env.LD_LIBRARY_PATH = "/lib:@ARCH_LIBDIR@:/usr/@ARCH_LIBDIR@"
+loader.env.PYTHONPATH = "@REPO_GUEST_DIR@"
+loader.env.PYTHONDONTWRITEBYTECODE = "1"
+loader.insecure__use_cmdline_argv = true
+
+sys.stack.size = "8M"
+
+sgx.debug = false
+sgx.enclave_size = "@ENCLAVE_SIZE@"
+sgx.max_threads = 8
+sgx.remote_attestation = "dcap"
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "@ARCH_LIBDIR@", uri = "file:@ARCH_LIBDIR@" },
+  { path = "/usr/@ARCH_LIBDIR@", uri = "file:/usr/@ARCH_LIBDIR@" },
+{% for path in python.get_sys_path("@PYTHON@") %}
+  { path = "{{ path }}", uri = "file:{{ path }}" },
+{% endfor %}
+  { path = "@PYTHON@", uri = "file:@PYTHON@" },
+  { path = "@REPO_GUEST_DIR@", uri = "file:@REPO_HOST_DIR@" },
+  { path = "@CONTROL_GUEST_DIR@", uri = "file:@CONTROL_HOST_DIR@" },
+  { type = "encrypted", path = "@SECURE_GUEST_DIR@", uri = "file:@SECURE_HOST_DIR@", key_name = "@KEY_NAME@" },
+  { type = "tmpfs", path = "/tmp" },
+]
+
+sgx.trusted_files = [
+  "file:@PYTHON@",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:@ARCH_LIBDIR@/",
+  "file:/usr/@ARCH_LIBDIR@/",
+{% for path in python.get_sys_path("@PYTHON@") %}
+  "file:{{ path }}{{ '/' if path.is_dir() else '' }}",
+{% endfor %}
+  "file:@REPO_HOST_DIR@/crypto/__init__.py",
+  "file:@REPO_HOST_DIR@/crypto/enclave_key.py",
+  "file:@REPO_HOST_DIR@/crypto/sm2.py",
+  "file:@REPO_HOST_DIR@/crypto/sm3.py",
+  "file:@REPO_HOST_DIR@/tee/enclave/encfs_worker.py",
+]
+
+sgx.allowed_files = [
+  "file:/lib64/ld-linux-x86-64.so.2",
+  "file:/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+  "file:@CONTROL_GUEST_DIR@/",
+]

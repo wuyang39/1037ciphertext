@@ -29,6 +29,9 @@ class ReleaseManifest:
     min_isvsvn: int
     debug_allowed: bool
     spu_build_hash: str
+    model_version: str
+    model_manifest_hash: str
+    precision_plan_hash: str
     expires_at: datetime
 
     @classmethod
@@ -41,6 +44,9 @@ class ReleaseManifest:
             min_isvsvn=value["min_isvsvn"],
             debug_allowed=value["debug_allowed"],
             spu_build_hash=value["spu_build_hash"],
+            model_version=value["model_version"],
+            model_manifest_hash=value["model_manifest_hash"],
+            precision_plan_hash=value["precision_plan_hash"],
             expires_at=_parse_timestamp(value["expires_at"]),
         )
 

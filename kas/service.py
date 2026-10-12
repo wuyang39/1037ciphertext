@@ -5,15 +5,20 @@ from __future__ import annotations
 import base64
 import binascii
 import datetime as dt
-import hashlib
 import secrets
 import threading
 import uuid
 from dataclasses import dataclass
 from typing import Callable, Protocol
 
+from crypto.enclave_key import (
+    EnclaveKeyError,
+    encode_bundle,
+    seal_bundle,
+    verify_enclave_report_data,
+    worker_startup_digest,
+)
 from crypto.sm2 import SM2KeyPair
-from crypto.sm3 import hkdf, sm3
 
 from .binding import build_report_data, csr_public_key_der, verify_report_data
 from .ca import CertificateAuthority
@@ -35,9 +40,12 @@ from .models import (
     JobTicketResponse,
     ReleaseStorageKeyRequest,
     ReleaseStorageKeyResponse,
+    SealedStorageKeyRequest,
+    SealedStorageKeyResponse,
     TicketPublicKeyResponse,
 )
 from .policy import PolicyRegistry, VerifiedQuote
+from .storage_keys import derive_storage_key
 from .tickets import JobTicketLedger
 
 
@@ -96,6 +104,7 @@ class KASService:
         self._challenges: dict[str, _Challenge] = {}
         self._leases: dict[str, _NodeLease] = {}
         self._released_storage_keys: set[tuple[str, int, str]] = set()
+        self._sealed_storage_keys: set[tuple[str, str, int, str]] = set()
         self._storage_key_lock = threading.Lock()
         self._lease_lock = threading.Lock()
         self._tickets = JobTicketLedger(
@@ -218,31 +227,114 @@ class KASService:
                 )
             self._released_storage_keys.add(replay_key)
 
-        context = b"".join(
-            (
-                b"A1-22:storage-key:v1\0",
-                request.role.encode("ascii"),
-                b"\0",
-                request.release_id.encode("utf-8"),
-                b"\0",
-                request.share_epoch.to_bytes(8, "big"),
-                b"\0",
-                request.purpose.encode("ascii"),
-            )
+        key, key_id = derive_storage_key(
+            storage_key_master=self._storage_key_master,
+            role=request.role,
+            release_id=request.release_id,
+            share_epoch=request.share_epoch,
+            purpose=request.purpose,
         )
-        key = hkdf(
-            salt=sm3(b"A1-22:storage-key-salt:v1\0"),
-            input_key_material=self._storage_key_master,
-            info=context,
-            length=32,
-        )
-        key_id = hashlib.sha256(
-            b"A1-22:storage-key-id:v1\0" + key
-        ).hexdigest()
         return ReleaseStorageKeyResponse(
             key_id=key_id,
             key_hex=key.hex(),
             expires_at=lease.expires_at,
+        )
+
+    def seal_storage_key(
+        self,
+        request: SealedStorageKeyRequest,
+    ) -> SealedStorageKeyResponse:
+        """Release the disk key sealed to a freshly attested enclave key.
+
+        Unlike :meth:`release_storage_key`, this path never returns ``K_disk_i``
+        in the clear: the key is wrapped with SM2 to the enclave public key that
+        the verified Quote binds in REPORTDATA. The host relaying the response
+        therefore cannot read the key, and the enclave cannot obtain it without
+        a Quote that satisfies the registered release policy.
+        """
+        now = self._clock()
+        challenge = self._challenges.pop(request.challenge_id, None)
+        if challenge is None:
+            raise ChallengeNotFound("challenge is unknown or already consumed")
+        if now >= challenge.expires_at:
+            raise ChallengeExpired("challenge has expired")
+        if request.role != challenge.role or request.release_id != challenge.release_id:
+            raise AttestationRejected("challenge request binding mismatch")
+
+        try:
+            quote_bytes = base64.b64decode(request.dcap_quote_b64, validate=True)
+        except (binascii.Error, ValueError) as exc:
+            raise AttestationRejected("DCAP Quote is not valid base64") from exc
+        if not quote_bytes:
+            raise AttestationRejected("DCAP Quote is empty")
+
+        verified_quote = self._quote_verifier.verify(quote_bytes)
+        release = self._policies.validate_quote(
+            request.release_id,
+            verified_quote,
+            now=now,
+        )
+        if not verify_enclave_report_data(
+            verified_quote.report_data,
+            public_key=request.enclave_public_key,
+            role=request.role,
+            release_id=request.release_id,
+            nonce=challenge.nonce,
+        ):
+            raise AttestationRejected(
+                "REPORTDATA does not bind the enclave temporary key"
+            )
+
+        replay_key = (
+            request.role,
+            request.release_id,
+            request.share_epoch,
+            request.purpose,
+        )
+        with self._storage_key_lock:
+            if replay_key in self._sealed_storage_keys:
+                raise StorageKeyRejected(
+                    "storage key was already sealed for this node and epoch"
+                )
+            self._sealed_storage_keys.add(replay_key)
+
+        key, key_id = derive_storage_key(
+            storage_key_master=self._storage_key_master,
+            role=request.role,
+            release_id=request.release_id,
+            share_epoch=request.share_epoch,
+            purpose=request.purpose,
+        )
+        startup_hash = worker_startup_digest(
+            role=request.role,
+            release_id=request.release_id,
+            model_version=release.model_version,
+            model_manifest_hash=release.model_manifest_hash,
+            precision_plan_hash=release.precision_plan_hash,
+            share_epoch=request.share_epoch,
+            expected_storage_key_id=key_id,
+        )
+        expires_at = now + self._node_lease_ttl
+        try:
+            bundle = encode_bundle(
+                key_id=key_id,
+                startup_hash=startup_hash,
+                share_epoch=request.share_epoch,
+                expires_at_unix=int(expires_at.timestamp()),
+                storage_key=key,
+            )
+            sealed = seal_bundle(request.enclave_public_key, bundle)
+        except EnclaveKeyError as exc:
+            raise AttestationRejected(
+                f"storage key could not be sealed to the enclave: {exc}"
+            ) from exc
+        return SealedStorageKeyResponse(
+            key_id=key_id,
+            startup_hash=startup_hash,
+            share_epoch=request.share_epoch,
+            expires_at=expires_at,
+            bundle_bytes=len(bundle),
+            sealed_bundle_hex=sealed.hex(),
         )
 
     def _require_active_lease(

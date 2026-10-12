@@ -7,6 +7,7 @@ This implementation keeps that case explicit and returns ``False`` instead.
 
 from __future__ import annotations
 
+import hmac
 import secrets
 from dataclasses import dataclass
 from typing import Optional
@@ -27,7 +28,11 @@ SM2_GENERATOR = (
 )
 SM2_DEFAULT_ID = b"1234567812345678"
 SM2_BYTES = 32
+SM2_C1_BYTES = SM2_BYTES * 2
+SM2_C3_BYTES = SM2_BYTES
+SM2_CIPHERTEXT_OVERHEAD = SM2_C1_BYTES + SM2_C3_BYTES
 _POINT_INFINITY = None
+_MAX_ENCRYPTION_ATTEMPTS = 128
 
 
 class SM2Error(ValueError):
@@ -313,3 +318,109 @@ def verify_sm2(signature: bytes, data: bytes, public_key: str) -> bool:
     affine_x = x * inverse_squared % SM2_FIELD
     e = _message_digest(public_key, data)
     return r == (e + affine_x) % SM2_ORDER
+
+
+def _kdf(x2: bytes, y2: bytes, length: int) -> bytes:
+    """SM3-based key derivation function from GM/T 0003.4-2012."""
+    if length <= 0:
+        raise SM2Error("KDF output length must be positive")
+    material = x2 + y2
+    output = bytearray()
+    counter = 1
+    while len(output) < length:
+        output.extend(sm3(material + counter.to_bytes(4, "big")))
+        counter += 1
+    return bytes(output[:length])
+
+
+def sm2_encrypt(
+    public_key: str,
+    data: bytes,
+    *,
+    scalar_hex: Optional[str] = None,
+) -> bytes:
+    """Encrypt ``data`` to an SM2 public key and return ``C1 || C3 || C2``.
+
+    ``scalar_hex`` exists for deterministic tests; production callers leave it
+    unset so the ephemeral scalar comes from ``secrets``.
+    """
+    if not isinstance(data, bytes) or not data:
+        raise SM2Error("SM2 plaintext must be a non-empty byte sequence")
+    public_point = _parse_public_point(public_key)
+    if scalar_hex is not None:
+        fixed_scalar = int(
+            _normalize_hex(
+                scalar_hex,
+                name="scalar_hex",
+                byte_length=SM2_BYTES,
+            ),
+            16,
+        )
+        if not 1 <= fixed_scalar < SM2_ORDER:
+            raise SM2Error("scalar_hex is outside the SM2 scalar field")
+        attempts = 1
+    else:
+        fixed_scalar = 0
+        attempts = _MAX_ENCRYPTION_ATTEMPTS
+
+    for _ in range(attempts):
+        scalar = fixed_scalar or (secrets.randbelow(SM2_ORDER - 1) + 1)
+        c1_point = _scalar_multiply(scalar, SM2_GENERATOR)
+        shared = _scalar_multiply(scalar, public_point)
+        if c1_point is None or shared is None:
+            if fixed_scalar:
+                raise SM2Error("SM2 encryption reached the point at infinity")
+            continue
+        x2 = shared[0].to_bytes(SM2_BYTES, "big")
+        y2 = shared[1].to_bytes(SM2_BYTES, "big")
+        mask = _kdf(x2, y2, len(data))
+        if not any(mask):
+            if fixed_scalar:
+                raise SM2Error("SM2 KDF produced an all-zero mask")
+            continue
+        c2 = bytes(left ^ right for left, right in zip(data, mask, strict=True))
+        c3 = sm3(x2 + data + y2)
+        c1 = (
+            c1_point[0].to_bytes(SM2_BYTES, "big")
+            + c1_point[1].to_bytes(SM2_BYTES, "big")
+        )
+        return c1 + c3 + c2
+    raise SM2Error("SM2 encryption could not find a usable ephemeral scalar")
+
+
+def sm2_decrypt(private_key: str, ciphertext: bytes) -> bytes:
+    """Decrypt an SM2 ``C1 || C3 || C2`` ciphertext and verify its C3 tag."""
+    if not isinstance(ciphertext, bytes) or len(ciphertext) <= SM2_CIPHERTEXT_OVERHEAD:
+        raise SM2Error("SM2 ciphertext is malformed")
+    normalized = _normalize_hex(
+        private_key,
+        name="private_key",
+        byte_length=SM2_BYTES,
+    )
+    c1 = ciphertext[:SM2_C1_BYTES]
+    c3 = ciphertext[SM2_C1_BYTES:SM2_CIPHERTEXT_OVERHEAD]
+    c2 = ciphertext[SM2_CIPHERTEXT_OVERHEAD:]
+    point = _parse_public_point(c1.hex())
+    scalar = int(normalized, 16)
+    if not 1 <= scalar < SM2_ORDER:
+        raise SM2Error("private_key is outside the SM2 scalar field")
+    shared = _scalar_multiply(scalar, point)
+    if shared is None:
+        raise SM2Error("SM2 shared point is at infinity")
+    x2 = shared[0].to_bytes(SM2_BYTES, "big")
+    y2 = shared[1].to_bytes(SM2_BYTES, "big")
+    mask = _kdf(x2, y2, len(c2))
+    plaintext = bytes(left ^ right for left, right in zip(c2, mask, strict=True))
+    if not hmac.compare_digest(sm3(x2 + plaintext + y2), c3):
+        raise SM2Error("SM2 ciphertext integrity check failed")
+    return plaintext
+
+
+__all__ = [
+    "SM2Error",
+    "SM2KeyPair",
+    "sm2_decrypt",
+    "sm2_encrypt",
+    "validate_sm2_public_key",
+    "verify_sm2",
+]

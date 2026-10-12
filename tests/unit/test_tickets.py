@@ -50,6 +50,9 @@ def make_release() -> ReleaseManifest:
             "min_isvsvn": 3,
             "debug_allowed": False,
             "spu_build_hash": "33" * 32,
+            "model_version": "tiny-decoder-v1",
+            "model_manifest_hash": "44" * 32,
+            "precision_plan_hash": "55" * 32,
             "expires_at": "2027-01-01T00:00:00Z",
         }
     )

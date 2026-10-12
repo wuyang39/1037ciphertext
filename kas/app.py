@@ -28,6 +28,8 @@ from .models import (
     JobTicketResponse,
     ReleaseStorageKeyRequest,
     ReleaseStorageKeyResponse,
+    SealedStorageKeyRequest,
+    SealedStorageKeyResponse,
     TicketPublicKeyResponse,
 )
 from .service import KASService
@@ -79,6 +81,16 @@ def create_app(service: KASService | None = None) -> FastAPI:
         request: ReleaseStorageKeyRequest,
     ) -> ReleaseStorageKeyResponse:
         return kas.release_storage_key(request)
+
+    @app.post(
+        "/v1/release-storage-key-sealed",
+        response_model=SealedStorageKeyResponse,
+    )
+    def release_storage_key_sealed(
+        request: SealedStorageKeyRequest,
+    ) -> SealedStorageKeyResponse:
+        """Release ``K_disk_i`` sealed to an attested enclave public key."""
+        return kas.seal_storage_key(request)
 
     @app.exception_handler(ChallengeNotFound)
     def challenge_not_found(_request, exc: ChallengeNotFound):

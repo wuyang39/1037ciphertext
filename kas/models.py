@@ -97,3 +97,24 @@ class ReleaseStorageKeyResponse(ProtocolModel):
     key_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     key_hex: str = Field(pattern=r"^[0-9a-f]{64}$")
     expires_at: datetime
+
+
+class SealedStorageKeyRequest(ProtocolModel):
+    """Request the disk key sealed to an attested enclave public key."""
+
+    challenge_id: str = Field(min_length=1, max_length=128)
+    role: NodeRole
+    release_id: str = Field(min_length=3, max_length=128)
+    share_epoch: int = Field(ge=0)
+    purpose: StoragePurpose
+    enclave_public_key: str = Field(pattern=r"^[0-9a-f]{128}$")
+    dcap_quote_b64: str = Field(min_length=1)
+
+
+class SealedStorageKeyResponse(ProtocolModel):
+    key_id: str = Field(pattern=r"^[0-9a-f]{64}$")
+    startup_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    share_epoch: int
+    expires_at: datetime
+    bundle_bytes: int = Field(ge=1)
+    sealed_bundle_hex: str = Field(min_length=2)

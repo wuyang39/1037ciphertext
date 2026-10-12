@@ -13,6 +13,8 @@
 *.edl text eol=lf
 *.lds text eol=lf
 Makefile text eol=lf
+*.template text eol=lf
+*.manifest text eol=lf
 
 docs/evidence/** text eol=lf
 

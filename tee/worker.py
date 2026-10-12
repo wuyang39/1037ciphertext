@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import datetime as dt
-import hashlib
 import threading
 from dataclasses import dataclass
 from typing import Callable
 
 from kas.tickets import JobTicket, assert_ticket_matches_session, verify_job_ticket
+
+from crypto.enclave_key import worker_startup_digest
 
 from .storage import ActiveLease, StorageKey
 
@@ -30,20 +31,15 @@ class WorkerStartup:
     expected_storage_key_id: str
 
     def digest(self) -> str:
-        material = b"|".join(
-            (
-                self.role.encode("ascii"),
-                self.release_id.encode("utf-8"),
-                self.model_version.encode("utf-8"),
-                self.model_manifest_hash.encode("ascii"),
-                self.precision_plan_hash.encode("ascii"),
-                str(self.share_epoch).encode("ascii"),
-                self.expected_storage_key_id.encode("ascii"),
-            )
+        return worker_startup_digest(
+            role=self.role,
+            release_id=self.release_id,
+            model_version=self.model_version,
+            model_manifest_hash=self.model_manifest_hash,
+            precision_plan_hash=self.precision_plan_hash,
+            share_epoch=self.share_epoch,
+            expected_storage_key_id=self.expected_storage_key_id,
         )
-        return hashlib.sha256(
-            b"A1-22:worker-startup:v1\0" + material
-        ).hexdigest()
 
 
 class ProtectedWorker:

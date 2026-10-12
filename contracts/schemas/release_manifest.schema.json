@@ -11,6 +11,9 @@
     "min_isvsvn",
     "debug_allowed",
     "spu_build_hash",
+    "model_version",
+    "model_manifest_hash",
+    "precision_plan_hash",
     "expires_at"
   ],
   "properties": {
@@ -33,6 +36,17 @@
       "const": false
     },
     "spu_build_hash": {
+      "$ref": "#/$defs/hex32"
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "model_manifest_hash": {
+      "$ref": "#/$defs/hex32"
+    },
+    "precision_plan_hash": {
       "$ref": "#/$defs/hex32"
     },
     "expires_at": {

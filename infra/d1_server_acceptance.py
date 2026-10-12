@@ -143,6 +143,11 @@ def _write_release_policy(path: Path, claims: Any, *, hours: int = 24) -> dict[s
         "min_isvsvn": claims.isv_svn,
         "debug_allowed": False,
         "spu_build_hash": claims.mr_enclave.hex(),
+        # D1 exercises attestation and key release without a model, so the
+        # model binding for that release is the probe measurement itself.
+        "model_version": "d1-attestation-probe",
+        "model_manifest_hash": claims.mr_enclave.hex(),
+        "precision_plan_hash": claims.mr_enclave.hex(),
         "expires_at": (_now() + dt.timedelta(hours=hours))
         .replace(microsecond=0)
         .isoformat(),
