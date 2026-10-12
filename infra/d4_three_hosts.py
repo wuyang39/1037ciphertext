@@ -502,7 +502,10 @@ def run_three_hosts(
                 )
             time.sleep(2.0)
 
-            for role in ("P1", "P2"):
+            # All three ranks join one collective: a peer's link only comes up
+            # once every rank is running, so P0 must start together with the
+            # others instead of after their ready markers.
+            for role in ("P1", "P2", "P0"):
                 transport.start_background(
                     role_routes[role],
                     node_command(
@@ -512,6 +515,7 @@ def run_three_hosts(
                         log=node_logs[role],
                     ),
                 )
+                time.sleep(1.0)
             for role in ("P1", "P2"):
                 wait_for_marker(
                     transport,
@@ -520,15 +524,6 @@ def run_three_hosts(
                     marker=READY_MARKER,
                     timeout=node_timeout,
                 )
-            transport.start_background(
-                role_routes["P0"],
-                node_command(
-                    python=python,
-                    repo=repo,
-                    config=f"{workspace}/configs/P0.json",
-                    log=node_logs["P0"],
-                ),
-            )
             wait_for_marker(
                 transport,
                 role_routes["P0"],
