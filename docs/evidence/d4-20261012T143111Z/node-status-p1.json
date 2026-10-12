@@ -1,0 +1,13 @@
+{
+  "batches_served": 16,
+  "identity_sha256": "e65133565d80cc2f6e8d20857cfe7740981ed62b8b0a651bf7ffc86669c4ef88",
+  "link_seconds": 4.147,
+  "peer_certificates": {
+    "P0": "0a9354e16d885e0caa8dff9be1c65e45e875435b365e76254c046fc6df023058",
+    "P2": "cc171169b7869d69083e79312918f8ef35bacdc4f4b004a95765527a68ccd29e"
+  },
+  "role": "P1",
+  "run_id": "d4-20261012T143111Z",
+  "teardown_finished": true,
+  "verdicts": "served"
+}

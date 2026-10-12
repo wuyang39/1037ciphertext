@@ -1,0 +1,29 @@
+{
+  "P0": {
+    "host": "172.27.172.201",
+    "brpc_port": 47100,
+    "share_port": 47200,
+    "ssh_host": "47.116.200.143",
+    "user": "jiahao",
+    "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+    "public_address": "47.116.200.143"
+  },
+  "P1": {
+    "host": "172.27.172.202",
+    "brpc_port": 47101,
+    "share_port": 47201,
+    "ssh_host": "47.117.34.67",
+    "user": "jiahao",
+    "instance_id": "iZuf6bd6qnhgtveg5khyf1Z",
+    "public_address": "47.117.34.67"
+  },
+  "P2": {
+    "host": "172.27.172.203",
+    "brpc_port": 47102,
+    "share_port": 47202,
+    "ssh_host": "106.15.54.240",
+    "user": "jiahao",
+    "instance_id": "iZuf6bd6qnhgtveg5khygdZ",
+    "public_address": "106.15.54.240"
+  }
+}

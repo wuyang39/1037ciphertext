@@ -66,6 +66,7 @@ bash deploy/run_d1_server.sh                 # 三种 Quote 探针 + KAS 闭环�
 bash deploy/run_d3_encfs.sh                  # Gramine encrypted FS 挂载、明文删除与宿主侧拒绝
 bash deploy/run_d3_kas_release.sh            # KAS 放行 K_disk_i + 固定 Worker 入口的真实启动条件
 bash deploy/run_d4_accept.sh                 # D4 三节点传输、1,024 组 RSS 向量、抓包与五类 fail-closed
+bash deploy/run_d4_three_hosts.sh            # D4 三台独立实例：跨私网跑网格并逐台抓包（在操作机上执行）
 ```
 
 `run_d1_gramine.sh` 与 `run_d1_server.sh` 写入 `artifacts/server/<run-id>/d1/`；
@@ -87,6 +88,20 @@ PYTHON=~/a122-venv311/bin/python bash deploy/run_d4_accept.sh
 
 它默认把 P0/P1/P2 跑成同机三进程，是跨三台实例、三个 `gramine-sgx` 节点前
 的固定彩排入口；结论与范围限定见 [d4-acceptance.md](../docs/d4-acceptance.md)。
+
+`run_d4_three_hosts.sh` 从操作机执行：它要有三台实例的 ssh 访问，实例上要
+有同一个提交、`spu` 和抓包权限。先复制示例 cluster 文件并填上地址：
+
+```bash
+cp deploy/d4-three-hosts.example.json deploy/d4-three-hosts.json   # 不提交
+CLUSTER=deploy/d4-three-hosts.json SSHK=~/.ssh/a122_id_sgx \
+  bash deploy/run_d4_three_hosts.sh
+```
+
+它把工作区 provision 到 P0，再把同一个 tar 分发到 P1/P2 的同一绝对路径，
+每台各起一份抓包和一个节点进程，跑完 1,024 组向量后把摘要、状态、日志、
+向量和 trace 收回并封存到 `artifacts/server/<run-id>/d4-three/`。原始抓包
+留在各自实例的 `/tmp/`，由证据包旁的 `.exclusions.json` 记录摘要。
 
 `run_d3_kas_release.sh` 需要两个解释器：`PYTHON`（KAS 侧，带 `cryptography`
 的 3.12 venv）与 `SYSTEM_PYTHON`（enclave 内加载的 `/usr/bin/python3`，需要

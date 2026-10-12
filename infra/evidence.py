@@ -134,12 +134,24 @@ def iter_evidence_files(root: Path) -> Iterable[Path]:
         yield path
 
 
-def seal_directory(root: Path) -> dict[str, Any]:
-    """Create an evidence index and a detached SHA-256 seal."""
+def seal_directory(
+    root: Path,
+    *,
+    external: Iterable[Mapping[str, Any]] = (),
+) -> dict[str, Any]:
+    """Create an evidence index and a detached SHA-256 seal.
+
+    ``external`` names artifacts the run produced that stay outside the
+    repository on purpose, such as the raw capture of a three-instance run that
+    would blow past the host file limit. They are recorded in the index so the
+    bundle's exclusions file can name them, and an absent one is only excused
+    when its digest and size still agree with the index. A small bundle passes
+    nothing here and keeps the default layout.
+    """
     root = Path(root)
     if not root.is_dir():
         raise EvidenceError(f"evidence directory does not exist: {root}")
-    entries = []
+    entries: list[dict[str, Any]] = []
     for path in iter_evidence_files(root):
         entries.append(
             {
@@ -148,6 +160,39 @@ def seal_directory(root: Path) -> dict[str, Any]:
                 "sha256": sha256_file(path),
             }
         )
+    bundled = {entry["path"] for entry in entries}
+    for record in external:
+        relative = str(record.get("path", ""))
+        if (
+            not relative
+            or Path(relative).is_absolute()
+            or ".." in Path(relative).parts
+        ):
+            raise EvidenceError(f"external artifact has an unsafe path: {relative!r}")
+        if relative in bundled:
+            raise EvidenceError(
+                f"external artifact collides with a bundled file: {relative}"
+            )
+        digest = str(record.get("sha256", ""))
+        if len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
+            raise EvidenceError(
+                f"external artifact has a malformed sha256: {relative}"
+            )
+        try:
+            size = int(record["bytes"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise EvidenceError(
+                f"external artifact has no usable size: {relative}"
+            ) from exc
+        entries.append(
+            {
+                "path": relative,
+                "bytes": size,
+                "sha256": digest,
+                "external": True,
+            }
+        )
+        bundled.add(relative)
     index = {
         "evidence_version": EVIDENCE_VERSION,
         "root": root.name,
@@ -164,6 +209,33 @@ def exclusions_path(root: Path) -> Path:
     """Where a bundle records the artifacts it deliberately leaves out."""
     root = Path(root)
     return root.with_name(root.name + EXCLUSIONS_SUFFIX)
+
+
+DEFAULT_EXCLUSION_NOTE = (
+    "Raw artifacts too large to commit are named here. Every excluded file "
+    "still has to match the sealed index if it is present, so restoring the "
+    "original capture tightens the check instead of bypassing it."
+)
+
+
+def write_exclusions(
+    root: Path,
+    entries: Iterable[Mapping[str, Any]],
+    *,
+    run_id: str | None = None,
+    note: str | None = None,
+) -> Path:
+    """Record the artifacts a bundle deliberately leaves out of the repository."""
+    root = Path(root)
+    document = {
+        "evidence_version": EVIDENCE_VERSION,
+        "run_id": run_id or root.name,
+        "note": note or DEFAULT_EXCLUSION_NOTE,
+        "excluded": [dict(entry) for entry in entries],
+    }
+    path = exclusions_path(root)
+    write_json(path, document)
+    return path
 
 
 def load_exclusions(root: Path) -> list[dict[str, Any]]:
@@ -287,5 +359,6 @@ __all__ = [
     "sha256_bytes",
     "sha256_file",
     "verify_directory",
+    "write_exclusions",
     "write_json",
 ]

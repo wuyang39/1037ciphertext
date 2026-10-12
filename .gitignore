@@ -25,6 +25,9 @@ checkpoints/
 data/
 models/
 
+# The real three-instance cluster description stays local
+deploy/d4-three-hosts.json
+
 # Runtime, benchmark, and evidence outputs
 runs/
 traces/
@@ -34,6 +37,9 @@ benchmark/runs/
 *.core
 core
 *.log
+
+# ...except the node logs inside a sealed evidence bundle, which are part of it
+!docs/evidence/**/*.log
 
 # Python
 __pycache__/

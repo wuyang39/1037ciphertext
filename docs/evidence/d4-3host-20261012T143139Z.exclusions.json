@@ -1,0 +1,25 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "excluded": [
+    {
+      "bytes": 144791448,
+      "path": "d4-three-P0.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on its own instance under /tmp/ and only its digest and the derived summary are committed",
+      "sha256": "4e73cabdb4cd6bdc0cdd597d87bcc326881d0d318457029e1ba09894539f656a"
+    },
+    {
+      "bytes": 143211316,
+      "path": "d4-three-P1.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on its own instance under /tmp/ and only its digest and the derived summary are committed",
+      "sha256": "557b2b67a5901426a77f11029d47a5c6ebfba23799ca3bf91b0215f3ae159979"
+    },
+    {
+      "bytes": 143195726,
+      "path": "d4-three-P2.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on its own instance under /tmp/ and only its digest and the derived summary are committed",
+      "sha256": "24d3170021874e747f98d3104e7f5af3ddf4ad0805b4da3544a333509d27e1c1"
+    }
+  ],
+  "note": "Raw artifacts too large to commit are named here. Every excluded file still has to match the sealed index if it is present, so restoring the original capture tightens the check instead of bypassing it.",
+  "run_id": "d4-3host-20261012T143139Z"
+}

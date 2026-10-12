@@ -22,7 +22,10 @@ directory as the raw artifact.
 
 from __future__ import annotations
 
+import argparse
+import json
 import struct
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Sequence
@@ -58,6 +61,10 @@ TLS_HANDSHAKE_TYPES = {
     20: "finished",
 }
 TLS13_VERSION = 0x0304
+
+# The six protocol ports a D4 run uses: BRPC 47100-47102 and the share
+# channels 47200-47202. ``--d4-ports`` covers the runs that use the defaults.
+D4_PORTS = (47100, 47101, 47102, 47200, 47201, 47202)
 TLS_LEGACY_VERSION = 0x0303
 
 
@@ -494,10 +501,73 @@ def render_summary(summary: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def main(argv: Sequence[str] | None = None) -> int:
+    """Render one capture's summary, so a host can describe its own traffic."""
+    parser = argparse.ArgumentParser(
+        description="Summarise the TLS traffic in a D4 capture"
+    )
+    parser.add_argument("capture", type=Path)
+    parser.add_argument(
+        "--port",
+        type=int,
+        action="append",
+        default=[],
+        help="a port the run used; repeat for each one",
+    )
+    parser.add_argument(
+        "--d4-ports",
+        action="store_true",
+        help="use the six default D4 ports (47100-47102, 47200-47202)",
+    )
+    parser.add_argument(
+        "--probe-endpoint",
+        action="append",
+        default=[],
+        metavar="HOST:PORT",
+        help="a listener the run deliberately probed in plaintext",
+    )
+    parser.add_argument("--probe-marker", default="")
+    parser.add_argument("--json", action="store_true")
+    args = parser.parse_args(argv)
+
+    ports = list(args.port)
+    if args.d4_ports:
+        ports.extend(D4_PORTS)
+    if not ports:
+        parser.error("give at least one --port, or pass --d4-ports")
+    endpoints: list[tuple[str, int]] = []
+    for item in args.probe_endpoint:
+        host, _, raw_port = item.rpartition(":")
+        if not host or not raw_port.isdigit():
+            parser.error(f"--probe-endpoint wants HOST:PORT, got {item!r}")
+        endpoints.append((host, int(raw_port)))
+    try:
+        document = analyse_capture(
+            args.capture,
+            expected_ports=ports,
+            expected_probe_endpoints=endpoints,
+            probe_marker=args.probe_marker.encode("utf-8"),
+        )
+    except (OSError, PcapError) as exc:
+        print(f"capture analysis failed: {exc}", file=sys.stderr)
+        return 1
+    if args.json:
+        print(json.dumps(document, ensure_ascii=True, sort_keys=True, indent=2))
+        return 0
+    print(render_summary(document), end="")
+    return 0
+
+
 __all__ = [
+    "D4_PORTS",
     "PcapError",
     "TLS13_VERSION",
     "TlsFlow",
     "analyse_capture",
+    "main",
     "render_summary",
 ]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

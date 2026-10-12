@@ -1,0 +1,18 @@
+A122-D4-NODE-READY {"identity_sha256": "0a9354e16d885e0caa8dff9be1c65e45e875435b365e76254c046fc6df023058", "link_seconds": 3.99, "partition_id": "a122-d4-d4-20261012T143111Z", "peer_certificates": {"P1": "e65133565d80cc2f6e8d20857cfe7740981ed62b8b0a651bf7ffc86669c4ef88", "P2": "cc171169b7869d69083e79312918f8ef35bacdc4f4b004a95765527a68ccd29e"}, "rank": 0, "role": "P0", "run_id": "d4-20261012T143111Z", "share_port": null, "tls": {"client_verify_depth": 4, "enable_ssl": true, "min_version": "TLS1.3", "require_client_certificate": true, "server_verify_depth": 4}}
+batch 1/16 vectors=64 passed=64 failed=0
+batch 2/16 vectors=64 passed=64 failed=0
+batch 3/16 vectors=64 passed=64 failed=0
+batch 4/16 vectors=64 passed=64 failed=0
+batch 5/16 vectors=64 passed=64 failed=0
+batch 6/16 vectors=64 passed=64 failed=0
+batch 7/16 vectors=64 passed=64 failed=0
+batch 8/16 vectors=64 passed=64 failed=0
+batch 9/16 vectors=64 passed=64 failed=0
+batch 10/16 vectors=64 passed=64 failed=0
+batch 11/16 vectors=64 passed=64 failed=0
+batch 12/16 vectors=64 passed=64 failed=0
+batch 13/16 vectors=64 passed=64 failed=0
+batch 14/16 vectors=64 passed=64 failed=0
+batch 15/16 vectors=64 passed=64 failed=0
+batch 16/16 vectors=64 passed=64 failed=0
+A122-D4-NODE-DONE P0

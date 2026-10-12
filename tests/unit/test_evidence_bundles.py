@@ -10,6 +10,7 @@ from infra.evidence import (
     load_exclusions,
     seal_directory,
     verify_directory,
+    write_exclusions,
     write_json,
 )
 
@@ -45,6 +46,55 @@ def test_committed_evidence_bundles_verify() -> None:
             for entry in exclusions
             if not (bundle / str(entry["path"])).is_file()
         )
+
+
+def test_seal_directory_records_artifacts_that_stay_on_the_instance(
+    tmp_path: Path,
+) -> None:
+    """A cross-host bundle names its captures without shipping them."""
+    bundle = _small_bundle(tmp_path)
+    (bundle / "summary.json").write_text('{"ok": true}\n', encoding="utf-8")
+    external = [
+        {
+            "path": "d4-three-P0.pcap",
+            "bytes": 144791448,
+            "sha256": "a" * 64,
+            "reason": "too large to commit",
+        }
+    ]
+    index = seal_directory(bundle, external=external)
+    assert [entry["path"] for entry in index["files"]] == [
+        "summary.json",
+        "d4-three-P0.pcap",
+    ]
+    assert index["files"][-1]["external"] is True
+    assert verify_directory(bundle, exclusions=external)["excluded"] == [
+        "d4-three-P0.pcap"
+    ]
+    write_exclusions(bundle, external, run_id="d4-3host-test")
+    assert load_exclusions(bundle) == external
+    # A digest that disagrees with the index is refused, so an exclusion can
+    # never excuse a substituted capture.
+    with pytest.raises(EvidenceError, match="disagrees with the index"):
+        verify_directory(
+            bundle,
+            exclusions=[
+                {"path": "d4-three-P0.pcap", "bytes": 144791448, "sha256": "b" * 64}
+            ],
+        )
+
+
+def test_seal_directory_rejects_a_malformed_external_artifact(tmp_path: Path) -> None:
+    bundle = _small_bundle(tmp_path)
+    (bundle / "summary.json").write_text("{}\n", encoding="utf-8")
+    for entry in (
+        {"path": "../escape.pcap", "bytes": 1, "sha256": "a" * 64},
+        {"path": "summary.json", "bytes": 1, "sha256": "a" * 64},
+        {"path": "capture.pcap", "bytes": 1, "sha256": "not-a-digest"},
+        {"path": "capture.pcap", "sha256": "a" * 64},
+    ):
+        with pytest.raises(EvidenceError):
+            seal_directory(bundle, external=[entry])
 
 
 def test_verify_directory_honours_an_exclusion_list(tmp_path: Path) -> None:

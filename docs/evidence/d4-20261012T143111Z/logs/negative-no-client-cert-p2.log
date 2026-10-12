@@ -1,0 +1,23 @@
+[2026-10-12 22:31:52.934] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+[2026-10-12 22:31:52.934] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: 
+	[external/yacl~/yacl/link/transport/channel.cc:430] Get data timeout, key=connect_0
+stacktrace: 
+#0 yacl::link::transport::Channel::Recv()+0x7f1f3b844b33
+#1 yacl::link::transport::Channel::TestRecv()+0x7f1f3b83ef21
+#2 yacl::link::Context::ConnectToMesh()+0x7f1f3b83c722
+#3 spu::BindLink()::{lambda()#18}::operator()()+0x7f1f37716487
+#4 pybind11::detail::argument_loader<>::call_impl<>()+0x7f1f3773145f
+#5 pybind11::detail::argument_loader<>::call<>()+0x7f1f3772df11
+#6 pybind11::cpp_function::initialize<>()::{lambda()#3}::operator()()+0x7f1f37727171
+#7 pybind11::cpp_function::initialize<>()::{lambda()#3}::_FUN()+0x7f1f37727205
+#8 pybind11::cpp_function::dispatcher()+0x7f1f377498ef
+#9 cfunction_call+0x55dc1a3a68f5
+#10 _PyEval_EvalFrameDefault+0x55dc1a417d6c
+#11 _PyEval_Vector+0x55dc1a3eeff6
+#12 builtin_exec+0x55dc1a53386b
+#13 cfunction_vectorcall_FASTCALL_KEYWORDS+0x55dc1a3a636b
+#14 _PyEval_EvalFrameDefault+0x55dc1a4179a9
+#15 _PyFunction_Vectorcall+0x55dc1a3791f9
+
+

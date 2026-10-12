@@ -1,0 +1,321 @@
+"""The three-instance D4 runner: routing, commands, and the collected bundle."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Mapping
+
+import pytest
+
+from infra.d4_three_hosts import (
+    SSHRoute,
+    ThreeHostError,
+    capture_command,
+    endpoints,
+    load_cluster,
+    node_command,
+    routes,
+    run_three_hosts,
+    summary_header,
+    wait_for_marker,
+)
+from infra.evidence import load_exclusions, verify_directory
+
+
+CLUSTER: dict[str, dict[str, Any]] = {
+    "P0": {
+        "host": "172.27.172.201",
+        "brpc_port": 47100,
+        "share_port": 47200,
+        "ssh_host": "198.51.100.11",
+        "instance_id": "i-p0",
+    },
+    "P1": {
+        "host": "172.27.172.202",
+        "brpc_port": 47101,
+        "share_port": 47201,
+        "ssh_host": "198.51.100.12",
+        "instance_id": "i-p1",
+    },
+    "P2": {
+        "host": "172.27.172.203",
+        "brpc_port": 47102,
+        "share_port": 47202,
+        "ssh_host": "198.51.100.13",
+        "instance_id": "i-p2",
+    },
+}
+
+IDENTITIES = {
+    "P0": "aa" * 32,
+    "P1": "bb" * 32,
+    "P2": "cc" * 32,
+}
+
+
+def _write_cluster(path: Path) -> Path:
+    path.write_text(json.dumps(CLUSTER), encoding="utf-8")
+    return path
+
+
+def test_load_cluster_requires_all_three_roles(tmp_path: Path) -> None:
+    incomplete = tmp_path / "cluster.json"
+    incomplete.write_text(json.dumps({"P0": CLUSTER["P0"]}), encoding="utf-8")
+    with pytest.raises(ThreeHostError, match="missing: P1, P2"):
+        load_cluster(incomplete, user="jiahao")
+    assert load_cluster(_write_cluster(tmp_path / "ok.json"), user="jiahao") == CLUSTER
+
+
+def test_routes_bind_private_endpoints_but_ssh_over_the_public_one() -> None:
+    parsed = routes(CLUSTER, user="jiahao")
+    assert parsed["P0"].ssh_target == "jiahao@198.51.100.11"
+    assert parsed["P0"].host == "172.27.172.201"
+    assert parsed["P0"].instance_id == "i-p0"
+    assert endpoints(CLUSTER)["P2"] == {
+        "host": "172.27.172.203",
+        "brpc_port": 47102,
+        "share_port": 47202,
+    }
+
+
+def test_route_defaults_to_the_private_address_when_no_public_one_is_known() -> None:
+    route = SSHRoute.from_document("P1", {"host": "10.0.0.5"}, user="ops")
+    assert route.ssh_target == "ops@10.0.0.5"
+    assert route.user == "ops"
+    with pytest.raises(ThreeHostError, match="has no host"):
+        SSHRoute.from_document("P2", {}, user="ops")
+
+
+def test_capture_and_node_commands_quote_their_paths() -> None:
+    capture = capture_command(
+        iface="eth0", pcap="/tmp/run/P0.pcap", log="/tmp/run/P0.log"
+    )
+    assert "setsid nohup tcpdump -i eth0" in capture
+    assert "port 47100 or port 47101 or port 47102" in capture
+    assert "port 47200 or port 47201 or port 47202" in capture
+    node = node_command(
+        python="/home/u/venv/bin/python",
+        repo="/home/u/repo",
+        config="/home/u/ws/configs/P1.json",
+        log="/tmp/P1.log",
+    )
+    assert "cd /home/u/repo" in node
+    assert "-m tee.enclave.spu_node --config /home/u/ws/configs/P1.json" in node
+
+
+def test_summary_header_records_the_capture_digest() -> None:
+    header = summary_header(
+        role="P1",
+        instance_id="i-p1",
+        private_address="172.27.172.202",
+        peers=["P0", "P2"],
+        capture="/tmp/d4-three-P1.pcap",
+        size=143211316,
+        digest="ab" * 32,
+    )
+    assert "role: P1" in header
+    assert "instance: i-p1" in header
+    assert "peers configured: P0 P2" in header
+    assert f"143211316 bytes, sha256 {'ab' * 32}" in header
+    assert header.endswith("\n\n")
+
+
+class FakeTransport:
+    """Stands in for paramiko: records commands, answers like the hosts would."""
+
+    def __init__(self, commit: str = "c0ffee") -> None:
+        self.commit = commit
+        self.commands: list[tuple[str, str]] = []
+        self.uploads: list[tuple[str, str, str]] = []
+        self.downloads: list[str] = []
+        self.closed = False
+
+    def run(
+        self,
+        route: SSHRoute,
+        command: str,
+        *,
+        timeout: float | None = None,
+        check: bool = True,
+    ) -> tuple[int, str, str]:
+        self.commands.append((route.role, command))
+        if "git rev-parse HEAD" in command:
+            return 0, self.commit + "\n", ""
+        if command.startswith("grep -m1"):
+            marker = "A122-D4-NODE-READY" if "READY" in command else "A122-D4-NODE-DONE"
+            return 0, f"{marker} {route.role}\n", ""
+        if "stat -c%s" in command:
+            return 0, "1234\n" + "ef" * 32 + "\n", ""
+        if "-m infra.pcap_tls" in command:
+            return 0, _FAKE_SUMMARY, ""
+        return 0, "", ""
+
+    def get(self, route: SSHRoute, remote: str, local: Path) -> None:
+        self.downloads.append(remote)
+        Path(local).parent.mkdir(parents=True, exist_ok=True)
+        if remote.endswith("node-status.json"):
+            peers = {
+                role: IDENTITIES[role]
+                for role in IDENTITIES
+                if role != route.role
+            }
+            document: dict[str, Any] = {
+                "role": route.role,
+                "run_id": "test",
+                "identity_sha256": IDENTITIES[route.role],
+                "peer_certificates": peers,
+                "verdicts": "passed" if route.role == "P0" else "served",
+                "teardown_finished": True,
+            }
+        elif remote.endswith("rss-vectors.json"):
+            document = {
+                "count": 1024,
+                "batch": 64,
+                "rows": 4,
+                "cols": 4,
+                "operators": ["add"],
+                "grid_digest": "11" * 32,
+                "summary": {"verdicts": "passed", "passed": 1024, "failed": 0},
+            }
+        elif remote.endswith("communication-trace.json"):
+            document = {
+                "transport": "SPU/YACL/BRPC over TLS 1.3 in a host process",
+                "inside_enclave": False,
+                "attestation_available": False,
+                "link_seconds": 1.5,
+                "share_bytes": 100,
+                "batches": [{}] * 16,
+            }
+        else:
+            Path(local).write_text(f"node log for {route.role}\n", encoding="utf-8")
+            return
+        Path(local).write_text(json.dumps(document), encoding="utf-8")
+
+    def put(self, route: SSHRoute, local: Path, remote: str) -> None:
+        self.uploads.append((route.role, str(local), remote))
+
+    def close(self) -> None:
+        self.closed = True
+
+
+_FAKE_SUMMARY = "\n".join(
+    [
+        "# A1-22 D4 TLS capture summary",
+        "packets on expected ports: 70000",
+        "TLS 1.3 flows: 23",
+        "TLS 1.2-or-lower flows: 0",
+        "handshake messages: 56",
+        "application-data records: 120000",
+        "non-TLS payload bytes: 0",
+        "verdict: tls13_only",
+        "",
+    ]
+)
+
+
+def test_wait_for_marker_reports_the_line_and_times_out(tmp_path: Path) -> None:
+    transport = FakeTransport()
+    route = routes(CLUSTER, user="jiahao")["P1"]
+    line = wait_for_marker(
+        transport, route, log="/tmp/P1.log", marker="A122-D4-NODE-READY", timeout=1
+    )
+    assert line.startswith("A122-D4-NODE-READY")
+
+    class Silent(FakeTransport):
+        def run(self, route, command, **kwargs):  # type: ignore[override]
+            return 0, "", ""
+
+    with pytest.raises(ThreeHostError, match="never reported"):
+        wait_for_marker(
+            Silent(),
+            route,
+            log="/tmp/P1.log",
+            marker="A122-D4-NODE-READY",
+            timeout=0.1,
+            poll=0.02,
+        )
+
+
+def test_run_three_hosts_produces_a_sealed_bundle(tmp_path: Path) -> None:
+    transport = FakeTransport()
+    out_dir = tmp_path / "d4-three"
+    result = run_three_hosts(
+        cluster=CLUSTER,
+        out_dir=out_dir,
+        run_id="d4-3host-test",
+        transport=transport,  # type: ignore[arg-type]
+        ssh_user="jiahao",
+        expect_commit=transport.commit,
+    )
+
+    # The workspace was provisioned once and carried to the other two hosts.
+    provision = [
+        command for _role, command in transport.commands if "--mode provision" in command
+    ]
+    assert len(provision) == 1
+    assert "--cluster-file /tmp/d4-3host-test-cluster.json" in provision[0]
+    assert [role for role, _local, _remote in transport.uploads] == ["P0", "P1", "P2"]
+    assert any(
+        role == "P1" and "tar xzf /tmp/d4-3host-test-workspace.tgz" in command
+        for role, command in transport.commands
+    )
+
+    # Every host was captured, and P0 was started only after P1 and P2 were up.
+    started = [
+        (role, command)
+        for role, command in transport.commands
+        if "-m tee.enclave.spu_node" in command
+    ]
+    assert [role for role, _command in started] == ["P1", "P2", "P0"]
+    assert (
+        len(
+            [
+                c
+                for _r, c in transport.commands
+                if "setsid nohup tcpdump -i eth0" in c
+            ]
+        )
+        == 3
+    )
+
+    summary = result["summary"]
+    assert summary["mode"] == "three-instances"
+    assert summary["evidence_complete"] is True
+    assert summary["peer_certificates_match"] is True
+    assert summary["certificate_mismatches"] == []
+    assert summary["grid"]["grid_digest"] == "11" * 32
+    assert summary["runtime"]["inside_enclave"] is False
+    assert summary["commit"] == transport.commit
+    assert summary["capture"]["P0"]["verdict"] == "tls13_only"
+    assert summary["capture"]["P1"]["sha256"] == "ef" * 32
+    assert summary["capture"]["P1"]["bytes"] == 1234
+
+    exclusions = load_exclusions(out_dir)
+    assert [entry["path"] for entry in exclusions] == [
+        "d4-three-P0.pcap",
+        "d4-three-P1.pcap",
+        "d4-three-P2.pcap",
+    ]
+    index = verify_directory(out_dir, exclusions=exclusions)
+    assert index["excluded"] == [
+        "d4-three-P0.pcap",
+        "d4-three-P1.pcap",
+        "d4-three-P2.pcap",
+    ]
+    assert (out_dir / "d4-three-p1-node.log").read_text(encoding="utf-8") == (
+        "node log for P1\n"
+    )
+
+
+def test_run_three_hosts_refuses_a_host_on_the_wrong_commit(tmp_path: Path) -> None:
+    transport = FakeTransport(commit="c0ffee")
+    with pytest.raises(ThreeHostError, match="expected deadbeef"):
+        run_three_hosts(
+            cluster=CLUSTER,
+            out_dir=tmp_path / "out",
+            run_id="d4-3host-test",
+            transport=transport,  # type: ignore[arg-type]
+            ssh_user="jiahao",
+            expect_commit="deadbeef",
+        )

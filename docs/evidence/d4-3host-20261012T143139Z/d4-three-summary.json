@@ -1,0 +1,125 @@
+{
+  "capture": {
+    "P0": {
+      "application_data_records": 123104,
+      "bytes": 144791448,
+      "handshake_messages": 96,
+      "lower_flows": 0,
+      "non_tls_payload_bytes": 0,
+      "packets": 71026,
+      "path": "d4-three-P0.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on its own instance under /tmp/ and only its digest and the derived summary are committed",
+      "sha256": "4e73cabdb4cd6bdc0cdd597d87bcc326881d0d318457029e1ba09894539f656a",
+      "tls13_flows": 42,
+      "verdict": "tls13_only"
+    },
+    "P1": {
+      "application_data_records": 122765,
+      "bytes": 143211316,
+      "handshake_messages": 56,
+      "lower_flows": 0,
+      "non_tls_payload_bytes": 0,
+      "packets": 70292,
+      "path": "d4-three-P1.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on its own instance under /tmp/ and only its digest and the derived summary are committed",
+      "sha256": "557b2b67a5901426a77f11029d47a5c6ebfba23799ca3bf91b0215f3ae159979",
+      "tls13_flows": 23,
+      "verdict": "tls13_only"
+    },
+    "P2": {
+      "application_data_records": 122765,
+      "bytes": 143195726,
+      "handshake_messages": 56,
+      "lower_flows": 0,
+      "non_tls_payload_bytes": 0,
+      "packets": 70083,
+      "path": "d4-three-P2.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on its own instance under /tmp/ and only its digest and the derived summary are committed",
+      "sha256": "24d3170021874e747f98d3104e7f5af3ddf4ad0805b4da3544a333509d27e1c1",
+      "tls13_flows": 23,
+      "verdict": "tls13_only"
+    }
+  },
+  "certificate_mismatches": [],
+  "cloud_region": "cn-shanghai",
+  "commit": "d048827",
+  "evidence_complete": true,
+  "grid": {
+    "batch": 64,
+    "cols": 4,
+    "count": 1024,
+    "failed": 0,
+    "grid_digest": "96b6c83502203292840fd9836f0efbe6f5fe49225aa5b110a6f2b3c27f3695d5",
+    "operators": [
+      "add",
+      "mul",
+      "matmul",
+      "truncate",
+      "compare",
+      "reciprocal"
+    ],
+    "passed": 1024,
+    "per_role": {
+      "P0": "passed",
+      "P1": "served",
+      "P2": "served"
+    },
+    "rows": 4,
+    "verdicts": "passed"
+  },
+  "missing_files": [],
+  "mode": "three-instances",
+  "note": "The three stages were copied with tar over the operator host, because the instances have no key to each other; the nodes were started on their own instance and the traffic crossed the VPC private network.",
+  "peer_certificates_match": true,
+  "phase": "D4",
+  "required_files": [
+    "d4-three-P0-tls-summary.txt",
+    "d4-three-P1-tls-summary.txt",
+    "d4-three-P2-tls-summary.txt",
+    "d4-three-p0-node-status.json",
+    "d4-three-p1-node-status.json",
+    "d4-three-p2-node-status.json",
+    "d4-three-p0-node.log",
+    "d4-three-p1-node.log",
+    "d4-three-p2-node.log",
+    "d4-three-rss-vectors.json",
+    "d4-three-communication-trace.json"
+  ],
+  "roles": {
+    "P0": {
+      "brpc_port": 47100,
+      "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+      "private_address": "172.27.172.201",
+      "public_address": "47.116.200.143",
+      "share_port": 47200
+    },
+    "P1": {
+      "brpc_port": 47101,
+      "instance_id": "iZuf6bd6qnhgtveg5khyf1Z",
+      "private_address": "172.27.172.202",
+      "public_address": "47.117.34.67",
+      "share_port": 47201
+    },
+    "P2": {
+      "brpc_port": 47102,
+      "instance_id": "iZuf6bd6qnhgtveg5khygdZ",
+      "private_address": "172.27.172.203",
+      "public_address": "106.15.54.240",
+      "share_port": 47202
+    }
+  },
+  "run_id": "d4-3host-20261012T143139Z",
+  "runtime": {
+    "attestation_available": false,
+    "batches": 16,
+    "inside_enclave": false,
+    "link_seconds": 1.774,
+    "share_bytes": 706252,
+    "transport": "SPU/YACL/BRPC over TLS 1.3 in a host process"
+  },
+  "teardown_finished": {
+    "P0": true,
+    "P1": true,
+    "P2": true
+  }
+}

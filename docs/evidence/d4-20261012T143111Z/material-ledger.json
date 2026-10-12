@@ -1,0 +1,49 @@
+{
+  "entries": [
+    {
+      "material_id": "d4-d4-20261012T143111Z-P0-preprocessing",
+      "rank": 0,
+      "remaining": 0,
+      "role": "P0",
+      "second_claim": "denied: material is not available: consumed",
+      "status_after_consume": "consumed"
+    },
+    {
+      "material_id": "d4-d4-20261012T143111Z-P1-preprocessing",
+      "rank": 1,
+      "remaining": 0,
+      "role": "P1",
+      "second_claim": "denied: material is not available: consumed",
+      "status_after_consume": "consumed"
+    },
+    {
+      "material_id": "d4-d4-20261012T143111Z-P2-preprocessing",
+      "rank": 2,
+      "remaining": 0,
+      "role": "P2",
+      "second_claim": "denied: material is not available: consumed",
+      "status_after_consume": "consumed"
+    }
+  ],
+  "grid_digest": "96b6c83502203292840fd9836f0efbe6f5fe49225aa5b110a6f2b3c27f3695d5",
+  "last_audit_event": {
+    "claim_id": "879c256d-d873-4a5a-bb94-0937c3b9719b",
+    "event": "consume",
+    "material_id": "d4-d4-20261012T143111Z-P2-preprocessing",
+    "remaining": 0
+  },
+  "model_version": "tiny-local-v1",
+  "one_time_consumption": true,
+  "op_type": "d4_grid",
+  "operators": [
+    "add",
+    "mul",
+    "matmul",
+    "truncate",
+    "compare",
+    "reciprocal"
+  ],
+  "run_id": "d4-20261012T143111Z",
+  "share_epoch": 1,
+  "vectors": 1024
+}

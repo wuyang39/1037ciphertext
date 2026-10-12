@@ -1,0 +1,38 @@
+E1012 22:31:22.822546 35310 8589935106 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:22.925482 35305 8589935362 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:23.952350 35310 8589937152 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:24.154511 35305 4294968068 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:26.954631 35310 8589935365 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:27.356800 35305 8589936641 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:31.957137 35310 4294968070 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:32.759640 35305 4294969346 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:33.459656 35309 12884902662 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:35.061899 35305 4294969347 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:36.461894 35309 17179869957 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:39.664505 35305 4294969348 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:41.464412 35309 21474836994 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:47.867014 35305 4294969349 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+E1012 22:31:50.967408 35309 4294967812 external/brpc~/src/brpc/socket.cpp:2086] Fail to SSL_do_handshake: error:0A0000C7:SSL routines::peer did not return a certificate
+[2026-10-12 22:31:56.833] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+[2026-10-12 22:31:56.833] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: 
+	[external/yacl~/yacl/link/transport/channel.cc:430] Get data timeout, key=connect_0
+stacktrace: 
+#0 yacl::link::transport::Channel::Recv()+0x7fac1652db33
+#1 yacl::link::transport::Channel::TestRecv()+0x7fac16527f21
+#2 yacl::link::Context::ConnectToMesh()+0x7fac16525722
+#3 spu::BindLink()::{lambda()#18}::operator()()+0x7fac123ff487
+#4 pybind11::detail::argument_loader<>::call_impl<>()+0x7fac1241a45f
+#5 pybind11::detail::argument_loader<>::call<>()+0x7fac12416f11
+#6 pybind11::cpp_function::initialize<>()::{lambda()#3}::operator()()+0x7fac12410171
+#7 pybind11::cpp_function::initialize<>()::{lambda()#3}::_FUN()+0x7fac12410205
+#8 pybind11::cpp_function::dispatcher()+0x7fac124328ef
+#9 cfunction_call+0x5644057cc8f5
+#10 _PyEval_EvalFrameDefault+0x56440583dd6c
+#11 _PyEval_Vector+0x564405814ff6
+#12 builtin_exec+0x56440595986b
+#13 cfunction_vectorcall_FASTCALL_KEYWORDS+0x5644057cc36b
+#14 _PyEval_EvalFrameDefault+0x56440583d9a9
+#15 _PyFunction_Vectorcall+0x56440579f1f9
+
+

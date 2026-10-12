@@ -44,8 +44,8 @@ Gramine 运行 `d1-20261012T1830`，证据在
 
 ## D4-D6 三节点
 
-- [x] YACL/BRPC 仅 TLS records，明文连接失败。（单实例三进程，运行
-  `d4-20261012T135923Z`：六个协议端口 108677 报文、41 条 TLS 1.3 流、
+- [x] YACL/BRPC 仅 TLS records，明文连接失败。（单实例三进程运行
+  `d4-20261012T143111Z`：六个协议端口 108760 报文、41 条 TLS 1.3 流、
   0 字节无法归属的非 TLS 载荷）
 - [x] 错误 CA、SAN、无客户端证书不能执行算子。（同上，三类负例均以退出码 3
   拒绝）
@@ -53,20 +53,25 @@ Gramine 运行 `d1-20261012T1830`，证据在
   without TLS`）
 - [x] 至少 1,000 组 RSS 向量与固定点参考一致。（同上，1024 组全过，
   网格摘要 `96b6c835...`）
-- [ ] 同一套 runner 在三台独立实例、三个 enclave 内复跑上述四项。
+- [x] P0/P1/P2 跑在三台独立实例上，跨 VPC 私网完成 1,024 组向量。（运行
+  `d4-3host-20261012T143139Z`：三份抓包各自 `tls13_only`，网格摘要与单实例
+  一致，6/6 对端证书互校通过）
+- [ ] 三台独立实例上复跑四类 fail-closed 负例与明文探针。
+- [ ] 三个 `gramine-sgx` enclave 内复跑上述所有项目，并让证书来自真实
+  attestation 放行。
 
-三台实例的基线已经就绪（同一提交 `8d8e1aa`、`spu` 0.9.5、SGX 设备与 `aesmd`
-正常、私网 `47100` 实测互通），缺的是跨机 runner 与 `gramine-sgx` 内的节点
-进程，见 [d4-acceptance.md](d4-acceptance.md) 第 8 节。
+三台实例的基线已经就绪（同一提交 `d048827`、`spu` 0.9.5、SGX 设备与 `aesmd`
+正常、私网 `47100` 实测互通），见 [d4-acceptance.md](d4-acceptance.md) 第 8 节。
 - [ ] Tiny Decoder Block 在三个 enclave 完成。
 - [ ] 连续生成至少 2 token。
 - [ ] ResultFrame 重复、篡改 `decode_step`、模型混用、输入/Ticket 重放均被拒绝。
 - [ ] 会话结束后 `/run/session`、临时目录和进程扫描无 Prompt share、KV、会话密钥。
 
 D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
-[docs/evidence/d4-20261012T135923Z](evidence/d4-20261012T135923Z)。该轮仍是
-同机三进程：链路、证书、抓包和拒绝路径是真的，`gramine-sgx` 内的执行与跨机
-私网尚未验证。
+[docs/evidence/d4-20261012T143111Z](evidence/d4-20261012T143111Z)（单实例三进程）
+与 [docs/evidence/d4-3host-20261012T143139Z](evidence/d4-3host-20261012T143139Z)
+（三实例）。链路、证书、抓包和拒绝路径是真的；`gramine-sgx` 内的执行与真实
+attestation 放行仍未验证。
 
 ## D7-D8 模型与指标
 
