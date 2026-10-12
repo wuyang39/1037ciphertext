@@ -529,15 +529,18 @@ class SpuNodeRuntime:
         self.context.barrier()
 
     def stop(self) -> None:
-        with_barrier = getattr(self.context, "barrier", None)
-        if with_barrier is not None:
-            try:
-                with_barrier()
-            except Exception:  # pragma: no cover - best effort shutdown
-                pass
+        # No barrier here: a peer that already left would turn teardown into an
+        # unbounded wait, and nothing is left to synchronise once the grid is
+        # finished.
         stop = getattr(self.context, "stop_link", None)
         if stop is not None:
-            stop()
+            try:
+                stop()
+            except Exception:
+                # A peer that already left makes the final link teardown
+                # noisy; the grid is finished by then, so the error is not
+                # allowed to change the verdict.
+                pass
 
 
 def split_inputs(

@@ -593,12 +593,14 @@ def run_node(config: NodeConfig) -> int:
             )
     finally:
         pool.shutdown(wait=True)
+        # The local link is torn down before the peers are told to stop: a peer
+        # that leaves first turns the final barrier into a retry storm.
+        runtime.stop()
         for role, session in sessions.items():
             try:
                 session.run_batch({"type": "shutdown"})
             except Exception:  # pragma: no cover - best effort shutdown
                 _log(f"shutdown of {role} failed")
-        runtime.stop()
 
     vector_document = {
         "run_id": config.run_id,
