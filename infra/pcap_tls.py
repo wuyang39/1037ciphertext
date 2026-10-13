@@ -3,12 +3,19 @@
 The D4 acceptance has to show that the protocol traffic between the three
 enclaves carries TLS records and nothing else. Rather than adding a tshark
 dependency, this module parses the classic libpcap format directly, reassembles
-each TCP flow in capture order, walks the TLS record layer, and reports:
+each TCP flow by sequence number, walks the TLS record layer, and reports:
 
 * the flows and their packet/byte counts,
 * the TLS record types and handshake messages seen per flow,
 * the versions offered and negotiated in the hello messages, and
 * any TCP payload that is not a well-formed TLS record.
+
+Reassembly follows the sequence number instead of the capture order: a loopback
+capture under enclave load does contain retransmitted segments, and appending
+one twice shifts the stream so that ciphertext starts looking like plaintext.
+Retransmissions, out-of-order segments and unfilled holes are counted per flow,
+and a hole that never got filled is reported as unreassembled bytes instead of
+being silently dropped.
 
 The D4 run deliberately fires a plaintext probe at each listener to show it is
 refused, so the capture always contains a few bytes that are not TLS. The
@@ -67,6 +74,15 @@ TLS13_VERSION = 0x0304
 D4_PORTS = (47100, 47101, 47102, 47200, 47201, 47202)
 TLS_LEGACY_VERSION = 0x0303
 
+# Sequence arithmetic happens modulo 2**32; a delta below half the space is
+# "ahead of the stream", anything else is "behind it".
+SEQUENCE_MASK = 0xFFFFFFFF
+SEQUENCE_HALF = 1 << 31
+# Out-of-order segments are held until the hole in front of them is filled.
+# A capture that needs more than this is not waiting on TCP, it is losing
+# packets, and the missing bytes are reported instead.
+MAX_PENDING_SEGMENTS = 64
+
 
 class PcapError(ValueError):
     """The capture file or its summary could not be produced."""
@@ -87,7 +103,15 @@ class TlsFlow:
     payload_bytes: int = 0
     alerts: list[int] = field(default_factory=list)
     malformed_prefix: bytes = b""
+    connections: int = 0
+    retransmitted_packets: int = 0
+    retransmitted_bytes: int = 0
+    out_of_order_packets: int = 0
+    gap_packets: int = 0
+    unreassembled_bytes: int = 0
     _buffer: bytearray = field(default_factory=bytearray, repr=False)
+    _next_seq: int | None = None
+    _pending: dict[int, bytes] = field(default_factory=dict, repr=False)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -111,6 +135,12 @@ class TlsFlow:
             "alerts": self.alerts,
             "malformed_bytes": self.malformed_bytes,
             "malformed_prefix": self.malformed_prefix.hex(),
+            "connections": self.connections,
+            "retransmitted_packets": self.retransmitted_packets,
+            "retransmitted_bytes": self.retransmitted_bytes,
+            "out_of_order_packets": self.out_of_order_packets,
+            "gap_packets": self.gap_packets,
+            "unreassembled_bytes": self.unreassembled_bytes,
         }
 
 
@@ -168,7 +198,10 @@ def _iter_packets(path: Path) -> Iterable[bytes]:
                 raise PcapError(f"unsupported pcap link type: {host}")
 
 
-def _parse_tcp(packet: bytes) -> tuple[str, int, str, int, bytes] | None:
+def _parse_tcp(
+    packet: bytes,
+) -> tuple[str, int, str, int, int, int, bytes] | None:
+    """Return (src, sport, dst, dport, sequence, flags, payload)."""
     if len(packet) < 20:
         return None
     version_ihl = packet[0]
@@ -185,13 +218,77 @@ def _parse_tcp(packet: bytes) -> tuple[str, int, str, int, bytes] | None:
     destination = ".".join(str(byte) for byte in packet[16:20])
     tcp = packet[ihl:]
     source_port, destination_port = struct.unpack("!HH", tcp[:4])
+    sequence = struct.unpack("!I", tcp[4:8])[0]
+    flags = tcp[13]
     offset = (tcp[12] >> 4) * 4
     if offset < 20 or len(tcp) < offset:
         return None
     payload = tcp[offset:]
     if total_length and ihl + len(tcp) > total_length:
         payload = payload[: max(total_length - ihl - offset, 0)]
-    return source, source_port, destination, destination_port, bytes(payload)
+    return source, source_port, destination, destination_port, sequence, flags, bytes(payload)
+
+
+def _deliver(flow: TlsFlow, payload: bytes) -> None:
+    """Append in-order bytes to the stream and parse whatever completed."""
+    flow._buffer.extend(payload)
+    flow._next_seq = (flow._next_seq + len(payload)) & SEQUENCE_MASK  # type: ignore[operator]
+    _parse_tls_records(flow)
+
+
+def _drain_pending(flow: TlsFlow) -> None:
+    """Deliver the segments that were waiting behind the hole just filled."""
+    while True:
+        payload = flow._pending.pop(flow._next_seq, None)  # type: ignore[arg-type]
+        if payload is None:
+            return
+        _deliver(flow, payload)
+
+
+def _feed_segment(flow: TlsFlow, sequence: int, flags: int, payload: bytes) -> None:
+    """Place one TCP segment in the stream, deduplicating retransmissions.
+
+    The flow is one direction of one 4-tuple, and ports do get reused: a SYN
+    opens a fresh stream (which is how a second client_hello lands in the same
+    key), a FIN after the last byte closes it, and a capture that starts
+    mid-connection simply adopts the first sequence number it sees.
+    """
+    syn = bool(flags & 0x02)
+    fin = bool(flags & 0x01)
+    if syn:
+        flow.connections += 1
+        flow._next_seq = (sequence + 1) & SEQUENCE_MASK
+        flow._pending.clear()
+    if not payload:
+        if fin and flow._pending:
+            flow.unreassembled_bytes += sum(len(part) for part in flow._pending.values())
+            flow._pending.clear()
+        if fin:
+            flow._next_seq = None
+        return
+    if flow._next_seq is None:
+        flow._next_seq = sequence
+    delta = (sequence - flow._next_seq) & SEQUENCE_MASK
+    if delta == 0:
+        _deliver(flow, payload)
+        _drain_pending(flow)
+        return
+    if delta < SEQUENCE_HALF:
+        # Ahead of the stream: the capture is missing the bytes in between.
+        flow.out_of_order_packets += 1
+        flow.gap_packets += 1
+        if len(flow._pending) < MAX_PENDING_SEGMENTS:
+            flow._pending[sequence] = payload
+        else:
+            flow.unreassembled_bytes += len(payload)
+        return
+    # Behind the stream: a retransmission, possibly carrying new tail bytes.
+    flow.retransmitted_packets += 1
+    flow.retransmitted_bytes += len(payload)
+    overlap = (flow._next_seq - sequence) & SEQUENCE_MASK
+    if overlap < len(payload):
+        _deliver(flow, payload[overlap:])
+        _drain_pending(flow)
 
 
 def _parse_tls_records(flow: TlsFlow) -> None:
@@ -341,7 +438,15 @@ def analyse_capture(
         parsed = _parse_tcp(packet)
         if parsed is None:
             continue
-        source, source_port, destination, destination_port, payload = parsed
+        (
+            source,
+            source_port,
+            destination,
+            destination_port,
+            sequence,
+            flags,
+            payload,
+        ) = parsed
         if source_port not in wanted and destination_port not in wanted:
             continue
         packet_count += 1
@@ -353,10 +458,18 @@ def analyse_capture(
         flow.packets += 1
         flow.bytes_total += len(payload)
         if not payload:
+            _feed_segment(flow, sequence, flags, b"")
             continue
         flow.payload_bytes += len(payload)
-        flow._buffer.extend(payload)
-        _parse_tls_records(flow)
+        _feed_segment(flow, sequence, flags, payload)
+
+    # A hole that never got filled leaves bytes we never looked at; a capture
+    # that cannot be reassembled cannot certify the stream either.
+    for flow in flows.values():
+        flow.unreassembled_bytes += sum(
+            len(part) for part in flow._pending.values()
+        )
+        flow._pending.clear()
 
     flow_documents = [flow.to_dict() for flow in flows.values()]
     sessions = _session_summary(flows)
@@ -372,6 +485,11 @@ def analyse_capture(
     application_records = sum(
         flow.record_types.get("application_data", 0) for flow in flows.values()
     )
+    retransmitted = sum(flow.retransmitted_packets for flow in flows.values())
+    retransmitted_bytes = sum(flow.retransmitted_bytes for flow in flows.values())
+    out_of_order = sum(flow.out_of_order_packets for flow in flows.values())
+    gap_packets = sum(flow.gap_packets for flow in flows.values())
+    unreassembled = sum(flow.unreassembled_bytes for flow in flows.values())
     handshakes = sum(
         sum(flow.handshake_types.values()) for flow in flows.values()
     )
@@ -386,11 +504,17 @@ def analyse_capture(
         "application_data_records": application_records,
         "non_tls_payload_bytes": unexplained,
         "expected_probe_bytes": expected_probe_bytes,
+        "retransmitted_packets": retransmitted,
+        "retransmitted_bytes": retransmitted_bytes,
+        "out_of_order_packets": out_of_order,
+        "gap_packets": gap_packets,
+        "unreassembled_bytes": unreassembled,
         "probe_marker": probe_marker.hex() if probe_marker else None,
         "probe_endpoints": sorted(f"{host}:{port}" for host, port in endpoints),
         "sessions": sessions,
-        "tls_only": bool(flows) and unexplained == 0,
-        "ciphertext_only": bool(flows) and unexplained == 0,
+        "capture_complete": unreassembled == 0,
+        "tls_only": bool(flows) and unexplained == 0 and unreassembled == 0,
+        "ciphertext_only": bool(flows) and unexplained == 0 and unreassembled == 0,
     }
     summary["verdict"] = (
         "tls13_only"
@@ -463,6 +587,10 @@ def render_summary(summary: dict[str, Any]) -> str:
         f"handshake messages: {summary['handshake_messages']}",
         f"application-data records: {summary['application_data_records']}",
         f"non-TLS payload bytes: {summary['non_tls_payload_bytes']}",
+        f"TCP retransmissions: {summary.get('retransmitted_packets', 0)} "
+        f"({summary.get('retransmitted_bytes', 0)} bytes, deduplicated)",
+        f"capture gaps: {summary.get('gap_packets', 0)} "
+        f"(unreassembled bytes: {summary.get('unreassembled_bytes', 0)})",
         f"verdict: {summary['verdict']}",
         "",
         "# deliberate plaintext probes",
@@ -485,6 +613,7 @@ def render_summary(summary: dict[str, Any]) -> str:
             f"negotiated={flow['negotiated_version']} "
             f"alerts={flow['alerts']} "
             f"non_tls={flow['malformed_bytes']} "
+            f"retransmits={flow.get('retransmitted_packets', 0)} "
             f"non_tls_prefix={flow['malformed_prefix']}"
         )
     lines.append("")

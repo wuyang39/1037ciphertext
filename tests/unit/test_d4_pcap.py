@@ -19,8 +19,9 @@ def _ipv4_tcp(
     destination_port: int,
     payload: bytes,
     sequence: int = 1,
+    flags: int = 0x18,
 ) -> bytes:
-    tcp = struct.pack("!HHIIBBHHH", source_port, destination_port, sequence, 0, 5 << 4, 0x18, 65535, 0, 0)
+    tcp = struct.pack("!HHIIBBHHH", source_port, destination_port, sequence, 0, 5 << 4, flags, 65535, 0, 0)
     tcp += payload
     total = 20 + len(tcp)
     ipv4 = struct.pack(
@@ -91,32 +92,59 @@ def _server_hello(version: int = 0x0304) -> bytes:
     return body
 
 
+def _payloads(
+    client_versions: tuple[int, ...] = (0x0304,),
+    server_version: int = 0x0304,
+) -> tuple[bytes, bytes, bytes]:
+    """(client hello, server hello, application data) as TLS records."""
+    return (
+        _record(22, _handshake(1, _client_hello(client_versions))),
+        _record(22, _handshake(2, _server_hello(server_version))),
+        _record(23, b"\x17\x03\x03"),
+    )
+
+
+def _client_next_sequence() -> int:
+    """Where the next segment of the client direction has to start."""
+    client_payload, _, data_payload = _payloads()
+    return 1 + len(client_payload) + len(data_payload)
+
+
 def _handshake_packets(
     client_versions: tuple[int, ...] = (0x0304,),
     server_version: int = 0x0304,
     frame=_ethernet_ipv4_tcp,
 ) -> list[bytes]:
+    # A real capture carries sequence numbers, and the analyser reassembles by
+    # them, so the fixtures advance the per-direction sequence instead of
+    # parking every segment at 1.
+    client_payload, server_payload, data_payload = _payloads(
+        client_versions, server_version
+    )
     return [
         frame(
             source="10.0.0.1",
             source_port=47100,
             destination="10.0.0.2",
             destination_port=47101,
-            payload=_record(22, _handshake(1, _client_hello(client_versions))),
+            payload=client_payload,
+            sequence=1,
         ),
         frame(
             source="10.0.0.2",
             source_port=47101,
             destination="10.0.0.1",
             destination_port=47100,
-            payload=_record(22, _handshake(2, _server_hello(server_version))),
+            payload=server_payload,
+            sequence=1,
         ),
         frame(
             source="10.0.0.1",
             source_port=47100,
             destination="10.0.0.2",
             destination_port=47101,
-            payload=_record(23, b"\x17\x03\x03"),
+            payload=data_payload,
+            sequence=1 + len(client_payload),
         ),
     ]
 
@@ -146,6 +174,84 @@ def test_cooked_v2_capture_from_tcpdump_any_is_parsed(tmp_path: Path) -> None:
     assert summary["verdict"] == "tls13_only"
 
 
+def test_retransmitted_segment_does_not_shift_the_stream(tmp_path: Path) -> None:
+    """A duplicate segment is a loopback artefact, not a plaintext violation.
+
+    A capture taken while three enclaves are running does contain
+    retransmissions; appending one twice would misalign every record after it
+    and make ciphertext look like a plaintext leak.
+    """
+    packets = _handshake_packets()
+    client_payload, _, _ = _payloads()
+    packets.insert(
+        1,
+        _ethernet_ipv4_tcp(
+            source="10.0.0.1",
+            source_port=47100,
+            destination="10.0.0.2",
+            destination_port=47101,
+            payload=client_payload,
+            sequence=1,
+        ),
+    )
+    capture = tmp_path / "retransmit.pcap"
+    capture.write_bytes(_pcap(packets))
+    summary = analyse_capture(capture, expected_ports=PCAP_PORTS)
+    assert summary["retransmitted_packets"] == 1
+    assert summary["unreassembled_bytes"] == 0
+    assert summary["non_tls_payload_bytes"] == 0
+    assert summary["verdict"] == "tls13_only"
+
+
+def test_out_of_order_segment_is_reordered(tmp_path: Path) -> None:
+    """A capture that reorders two segments still reassembles in order."""
+    client_payload, server_payload, data_payload = _payloads()
+    packets = [
+        _ethernet_ipv4_tcp(
+            source="10.0.0.1",
+            source_port=47100,
+            destination="10.0.0.2",
+            destination_port=47101,
+            payload=b"",
+            sequence=0,
+            flags=0x02,
+        ),
+        # The application-data segment arrives before the hello that precedes
+        # it, so the analyser has to hold it and place it after.
+        _ethernet_ipv4_tcp(
+            source="10.0.0.1",
+            source_port=47100,
+            destination="10.0.0.2",
+            destination_port=47101,
+            payload=data_payload,
+            sequence=1 + len(client_payload),
+        ),
+        _ethernet_ipv4_tcp(
+            source="10.0.0.2",
+            source_port=47101,
+            destination="10.0.0.1",
+            destination_port=47100,
+            payload=server_payload,
+            sequence=1,
+        ),
+        _ethernet_ipv4_tcp(
+            source="10.0.0.1",
+            source_port=47100,
+            destination="10.0.0.2",
+            destination_port=47101,
+            payload=client_payload,
+            sequence=1,
+        ),
+    ]
+    capture = tmp_path / "reordered.pcap"
+    capture.write_bytes(_pcap(packets))
+    summary = analyse_capture(capture, expected_ports=PCAP_PORTS)
+    assert summary["out_of_order_packets"] == 1
+    assert summary["unreassembled_bytes"] == 0
+    assert summary["non_tls_payload_bytes"] == 0
+    assert summary["verdict"] == "tls13_only"
+
+
 def test_plaintext_payload_fails_the_capture(tmp_path: Path) -> None:
     packets = _handshake_packets()
     packets.append(
@@ -155,6 +261,7 @@ def test_plaintext_payload_fails_the_capture(tmp_path: Path) -> None:
             destination="10.0.0.2",
             destination_port=47101,
             payload=b"GET /status HTTP/1.1\r\n\r\n",
+            sequence=_client_next_sequence(),
         )
     )
     capture = tmp_path / "mixed.pcap"
