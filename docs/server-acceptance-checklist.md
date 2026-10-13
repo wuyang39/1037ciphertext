@@ -91,9 +91,23 @@ Gramine 运行 `d1-20261012T1830`，证据在
   Argmax 结果与浮点参考逐个相等，三份抓包都是 `tls13_only`、非 TLS 字节 0，
   证书互校 6/6，三棵树的 reveal 扫描无未解释命中。权重是合成权重，正式英文
   GPT-2 属 D7。见 [d5-acceptance.md](d5-acceptance.md)）
-- [ ] 连续生成至少 2 token。
-- [ ] ResultFrame 重复、篡改 `decode_step`、模型混用、输入/Ticket 重放均被拒绝。
-- [ ] 会话结束后 `/run/session`、临时目录和进程扫描无 Prompt share、KV、会话密钥。
+- [x] 连续生成至少 2 token。（运行 `d6-enclave-3host-20261013T1324Z`：prompt
+  `the cipher key is secret` 在三个 enclave 内连续生成 3 个 token
+  `yes his small`，逐步的安全 Argmax 与客户端重建 logits 后的 Argmax 逐个相等，
+  与 float64 参考的 `max_abs_error` 为 4.2e-4 ~ 8.0e-4）
+- [x] ResultFrame 重复、篡改 `decode_step`、模型混用、输入/Ticket 重放均被拒绝。
+  （同上运行：五类负例全部被拒，理由分别是结果帧不覆盖三角色、`decode_step`
+  不匹配、模型不匹配、counter 重复/乱序、JobTicket 已被本节点接受）
+- [x] 会话结束后 `/run/session`、临时目录和进程扫描无 Prompt share、KV、会话密钥。
+  （同上运行：close 之前三台各有 1 份溢写份额共 4323 字节，close 之后会话目录
+  被就地覆写并删除、`/dev/shm` 会话根为空、80 字节会话密钥清零、KV 无残留，
+  随后的清洁度扫描与 reveal 扫描在三台都干净）
+
+已完成项见 [d6-acceptance.md](d6-acceptance.md)（运行
+`d6-enclave-3host-20261013T1324Z`，提交 `3e82e1b`），证据在
+[docs/evidence/d6-enclave-3host-20261013T1324Z](evidence/d6-enclave-3host-20261013T1324Z)。
+权重是合成权重，正式英文 GPT-2 属 D7；三台的测量值互不相同（默认驱动让每台
+签名自己的树），与 D4 同类。
 
 D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
 [docs/evidence/d4-20261012T143111Z](evidence/d4-20261012T143111Z)（单实例三进程）
