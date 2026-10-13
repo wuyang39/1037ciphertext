@@ -26,6 +26,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import shlex
 import shutil
 import socket
 import subprocess
@@ -682,6 +683,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--run-id", default=None)
     parser.add_argument("--out-dir", type=Path, default=None)
     parser.add_argument("--python", default=sys.executable)
+    parser.add_argument(
+        "--node-wrapper",
+        default=None,
+        help=(
+            "command prefix that launches each node, e.g. "
+            "'gramine-sgx /path/to/spu_node.manifest'; the node module and its "
+            "--config argument are appended to it, so the same grid and the "
+            "same refusal cases run inside an enclave"
+        ),
+    )
     parser.add_argument("--cluster-file", type=Path, default=None)
     parser.add_argument("--vectors", type=int, default=DEFAULT_COUNT)
     parser.add_argument("--batch", type=int, default=DEFAULT_BATCH)
@@ -693,6 +704,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     run_id = args.run_id or f"d4-{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
     out_dir = args.out_dir or (Path(args.workspace) / "evidence")
+    wrapper = shlex.split(args.node_wrapper) if args.node_wrapper else None
     try:
         if args.mode == "provision":
             if args.cluster_file is None:
@@ -718,6 +730,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 instance_id=args.instance_id,
                 cloud_region=args.cloud_region,
                 node_timeout=args.node_timeout,
+                wrapper=wrapper,
             )
             print(json.dumps(result["verdicts"], ensure_ascii=True, sort_keys=True, indent=2))
             return 0 if not result["missing"] else 1
