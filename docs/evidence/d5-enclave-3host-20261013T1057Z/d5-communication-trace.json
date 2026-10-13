@@ -1,0 +1,271 @@
+{
+  "attestation_available": true,
+  "inside_enclave": true,
+  "link": {
+    "allow_brpc_builtin_services": false,
+    "client_verify_depth": 4,
+    "connect_retry_interval_ms": 500,
+    "connect_retry_times": 120,
+    "enable_ssl": true,
+    "endpoints": [
+      {
+        "host": "172.27.172.201",
+        "port": 47100,
+        "role": "P0"
+      },
+      {
+        "host": "172.27.172.202",
+        "port": 47101,
+        "role": "P1"
+      },
+      {
+        "host": "172.27.172.203",
+        "port": 47102,
+        "role": "P2"
+      }
+    ],
+    "min_version": "TLS1.3",
+    "partition_id": "a122-d5-d5-enclave-3host-20261013T1057Z",
+    "rank": 0,
+    "require_client_certificate": true,
+    "role": "P0",
+    "server_verify_depth": 4
+  },
+  "link_seconds": 5.313,
+  "note": "Only byte counts, roles, fingerprints and timings are recorded; no share, key or plaintext input reaches the trace.",
+  "partition_id": "a122-d5-d5-enclave-3host-20261013T1057Z",
+  "role": "P0",
+  "run_id": "d5-enclave-3host-20261013T1057Z",
+  "runs": [
+    {
+      "case": "small",
+      "elapsed_ms": 346.251,
+      "program": "softmax",
+      "share_bytes": 1690
+    },
+    {
+      "case": "wide_range",
+      "elapsed_ms": 486.845,
+      "program": "softmax",
+      "share_bytes": 1700
+    },
+    {
+      "case": "ramp",
+      "elapsed_ms": 427.653,
+      "program": "softmax",
+      "share_bytes": 1688
+    },
+    {
+      "case": "near_ties",
+      "elapsed_ms": 507.59,
+      "program": "softmax",
+      "share_bytes": 1698
+    },
+    {
+      "case": "random-00",
+      "elapsed_ms": 457.737,
+      "program": "softmax",
+      "share_bytes": 1698
+    },
+    {
+      "case": "random-01",
+      "elapsed_ms": 313.804,
+      "program": "softmax",
+      "share_bytes": 1698
+    },
+    {
+      "case": "random-02",
+      "elapsed_ms": 394.605,
+      "program": "softmax",
+      "share_bytes": 1698
+    },
+    {
+      "case": "random-03",
+      "elapsed_ms": 387.478,
+      "program": "softmax",
+      "share_bytes": 1698
+    },
+    {
+      "case": "scale-00",
+      "elapsed_ms": 133.601,
+      "program": "layernorm",
+      "share_bytes": 2400
+    },
+    {
+      "case": "scale-01",
+      "elapsed_ms": 122.114,
+      "program": "layernorm",
+      "share_bytes": 2400
+    },
+    {
+      "case": "scale-02",
+      "elapsed_ms": 127.134,
+      "program": "layernorm",
+      "share_bytes": 2400
+    },
+    {
+      "case": "scale-03",
+      "elapsed_ms": 153.858,
+      "program": "layernorm",
+      "share_bytes": 2400
+    },
+    {
+      "case": "scale-04",
+      "elapsed_ms": 193.773,
+      "program": "layernorm",
+      "share_bytes": 2400
+    },
+    {
+      "case": "scale-05",
+      "elapsed_ms": 202.467,
+      "program": "layernorm",
+      "share_bytes": 2400
+    },
+    {
+      "case": "small_variance",
+      "elapsed_ms": 170.363,
+      "program": "layernorm",
+      "share_bytes": 2412
+    },
+    {
+      "case": "unit_range",
+      "elapsed_ms": 256.23,
+      "program": "gelu",
+      "share_bytes": 1684
+    },
+    {
+      "case": "tail",
+      "elapsed_ms": 156.009,
+      "program": "gelu",
+      "share_bytes": 1672
+    },
+    {
+      "case": "random-00",
+      "elapsed_ms": 246.989,
+      "program": "gelu",
+      "share_bytes": 1682
+    },
+    {
+      "case": "random-01",
+      "elapsed_ms": 242.561,
+      "program": "gelu",
+      "share_bytes": 1682
+    },
+    {
+      "case": "random-02",
+      "elapsed_ms": 282.139,
+      "program": "gelu",
+      "share_bytes": 1682
+    },
+    {
+      "case": "random-03",
+      "elapsed_ms": 196.663,
+      "program": "gelu",
+      "share_bytes": 1682
+    },
+    {
+      "case": "unique",
+      "elapsed_ms": 740.704,
+      "program": "argmax",
+      "share_bytes": 1010
+    },
+    {
+      "case": "first_of_ties",
+      "elapsed_ms": 747.521,
+      "program": "argmax",
+      "share_bytes": 1024
+    },
+    {
+      "case": "last_position",
+      "elapsed_ms": 708.273,
+      "program": "argmax",
+      "share_bytes": 1024
+    },
+    {
+      "case": "all_negative",
+      "elapsed_ms": 723.389,
+      "program": "argmax",
+      "share_bytes": 1022
+    },
+    {
+      "case": "random-00",
+      "elapsed_ms": 676.986,
+      "program": "argmax",
+      "share_bytes": 1016
+    },
+    {
+      "case": "random-01",
+      "elapsed_ms": 688.71,
+      "program": "argmax",
+      "share_bytes": 1016
+    },
+    {
+      "case": "random-02",
+      "elapsed_ms": 690.474,
+      "program": "argmax",
+      "share_bytes": 1016
+    },
+    {
+      "case": "random-03",
+      "elapsed_ms": 673.524,
+      "program": "argmax",
+      "share_bytes": 1016
+    },
+    {
+      "case": "random-00",
+      "elapsed_ms": 1758.25,
+      "program": "block",
+      "share_bytes": 24876
+    },
+    {
+      "case": "random-01",
+      "elapsed_ms": 1742.597,
+      "program": "block",
+      "share_bytes": 24876
+    },
+    {
+      "case": "random-02",
+      "elapsed_ms": 1972.04,
+      "program": "block",
+      "share_bytes": 24876
+    },
+    {
+      "case": "random-03",
+      "elapsed_ms": 1919.074,
+      "program": "block",
+      "share_bytes": 24876
+    },
+    {
+      "case": "random-04",
+      "elapsed_ms": 1687.593,
+      "program": "block",
+      "share_bytes": 24876
+    },
+    {
+      "case": "random-05",
+      "elapsed_ms": 1609.41,
+      "program": "block",
+      "share_bytes": 24876
+    },
+    {
+      "case": "random-06",
+      "elapsed_ms": 1718.13,
+      "program": "block",
+      "share_bytes": 24876
+    },
+    {
+      "case": "random-07",
+      "elapsed_ms": 1598.113,
+      "program": "block",
+      "share_bytes": 24876
+    },
+    {
+      "case": "wide_range",
+      "elapsed_ms": 1640.279,
+      "program": "block",
+      "share_bytes": 24878
+    }
+  ],
+  "share_bytes": 272494,
+  "transport": "SPU/YACL/BRPC over TLS 1.3 inside a Gramine-SGX enclave"
+}

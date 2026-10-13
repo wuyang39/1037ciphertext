@@ -1,0 +1,16 @@
+{
+  "case_digest": "b3009707f56ea9dce2e5a383dcd628acaa52d1f932a600289d73cdabcc347292",
+  "cases": 38,
+  "failed": 0,
+  "grid_digest": "0dca84b60da01202269696d1de25bdfa1617155c28e3df881b93a61d6c8eea8d",
+  "identity_sha256": "2c2d1783830b5ba7af11ee65609954b2b9a3e55381669ad7e6ed3103c80cdfd3",
+  "passed": 38,
+  "peer_certificates": {
+    "P1": "1dc411c56af0085d0e7b771ef3564ec40ac74648f21ca9529545cc50a254e2e4",
+    "P2": "379e71786aaaeb784ccd6addba30f37bbe16a8ce4d29dbd223c501e5ec4333af"
+  },
+  "role": "P0",
+  "run_id": "d5-enclave-3host-20261013T1057Z",
+  "teardown_finished": true,
+  "verdicts": "passed"
+}

@@ -1,0 +1,63 @@
+{
+  "block": {
+    "fractional_bits": 18,
+    "hidden_size": 8,
+    "intermediate_size": 16,
+    "num_heads": 2,
+    "sequence": 8,
+    "vocab_size": 32
+  },
+  "by_program": {
+    "argmax": {
+      "cases": 8,
+      "failed": 0,
+      "max_abs_error": 0.0,
+      "overflow_count": 0,
+      "passed": 8
+    },
+    "block": {
+      "cases": 9,
+      "failed": 0,
+      "max_abs_error": 0.0007037518465985437,
+      "overflow_count": 0,
+      "passed": 9
+    },
+    "gelu": {
+      "cases": 6,
+      "failed": 0,
+      "max_abs_error": 0.0536346435546875,
+      "overflow_count": 0,
+      "passed": 6
+    },
+    "layernorm": {
+      "cases": 7,
+      "failed": 0,
+      "max_abs_error": 0.0010904688020927367,
+      "overflow_count": 0,
+      "passed": 7
+    },
+    "softmax": {
+      "cases": 8,
+      "failed": 0,
+      "max_abs_error": 0.002556877200567076,
+      "overflow_count": 0,
+      "passed": 8
+    }
+  },
+  "cases": 38,
+  "failed": 0,
+  "grid_digest": "0dca84b60da01202269696d1de25bdfa1617155c28e3df881b93a61d6c8eea8d",
+  "partition_id": "a122-d5-d5-enclave-3host-20261013T1057Z",
+  "passed": 38,
+  "programs": [
+    "softmax",
+    "layernorm",
+    "gelu",
+    "argmax",
+    "block"
+  ],
+  "run_id": "d5-enclave-3host-20261013T1057Z",
+  "seed": 20261013,
+  "share_bytes": 272494,
+  "verdicts": "passed"
+}

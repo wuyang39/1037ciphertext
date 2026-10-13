@@ -1,0 +1,1172 @@
+{
+  "cases": [
+    {
+      "case": "small",
+      "elapsed_ms": 346.251,
+      "elements": 64,
+      "max_abs_error": 0.00031924108557046527,
+      "max_scaled_error": 0.05061115066768074,
+      "mean_abs_error": 0.00011769719026919108,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 345.235,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 344.678,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "softmax",
+      "relative_error": 0.006199758620055214,
+      "shape_mismatch": false,
+      "share_bytes": 1690,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "wide_range",
+      "elapsed_ms": 486.845,
+      "elements": 64,
+      "max_abs_error": 0.0019909305877354733,
+      "max_scaled_error": 0.22388057987890952,
+      "mean_abs_error": 0.0001585450660463412,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 486.085,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 485.604,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "softmax",
+      "relative_error": 0.04322879230006602,
+      "shape_mismatch": false,
+      "share_bytes": 1700,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "ramp",
+      "elapsed_ms": 427.653,
+      "elements": 64,
+      "max_abs_error": 0.0015826463533368251,
+      "max_scaled_error": 0.173925916674771,
+      "mean_abs_error": 0.0003680646378032005,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 426.819,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 426.51,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "softmax",
+      "relative_error": 0.04762673791793813,
+      "shape_mismatch": false,
+      "share_bytes": 1688,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "near_ties",
+      "elapsed_ms": 507.59,
+      "elements": 64,
+      "max_abs_error": 0.0001229910424996039,
+      "max_scaled_error": 0.02186750325041311,
+      "mean_abs_error": 4.072990122982317e-05,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 506.851,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 506.405,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "softmax",
+      "relative_error": 0.0009849129715177748,
+      "shape_mismatch": false,
+      "share_bytes": 1698,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "random-00",
+      "elapsed_ms": 457.737,
+      "elements": 64,
+      "max_abs_error": 0.0019381291046335347,
+      "max_scaled_error": 0.21044545357485145,
+      "mean_abs_error": 0.0003097285535995962,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 456.688,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 456.978,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "softmax",
+      "relative_error": 0.04918812851631479,
+      "shape_mismatch": false,
+      "share_bytes": 1698,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "random-01",
+      "elapsed_ms": 313.804,
+      "elements": 64,
+      "max_abs_error": 0.002161899438752335,
+      "max_scaled_error": 0.22755069466423394,
+      "mean_abs_error": 0.0002960082194442611,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 313.104,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 312.661,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "softmax",
+      "relative_error": 0.04454871977335936,
+      "shape_mismatch": false,
+      "share_bytes": 1698,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "random-02",
+      "elapsed_ms": 394.605,
+      "elements": 64,
+      "max_abs_error": 0.002162937137575205,
+      "max_scaled_error": 0.23388766158278473,
+      "mean_abs_error": 0.00023834545143819024,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 393.954,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 392.738,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "softmax",
+      "relative_error": 0.04328791937513385,
+      "shape_mismatch": false,
+      "share_bytes": 1698,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "random-03",
+      "elapsed_ms": 387.478,
+      "elements": 64,
+      "max_abs_error": 0.002556877200567076,
+      "max_scaled_error": 0.26947257587778656,
+      "mean_abs_error": 0.0004957860753902948,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 386.449,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 386.557,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "softmax",
+      "relative_error": 0.047556677830620384,
+      "shape_mismatch": false,
+      "share_bytes": 1698,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "scale-00",
+      "elapsed_ms": 133.601,
+      "elements": 64,
+      "max_abs_error": 0.00045744087981391957,
+      "max_scaled_error": 0.0320843796021444,
+      "mean_abs_error": 7.294023085132782e-05,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 132.839,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 132.491,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "layernorm",
+      "relative_error": 0.002191091692634814,
+      "shape_mismatch": false,
+      "share_bytes": 2400,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "scale-01",
+      "elapsed_ms": 122.114,
+      "elements": 64,
+      "max_abs_error": 0.000311919376899672,
+      "max_scaled_error": 0.02206014963032778,
+      "mean_abs_error": 6.691867196059937e-05,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 121.071,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 121.39,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "layernorm",
+      "relative_error": 0.0028802017310952666,
+      "shape_mismatch": false,
+      "share_bytes": 2400,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "scale-02",
+      "elapsed_ms": 127.134,
+      "elements": 64,
+      "max_abs_error": 0.0005438133789783528,
+      "max_scaled_error": 0.0314189429302289,
+      "mean_abs_error": 0.00010250506022206493,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 126.478,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 126.013,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "layernorm",
+      "relative_error": 0.001161842023138077,
+      "shape_mismatch": false,
+      "share_bytes": 2400,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "scale-03",
+      "elapsed_ms": 153.858,
+      "elements": 64,
+      "max_abs_error": 0.00032706368439061606,
+      "max_scaled_error": 0.016942069451902533,
+      "mean_abs_error": 7.474326696242802e-05,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 153.19,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 152.991,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "layernorm",
+      "relative_error": 0.0005870608112991529,
+      "shape_mismatch": false,
+      "share_bytes": 2400,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "scale-04",
+      "elapsed_ms": 193.773,
+      "elements": 64,
+      "max_abs_error": 0.0003049267645904852,
+      "max_scaled_error": 0.021511134050557778,
+      "mean_abs_error": 6.220732785301285e-05,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 192.918,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 193.038,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "layernorm",
+      "relative_error": 0.0018229937534530727,
+      "shape_mismatch": false,
+      "share_bytes": 2400,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "scale-05",
+      "elapsed_ms": 202.467,
+      "elements": 64,
+      "max_abs_error": 0.00022768459798605534,
+      "max_scaled_error": 0.017176061625970403,
+      "mean_abs_error": 4.6946512423661304e-05,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 201.61,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 201.746,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "layernorm",
+      "relative_error": 0.0004435057685438647,
+      "shape_mismatch": false,
+      "share_bytes": 2400,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "case": "small_variance",
+      "elapsed_ms": 170.363,
+      "elements": 64,
+      "max_abs_error": 0.0010904688020927367,
+      "max_scaled_error": 0.0620892438768978,
+      "mean_abs_error": 0.0001636599570179918,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 169.555,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 169.595,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "layernorm",
+      "relative_error": 0.005513595033915242,
+      "shape_mismatch": false,
+      "share_bytes": 2412,
+      "tolerance": 0.005,
+      "verdict": "pass"
+    },
+    {
+      "approximation_error": 0.0004701645398208498,
+      "case": "unit_range",
+      "elapsed_ms": 256.23,
+      "elements": 64,
+      "max_abs_error": 0.008045196617599615,
+      "max_scaled_error": 0.15346293111984324,
+      "mean_abs_error": 0.00397600286098962,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 255.622,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 255.28,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "gelu",
+      "relative_error": 0.8045196617599615,
+      "shape_mismatch": false,
+      "share_bytes": 1684,
+      "tail_error_per_input": 0.002382713930544935,
+      "tolerance": 0.01,
+      "verdict": "pass"
+    },
+    {
+      "approximation_error": 0.0003406193474749784,
+      "case": "tail",
+      "elapsed_ms": 156.009,
+      "elements": 64,
+      "max_abs_error": 0.0536346435546875,
+      "max_scaled_error": 0.15532857236035666,
+      "mean_abs_error": 0.027283749652615097,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 155.458,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 155.158,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "gelu",
+      "relative_error": 5.36346435546875,
+      "shape_mismatch": false,
+      "share_bytes": 1672,
+      "tail_error_per_input": 0.002368760728495439,
+      "tolerance": 0.01,
+      "verdict": "pass"
+    },
+    {
+      "approximation_error": 0.00044817816565288337,
+      "case": "random-00",
+      "elapsed_ms": 246.989,
+      "elements": 64,
+      "max_abs_error": 0.005419513872075705,
+      "max_scaled_error": 0.1549270108329558,
+      "mean_abs_error": 0.0011140007596055442,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 246.178,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 246.31,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "gelu",
+      "relative_error": 0.5419513872075705,
+      "shape_mismatch": false,
+      "share_bytes": 1682,
+      "tail_error_per_input": 0.0023629146646804893,
+      "tolerance": 0.01,
+      "verdict": "pass"
+    },
+    {
+      "approximation_error": 0.00045764242842497894,
+      "case": "random-01",
+      "elapsed_ms": 242.561,
+      "elements": 64,
+      "max_abs_error": 0.007308712682143614,
+      "max_scaled_error": 0.15712629480180915,
+      "mean_abs_error": 0.002265458590569969,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 241.381,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 241.497,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "gelu",
+      "relative_error": 0.571571469027121,
+      "shape_mismatch": false,
+      "share_bytes": 1682,
+      "tail_error_per_input": 0.002404432861214191,
+      "tolerance": 0.01,
+      "verdict": "pass"
+    },
+    {
+      "approximation_error": 0.0004731869628501698,
+      "case": "random-02",
+      "elapsed_ms": 282.139,
+      "elements": 64,
+      "max_abs_error": 0.012936000529508718,
+      "max_scaled_error": 0.14767936498803502,
+      "mean_abs_error": 0.003495523754275702,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 281.553,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 281.194,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "gelu",
+      "relative_error": 1.16729736328125,
+      "shape_mismatch": false,
+      "share_bytes": 1682,
+      "tail_error_per_input": 0.002246057534898575,
+      "tolerance": 0.01,
+      "verdict": "pass"
+    },
+    {
+      "approximation_error": 0.00047156265827560245,
+      "case": "random-03",
+      "elapsed_ms": 196.663,
+      "elements": 64,
+      "max_abs_error": 0.012775421142578125,
+      "max_scaled_error": 0.15666646987297636,
+      "mean_abs_error": 0.004476304751329733,
+      "overflow_count": 0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 196.107,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 195.912,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "gelu",
+      "relative_error": 1.2775421142578125,
+      "shape_mismatch": false,
+      "share_bytes": 1682,
+      "tail_error_per_input": 0.002410359258357297,
+      "tolerance": 0.01,
+      "verdict": "pass"
+    },
+    {
+      "actual": 31.0,
+      "argmax_match": true,
+      "case": "unique",
+      "elapsed_ms": 740.704,
+      "expected": 31.0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 739.908,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 739.6,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "argmax",
+      "share_bytes": 1010,
+      "tolerance": 0.0,
+      "verdict": "pass"
+    },
+    {
+      "actual": 0.0,
+      "argmax_match": true,
+      "case": "first_of_ties",
+      "elapsed_ms": 747.521,
+      "expected": 0.0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 746.572,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 746.665,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "argmax",
+      "share_bytes": 1024,
+      "tolerance": 0.0,
+      "verdict": "pass"
+    },
+    {
+      "actual": 31.0,
+      "argmax_match": true,
+      "case": "last_position",
+      "elapsed_ms": 708.273,
+      "expected": 31.0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 707.581,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 707.255,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "argmax",
+      "share_bytes": 1024,
+      "tolerance": 0.0,
+      "verdict": "pass"
+    },
+    {
+      "actual": 9.0,
+      "argmax_match": true,
+      "case": "all_negative",
+      "elapsed_ms": 723.389,
+      "expected": 9.0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 722.699,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 702.649,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "argmax",
+      "share_bytes": 1022,
+      "tolerance": 0.0,
+      "verdict": "pass"
+    },
+    {
+      "actual": 15.0,
+      "argmax_match": true,
+      "case": "random-00",
+      "elapsed_ms": 676.986,
+      "expected": 15.0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 675.356,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 674.865,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "argmax",
+      "share_bytes": 1016,
+      "tolerance": 0.0,
+      "verdict": "pass"
+    },
+    {
+      "actual": 24.0,
+      "argmax_match": true,
+      "case": "random-01",
+      "elapsed_ms": 688.71,
+      "expected": 24.0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 687.584,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 687.907,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "argmax",
+      "share_bytes": 1016,
+      "tolerance": 0.0,
+      "verdict": "pass"
+    },
+    {
+      "actual": 30.0,
+      "argmax_match": true,
+      "case": "random-02",
+      "elapsed_ms": 690.474,
+      "expected": 30.0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 689.508,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 689.707,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "argmax",
+      "share_bytes": 1016,
+      "tolerance": 0.0,
+      "verdict": "pass"
+    },
+    {
+      "actual": 4.0,
+      "argmax_match": true,
+      "case": "random-03",
+      "elapsed_ms": 673.524,
+      "expected": 4.0,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 672.733,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 672.219,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "argmax",
+      "share_bytes": 1016,
+      "tolerance": 0.0,
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "random-00",
+      "elapsed_ms": 1758.25,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 0.00021269446803640069,
+        "max_scaled_error": 0.009600432763277903,
+        "mean_abs_error": 7.443032199551565e-05,
+        "overflow_count": 0,
+        "relative_error": 0.007997694837391656,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 0.00010244027973971802,
+        "max_scaled_error": 0.005078768472311942,
+        "mean_abs_error": 2.0728532453450846e-05,
+        "overflow_count": 0,
+        "relative_error": 0.005122013986985901,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1750.63,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1750.336,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24876,
+      "token": {
+        "actual": 4.0,
+        "expected": 4.0
+      },
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "random-01",
+      "elapsed_ms": 1742.597,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 0.00033644392310849813,
+        "max_scaled_error": 0.01480096982712229,
+        "mean_abs_error": 9.179398407357085e-05,
+        "overflow_count": 0,
+        "relative_error": 0.008224041394806411,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 0.000158650492451895,
+        "max_scaled_error": 0.005350198207228957,
+        "mean_abs_error": 2.529745101048957e-05,
+        "overflow_count": 0,
+        "relative_error": 0.0022796394032405937,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1740.788,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1740.403,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24876,
+      "token": {
+        "actual": 26.0,
+        "expected": 26.0
+      },
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "random-02",
+      "elapsed_ms": 1972.04,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 0.00011455818917971428,
+        "max_scaled_error": 0.004087060468965142,
+        "mean_abs_error": 3.9355820372655474e-05,
+        "overflow_count": 0,
+        "relative_error": 0.001049651304656822,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 7.078618980760343e-05,
+        "max_scaled_error": 0.0024390118054897236,
+        "mean_abs_error": 1.1756661515150526e-05,
+        "overflow_count": 0,
+        "relative_error": 0.0024623921507233026,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1959.57,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1970.153,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24876,
+      "token": {
+        "actual": 16.0,
+        "expected": 16.0
+      },
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "random-03",
+      "elapsed_ms": 1919.074,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 0.00012616901501738553,
+        "max_scaled_error": 0.003962183606855017,
+        "mean_abs_error": 4.948263465952502e-05,
+        "overflow_count": 0,
+        "relative_error": 0.0011420039983102265,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 4.219515026321341e-05,
+        "max_scaled_error": 0.001954497165418252,
+        "mean_abs_error": 9.752691982752814e-06,
+        "overflow_count": 0,
+        "relative_error": 0.0018138954498485322,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1917.321,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1916.949,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24876,
+      "token": {
+        "actual": 6.0,
+        "expected": 6.0
+      },
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "random-04",
+      "elapsed_ms": 1687.593,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 0.00015548634207318557,
+        "max_scaled_error": 0.007298056947301849,
+        "mean_abs_error": 5.280437194728324e-05,
+        "overflow_count": 0,
+        "relative_error": 0.007330558146045885,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 4.733585940580598e-05,
+        "max_scaled_error": 0.0020996694282615306,
+        "mean_abs_error": 9.802715696434563e-06,
+        "overflow_count": 0,
+        "relative_error": 0.0007475736988490911,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1685.56,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1685.736,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24876,
+      "token": {
+        "actual": 8.0,
+        "expected": 8.0
+      },
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "random-05",
+      "elapsed_ms": 1609.41,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 9.664865817282653e-05,
+        "max_scaled_error": 0.0036392576676153657,
+        "mean_abs_error": 4.0526896952630155e-05,
+        "overflow_count": 0,
+        "relative_error": 0.0012226259954769214,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 6.759007279477647e-05,
+        "max_scaled_error": 0.002455435647087529,
+        "mean_abs_error": 1.1008450075266099e-05,
+        "overflow_count": 0,
+        "relative_error": 0.0024231969163485134,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1602.062,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1607.532,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24876,
+      "token": {
+        "actual": 7.0,
+        "expected": 7.0
+      },
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "random-06",
+      "elapsed_ms": 1718.13,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 0.00011377290180503152,
+        "max_scaled_error": 0.0037723315774081958,
+        "mean_abs_error": 3.588737303513497e-05,
+        "overflow_count": 0,
+        "relative_error": 0.0006468399433353438,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 2.4959779912958613e-05,
+        "max_scaled_error": 0.0012297982468494725,
+        "mean_abs_error": 5.303037938768785e-06,
+        "overflow_count": 0,
+        "relative_error": 0.0012479889956479306,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1716.285,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1715.716,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24876,
+      "token": {
+        "actual": 6.0,
+        "expected": 6.0
+      },
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "random-07",
+      "elapsed_ms": 1598.113,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 0.0001968264009548637,
+        "max_scaled_error": 0.003961682282357761,
+        "mean_abs_error": 5.3849200072054754e-05,
+        "overflow_count": 0,
+        "relative_error": 0.0013954120743809605,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 2.966899274942092e-05,
+        "max_scaled_error": 0.001314617507381302,
+        "mean_abs_error": 8.560014354599153e-06,
+        "overflow_count": 0,
+        "relative_error": 0.0013365976347774755,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1595.857,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1596.119,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24876,
+      "token": {
+        "actual": 11.0,
+        "expected": 11.0
+      },
+      "verdict": "pass"
+    },
+    {
+      "argmax_match": true,
+      "case": "wide_range",
+      "elapsed_ms": 1640.279,
+      "failed_outputs": [],
+      "hidden": {
+        "elements": 64,
+        "max_abs_error": 0.0007037518465985437,
+        "max_scaled_error": 0.022226249577591638,
+        "mean_abs_error": 0.00012387888844730272,
+        "overflow_count": 0,
+        "relative_error": 0.0012068012151265483,
+        "shape_mismatch": false
+      },
+      "hidden_tolerance": 0.02,
+      "logits": {
+        "elements": 256,
+        "max_abs_error": 0.0001246602958887566,
+        "max_scaled_error": 0.00429446941547542,
+        "mean_abs_error": 2.184407141541403e-05,
+        "overflow_count": 0,
+        "relative_error": 0.0017551308420016287,
+        "shape_mismatch": false
+      },
+      "logits_tolerance": 0.02,
+      "peers": [
+        {
+          "role": "P1",
+          "rtt_ms": 1638.506,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "role": "P2",
+          "rtt_ms": 1637.953,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "program": "block",
+      "share_bytes": 24878,
+      "token": {
+        "actual": 9.0,
+        "expected": 9.0
+      },
+      "verdict": "pass"
+    }
+  ]
+}

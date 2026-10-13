@@ -1,0 +1,124 @@
+{
+  "by_program": {
+    "argmax": {
+      "cases": 8,
+      "failed": 0,
+      "max_abs_error": 0.0,
+      "overflow_count": 0,
+      "passed": 8
+    },
+    "block": {
+      "cases": 9,
+      "failed": 0,
+      "max_abs_error": 0.0007037518465985437,
+      "overflow_count": 0,
+      "passed": 9
+    },
+    "gelu": {
+      "cases": 6,
+      "failed": 0,
+      "max_abs_error": 0.0536346435546875,
+      "overflow_count": 0,
+      "passed": 6
+    },
+    "layernorm": {
+      "cases": 7,
+      "failed": 0,
+      "max_abs_error": 0.0010904688020927367,
+      "overflow_count": 0,
+      "passed": 7
+    },
+    "softmax": {
+      "cases": 8,
+      "failed": 0,
+      "max_abs_error": 0.002556877200567076,
+      "overflow_count": 0,
+      "passed": 8
+    }
+  },
+  "captures": {
+    "P0": {
+      "bytes": 51710490,
+      "path": "d5-three-P0.pcap",
+      "reason": "the raw capture is 51710490 bytes and stays on the instance that produced it (P0) under /tmp/d5-enclave-3host-20261013T1057Z-P0.pcap; the bundle ships its digest and the TLS 1.3 summary that instance derived from it",
+      "sha256": "04c6c4f9df57de5eaf076732dfa3733255aa174b748889645a91fa97e5499b86"
+    },
+    "P1": {
+      "bytes": 51353714,
+      "path": "d5-three-P1.pcap",
+      "reason": "the raw capture is 51353714 bytes and stays on the instance that produced it (P1) under /tmp/d5-enclave-3host-20261013T1057Z-P1.pcap; the bundle ships its digest and the TLS 1.3 summary that instance derived from it",
+      "sha256": "724e53c8da338944d33f34a7970a37423cd640a05efb2330ba4f257b98452bfd"
+    },
+    "P2": {
+      "bytes": 51356458,
+      "path": "d5-three-P2.pcap",
+      "reason": "the raw capture is 51356458 bytes and stays on the instance that produced it (P2) under /tmp/d5-enclave-3host-20261013T1057Z-P2.pcap; the bundle ships its digest and the TLS 1.3 summary that instance derived from it",
+      "sha256": "11eb0c2fd378c7cefda2874ff990623bc063442b3821266bb68f46d5cb0f20a0"
+    }
+  },
+  "cases": 38,
+  "certificate_mismatches": [],
+  "commit": "4f17822bbf8ef9a57a0e56ae5d56a1f364f3a3ae",
+  "enclosure": {
+    "directory": "/home/jiahao/a122-enclave/d5-enclave-3host-20261013T1057Z",
+    "distinct_measurements": 3,
+    "enclave_size": "4G",
+    "manifest_sha256": {
+      "P0": "b5a3d0d2f0990cff0942ca9485b272cfdf932d7c1b80f4950d5485835a258085",
+      "P1": "9f965688c696aae3aff7826d742c860d3922353958465c7d585183f5fe93d3b9",
+      "P2": "38c28aee25da210dbd035d0a35106c48aed9e679ab469054331d9a4fee66745e"
+    },
+    "max_threads": 64,
+    "measurements": {
+      "P0": "83d40e4435dba334f9075b9cc0baa65e504062c1bf266e86140489853ff050eb",
+      "P1": "c784b44dacf4977af3cf0e00f89275b0496c3a95f1baab08457922126e0e260a",
+      "P2": "3b7014bbe088501d90a0e159faf243a24f3dc57538c33f2aabf3f51984bf34d0"
+    },
+    "shared_measurement": false,
+    "stack_size": "2M",
+    "template": "spu_node.manifest.template",
+    "wrapper": [
+      "gramine-sgx",
+      "/home/jiahao/a122-enclave/d5-enclave-3host-20261013T1057Z/d5_node"
+    ]
+  },
+  "failed": 0,
+  "grid_digest": "0dca84b60da01202269696d1de25bdfa1617155c28e3df881b93a61d6c8eea8d",
+  "identity_sha256": {
+    "P0": "2c2d1783830b5ba7af11ee65609954b2b9a3e55381669ad7e6ed3103c80cdfd3",
+    "P1": "1dc411c56af0085d0e7b771ef3564ec40ac74648f21ca9529545cc50a254e2e4",
+    "P2": "379e71786aaaeb784ccd6addba30f37bbe16a8ce4d29dbd223c501e5ec4333af"
+  },
+  "mode": "enclave",
+  "passed": 38,
+  "peer_certificates_match": true,
+  "phase": "D5",
+  "roles": {
+    "P0": {
+      "brpc_port": 47100,
+      "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+      "private_address": "172.27.172.201",
+      "public_address": "106.14.207.224",
+      "share_port": 47200
+    },
+    "P1": {
+      "brpc_port": 47101,
+      "instance_id": "iZuf6bd6qnhgtveg5khyf1Z",
+      "private_address": "172.27.172.202",
+      "public_address": "47.117.34.67",
+      "share_port": 47201
+    },
+    "P2": {
+      "brpc_port": 47102,
+      "instance_id": "iZuf6bd6qnhgtveg5khygdZ",
+      "private_address": "172.27.172.203",
+      "public_address": "47.116.200.143",
+      "share_port": 47202
+    }
+  },
+  "run_id": "d5-enclave-3host-20261013T1057Z",
+  "seed": 20261013,
+  "share_bytes": 272494,
+  "timestamp_utc": "2026-10-13T11:03:42Z",
+  "verdicts": "passed"
+}

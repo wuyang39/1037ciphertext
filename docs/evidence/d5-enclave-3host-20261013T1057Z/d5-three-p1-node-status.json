@@ -1,0 +1,13 @@
+{
+  "identity_sha256": "1dc411c56af0085d0e7b771ef3564ec40ac74648f21ca9529545cc50a254e2e4",
+  "link_seconds": 9.932,
+  "peer_certificates": {
+    "P0": "2c2d1783830b5ba7af11ee65609954b2b9a3e55381669ad7e6ed3103c80cdfd3",
+    "P2": "379e71786aaaeb784ccd6addba30f37bbe16a8ce4d29dbd223c501e5ec4333af"
+  },
+  "role": "P1",
+  "run_id": "d5-enclave-3host-20261013T1057Z",
+  "runs_served": 38,
+  "teardown_finished": true,
+  "verdicts": "served"
+}
