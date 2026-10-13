@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+from pathlib import Path
+
 import pytest
 
 from client.result import ResultRejected, reconstruct_result_frames
@@ -16,6 +21,44 @@ from tests.unit.test_d2_session import NOW, establish, make_bindings
 
 MODEL_HASH = "31" * 32
 PLAN_HASH = "42" * 32
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def test_the_node_import_chain_needs_no_framework() -> None:
+    """The D6 node runs in an enclave venv that has no torch.
+
+    It reaches for ``mpc.secure_ops.kv_cache``, whose package pulls in the
+    fixed-point adapter, which pulls in ``model``. Blocking ``torch`` in a
+    fresh interpreter is the cheapest way to keep that chain honest, because
+    on an operator machine with torch installed the mistake is invisible.
+    """
+    code = (
+        "import sys\n"
+        "sys.modules['torch'] = None\n"
+        "from mpc.secure_ops.kv_cache import SecureKVCache\n"
+        "from mpc.secure_ops import FixedPointAdapter\n"
+        "import model\n"
+        "assert callable(model.add_fixed)\n"
+        "print('torch-free')\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+        env={**os.environ, "PYTHONPATH": str(REPO_ROOT)},
+    )
+    assert result.returncode == 0, result.stderr
+    assert "torch-free" in result.stdout
+
+
+def test_the_decoder_is_resolved_on_first_use() -> None:
+    import model
+
+    assert "TinyDecoder" not in vars(model)
+    assert "TinyDecoderConfig" not in vars(model)
+    with pytest.raises(AttributeError):
+        model.not_a_real_attribute
 
 
 def test_three_node_runtime_results_bind_and_reconstruct() -> None:
