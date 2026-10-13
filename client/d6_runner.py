@@ -15,6 +15,7 @@ did".
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -94,6 +95,21 @@ def _tls_identity(document: Mapping[str, Any]) -> TLSIdentity:
     )
 
 
+def build_ledger(kas_document: Mapping[str, Any]) -> JobTicketLedger:
+    """The client issues its own JobTickets from the KAS signing key it holds.
+
+    The ledger's clock is the runner's own wall clock: the ticket expiry is
+    what a node checks against its clock, so it has to be real UTC rather than
+    a value frozen for a test.
+    """
+    return JobTicketLedger(
+        signing_key=SM2KeyPair.from_private_key(
+            str(kas_document["kas_signing_private_key"])
+        ),
+        clock=lambda: dt.datetime.now(dt.timezone.utc),
+    )
+
+
 def build_client(
     client_document: Mapping[str, Any],
     kas_document: Mapping[str, Any],
@@ -106,11 +122,7 @@ def build_client(
     authority = SM2CertificateAuthority(
         SM2KeyPair.from_private_key(str(kas_document["client_authority_private_key"]))
     )
-    ledger = JobTicketLedger(
-        signing_key=SM2KeyPair.from_private_key(
-            str(kas_document["kas_signing_private_key"])
-        ),
-    )
+    ledger = build_ledger(kas_document)
     libspu, _ = load_libspu()
     io = make_io(libspu, runtime_config(libspu, fraction_bits=plan.fractional_bits))
     client = D6Client(
