@@ -390,12 +390,22 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--timeout", type=float, default=1800.0)
     parser.add_argument("--ssh-user", default="jiahao")
     parser.add_argument("--ssh-host", default=None)
+    parser.add_argument(
+        "--ssh-key",
+        default=None,
+        help="private key the driver authenticates with, when the operator "
+        "host carries no usable ~/.ssh identity of its own",
+    )
+    parser.add_argument("--ssh-key-password", default=None)
     parser.add_argument("--expect-commit", default=None)
     parser.add_argument("--seal", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
     cluster = load_cluster(args.cluster, user=args.ssh_user, ssh_host=args.ssh_host)
-    transport = Transport()
+    transport = Transport(
+        key_path=args.ssh_key,
+        key_password=args.ssh_key_password,
+    )
     result = run_three_hosts(
         cluster=cluster,
         out_dir=args.out_dir,
