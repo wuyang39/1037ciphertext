@@ -21,6 +21,11 @@ RUN_ID="${1:-${RUN_ID:-d4-enclave-$(date -u +%Y%m%dT%H%M%SZ)}}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-$ROOT/artifacts/server}"
 OUT="$OUTPUT_ROOT/$RUN_ID/d4"
 WORK="$OUTPUT_ROOT/$RUN_ID/work/d4"
+# The runner seals $OUT when it finishes, so its own log must live outside the
+# evidence directory until the run is over. A redirect into $OUT would keep
+# growing after the index was written and leave the seal describing a file that
+# is no longer the one on disk.
+ACCEPT_LOG="$OUTPUT_ROOT/$RUN_ID/d4-enclave-acceptance.txt"
 PYTHON="${PYTHON:-$HOME/a122-venv311/bin/python}"
 VENV="${VENV:-$(dirname "$(dirname "$PYTHON")")}"
 SITE="${SITE:-$VENV/lib/python$( "$PYTHON" -c 'import sys; print("%d.%d" % sys.version_info[:2])' )/site-packages}"
@@ -137,9 +142,18 @@ PYTHONPATH="$ROOT" "$PYTHON" -m infra.d4_acceptance \
     --capture \
     --instance-id "$INSTANCE_ID" \
     --cloud-region "$CLOUD_REGION" \
-    > "$OUT/d4-enclave-acceptance.txt" 2>&1
+    > "$ACCEPT_LOG" 2>&1
 STATUS=$?
 set -e
+
+# Now that the log is complete, bring it inside the bundle and re-seal, so the
+# index covers the whole log rather than the prefix that existed mid-run.
+if [ -f "$ACCEPT_LOG" ]; then
+    cp "$ACCEPT_LOG" "$OUT/d4-enclave-acceptance.txt"
+fi
+if [ -f "$OUT/evidence-index.json" ]; then
+    PYTHONPATH="$ROOT" "$PYTHON" -m infra.seal_evidence seal "$OUT" >/dev/null
+fi
 
 echo "==> acceptance status: $STATUS"
 ls -1 "$OUT"

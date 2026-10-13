@@ -9,14 +9,17 @@ from typing import Any, Mapping
 import pytest
 
 from infra.d4_three_hosts import (
+    ENCLAVE_SIGNED_MARKER,
     SSHRoute,
     ThreeHostError,
     Transport,
     capture_command,
+    enclave_sign_command,
     endpoints,
     kill_nodes,
     load_cluster,
     node_command,
+    parse_sign_output,
     probe_command,
     remote_path,
     require_workspace,
@@ -115,6 +118,66 @@ def test_capture_and_node_commands_quote_their_paths() -> None:
     )
     assert "cd /home/u/repo" in node
     assert "-m tee.enclave.spu_node --config /home/u/ws/configs/P1.json" in node
+
+
+def test_node_command_hands_a_wrapper_the_node_as_its_own_arguments() -> None:
+    """Gramine hands the app ``[entrypoint, *argv]``, so the wrapper replaces
+    the interpreter instead of prefixing it."""
+    node = node_command(
+        python="/home/u/venv/bin/python",
+        repo="/home/u/repo",
+        config="/home/u/ws/configs/P1.json",
+        log="/tmp/P1.log",
+        wrapper=["gramine-sgx", "~/a122-enclave/run/spu_node"],
+    )
+    assert "setsid nohup gramine-sgx" in node
+    assert '"$HOME/a122-enclave/run/spu_node"' in node
+    assert "/home/u/venv/bin/python" not in node
+    assert "-m tee.enclave.spu_node --config /home/u/ws/configs/P1.json" in node
+
+
+def test_enclave_sign_command_renders_then_signs() -> None:
+    command = enclave_sign_command(
+        enclave_dir="~/a122-enclave/run",
+        python="~/a122-venv311/bin/python",
+        repo="/home/jiahao/1037ciphertext",
+        workspace="/home/jiahao/a122-d4/three/workspace",
+    )
+    assert 'cd "$HOME/a122-enclave/run"' in command
+    assert '"$(readlink -f "$HOME/a122-venv311/bin/python")"' in command
+    # The workspace the manifest trusts only exists once the run has landed it,
+    # so the render step is what turns the template into a signable manifest.
+    assert "gramine-manifest spu_node.manifest.rendered > spu_node.manifest" in command
+    assert 's|@WORKSPACE@|/home/jiahao/a122-d4/three/workspace|g' in command
+    assert "[ -f sign.pem ] || gramine-sgx-gen-private-key sign.pem" in command
+    assert "gramine-sgx-sign --manifest spu_node.manifest" in command
+    assert ENCLAVE_SIGNED_MARKER in command
+
+
+def test_parse_sign_output_reads_the_measurement_from_its_own_line() -> None:
+    """The signer prints the label and the value on separate lines."""
+    parsed = parse_sign_output(
+        "Attributes (required for enclave measurement):\n"
+        "    size:        0x100000000\n"
+        "Measurement:\n"
+        "    3d679156cd2c6dd781efe88f47e47f7e49129978b1dbf264d1a64ce946bd3c56\n"
+        "8749e2a081eb65946b9fa55076934a9e5347d27d7a21198eb09615833a70b596"
+        "  spu_node.manifest\n"
+        "abc123  spu_node.manifest.sgx\n"
+        f"{ENCLAVE_SIGNED_MARKER}\n"
+    )
+    assert (
+        parsed["measurement"]
+        == "3d679156cd2c6dd781efe88f47e47f7e49129978b1dbf264d1a64ce946bd3c56"
+    )
+    assert (
+        parsed["manifest_sha256"]
+        == "8749e2a081eb65946b9fa55076934a9e5347d27d7a21198eb09615833a70b596"
+    )
+    assert parse_sign_output("no measurement here\n") == {
+        "measurement": "",
+        "manifest_sha256": "",
+    }
 
 
 def test_transport_expands_a_home_relative_sftp_path() -> None:

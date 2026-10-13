@@ -60,6 +60,20 @@ DEFAULT_IFACE = "eth0"
 DEFAULT_REPO = "~/1037ciphertext"
 DEFAULT_PYTHON = "~/a122-venv311/bin/python"
 DEFAULT_WORKSPACE = "~/a122-d4/three/workspace"
+DEFAULT_ENCLAVE_DIR = "~/a122-enclave"
+# The enclave the D4 nodes run in is described once, by a template that both
+# this runner and deploy/run_d4_gramine.sh render on the instance that will
+# sign it, so the loopback and the cross-host runs measure the same thing.
+ENCLAVE_NODE = "spu_node"
+ENCLAVE_TEMPLATE = "tee/gramine/enclave/spu_node.manifest.template"
+DEFAULT_ARCH_LIBDIR = "/lib/x86_64-linux-gnu"
+DEFAULT_USR_LIBDIR = "/usr/lib/x86_64-linux-gnu"
+DEFAULT_ENCLAVE_SIZE = "4G"
+DEFAULT_MAX_THREADS = 64
+DEFAULT_STACK_SIZE = "2M"
+ENCLAVE_SIGNED_MARKER = "A122-D4-ENCLAVE-SIGNED"
+MEASUREMENT_PREFIX = "Measurement:"
+# ``plaintext`` is the probe of the live listeners, not a mutated config, so it
 READY_MARKER = "A122-D4-NODE-READY"
 DONE_MARKER = "A122-D4-NODE-DONE"
 D4_PORTS = (47100, 47101, 47102, 47200, 47201, 47202)
@@ -345,13 +359,259 @@ def capture_command(*, iface: str, pcap: str, log: str) -> str:
     )
 
 
-def node_command(*, python: str, repo: str, config: str, log: str) -> str:
+def node_command(
+    *,
+    python: str,
+    repo: str,
+    config: str,
+    log: str,
+    wrapper: Sequence[str] | None = None,
+) -> str:
+    """Start one node, optionally under ``gramine-sgx``.
+
+    A wrapper replaces the interpreter instead of prefixing it. Gramine hands
+    the app ``[entrypoint, *argv]``, so ``gramine-sgx <manifest>`` has to
+    receive the node as its own arguments, exactly as
+    :mod:`infra.d4_acceptance` builds it for the loopback run.
+    """
+    launcher = (
+        " ".join(remote_path(token) for token in wrapper)
+        if wrapper
+        else remote_path(python)
+    )
     return (
         f"cd {remote_path(repo)} && "
-        f"setsid nohup {remote_path(python)} -m tee.enclave.spu_node "
+        f"setsid nohup {launcher} -m tee.enclave.spu_node "
         f"--config {remote_path(config)} > {shlex.quote(log)} 2>&1 < /dev/null & "
         f"echo started"
     )
+
+
+def enclave_sign_command(
+    *,
+    enclave_dir: str,
+    python: str,
+    repo: str,
+    workspace: str,
+    arch_libdir: str = DEFAULT_ARCH_LIBDIR,
+    usr_libdir: str = DEFAULT_USR_LIBDIR,
+    enclave_size: str = DEFAULT_ENCLAVE_SIZE,
+    max_threads: int = DEFAULT_MAX_THREADS,
+    stack_size: str = DEFAULT_STACK_SIZE,
+) -> str:
+    """Render and sign the node manifest on the instance that will run it.
+
+    Every value the template carries is a path the instance resolves itself, so
+    the measurement describes the interpreter, the venv, the repo and the
+    workspace that are really there rather than a laptop's guess at them.
+    """
+    substitutions = [
+        ("@PYTHON@", "$PY"),
+        ("@ARCH_LIBDIR@", arch_libdir),
+        ("@USR_LIBDIR@", usr_libdir),
+        ("@UV_ROOT@", "$UV_ROOT"),
+        ("@SITE@", "$SITE"),
+        ("@REPO@", repo),
+        ("@WORKSPACE@", workspace),
+        ("@LIBSPU@", "$LIBSPU"),
+        ("@ENCLAVE_SIZE@", enclave_size),
+        ("@MAX_THREADS@", str(int(max_threads))),
+        ("@STACK_SIZE@", stack_size),
+    ]
+    sed_flags = " ".join(
+        f'-e "s|{token}|{value}|g"' for token, value in substitutions
+    )
+    return "\n".join(
+        [
+            "set -euo pipefail",
+            f"cd {remote_path(enclave_dir)}",
+            f'PY="$(readlink -f {remote_path(python)})"',
+            f'VENV="$(dirname "$(dirname {remote_path(python)})")"',
+            'ABI="$("$PY" -c "import sys; print(\'python%d.%d\' % sys.version_info[:2])")"',
+            'SITE="$VENV/lib/$ABI/site-packages"',
+            'UV_ROOT="$(dirname "$(dirname "$PY")")"',
+            'LIBSPU="$SITE/spu/libspu.so"',
+            'test -f "$LIBSPU"',
+            f"sed {sed_flags} {ENCLAVE_NODE}.manifest.template "
+            f"> {ENCLAVE_NODE}.manifest.rendered",
+            f"gramine-manifest {ENCLAVE_NODE}.manifest.rendered "
+            f"> {ENCLAVE_NODE}.manifest",
+            "[ -f sign.pem ] || gramine-sgx-gen-private-key sign.pem",
+            f"gramine-sgx-sign --manifest {ENCLAVE_NODE}.manifest "
+            f"--output {ENCLAVE_NODE}.manifest.sgx --key sign.pem",
+            f"test -f {ENCLAVE_NODE}.manifest.sgx",
+            # The digest lets a reader check the peers signed the same manifest
+            # as the one the bundle ships.
+            f"sha256sum {ENCLAVE_NODE}.manifest {ENCLAVE_NODE}.manifest.sgx",
+            f"echo {ENCLAVE_SIGNED_MARKER}",
+        ]
+    )
+
+
+def _absolute_paths(
+    transport: Transport,
+    route: SSHRoute,
+    *,
+    repo: str,
+    python: str,
+    workspace: str,
+    enclave_dir: str,
+) -> dict[str, str]:
+    """Ask the instance what the ``~``-relative defaults really point at."""
+    command = "\n".join(
+        [
+            f'echo "repo=$(cd {remote_path(repo)} && pwd)"',
+            f'echo "python=$(readlink -f {remote_path(python)})"',
+            f'echo "workspace=$(cd {remote_path(workspace)} && pwd)"',
+            f'echo "enclave=$(mkdir -p {remote_path(enclave_dir)} && '
+            f'cd {remote_path(enclave_dir)} && pwd)"',
+        ]
+    )
+    _status, out, _err = transport.run(route, command)
+    resolved: dict[str, str] = {}
+    for line in out.splitlines():
+        key, separator, value = line.partition("=")
+        if separator and value.strip():
+            resolved[key.strip()] = value.strip()
+    missing = {"repo", "python", "workspace", "enclave"} - set(resolved)
+    if missing:
+        raise ThreeHostError(
+            "could not resolve the enclave paths on "
+            f"{route.role}: missing {', '.join(sorted(missing))}"
+        )
+    return resolved
+
+
+def parse_sign_output(text: str) -> dict[str, str]:
+    """Read the measurement and manifest digest out of ``gramine-sgx-sign``.
+
+    The signer prints ``Measurement:`` on its own line with the value indented
+    underneath it, then the digests of the sealed manifest.
+    """
+    lines = [line.strip() for line in text.splitlines()]
+    measurement = ""
+    for index, line in enumerate(lines):
+        if line == MEASUREMENT_PREFIX and index + 1 < len(lines):
+            measurement = lines[index + 1]
+            break
+    manifest_sha256 = ""
+    for line in lines:
+        parts = line.split()
+        if len(parts) == 2 and parts[1] == f"{ENCLAVE_NODE}.manifest":
+            manifest_sha256 = parts[0]
+            break
+    return {"measurement": measurement, "manifest_sha256": manifest_sha256}
+
+
+def prepare_enclave(
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    *,
+    template: Path,
+    run_id: str,
+    out_dir: Path,
+    repo: str = DEFAULT_REPO,
+    python: str = DEFAULT_PYTHON,
+    workspace: str = DEFAULT_WORKSPACE,
+    enclave_dir: str = DEFAULT_ENCLAVE_DIR,
+    arch_libdir: str = DEFAULT_ARCH_LIBDIR,
+    usr_libdir: str = DEFAULT_USR_LIBDIR,
+    enclave_size: str = DEFAULT_ENCLAVE_SIZE,
+    max_threads: int = DEFAULT_MAX_THREADS,
+    stack_size: str = DEFAULT_STACK_SIZE,
+) -> dict[str, Any]:
+    """Sign the node enclave on every instance and return how to start it.
+
+    One signing key is generated on the driver's host and copied to the peers,
+    so all three ranks measure the same enclave: both the manifest contents and
+    the key's hash end up inside the measurement.
+    """
+    template = Path(template)
+    if not template.is_file():
+        raise ThreeHostError(f"the enclave template is missing: {template}")
+    resolved = _absolute_paths(
+        transport,
+        role_routes[DRIVER],
+        repo=repo,
+        python=python,
+        workspace=workspace,
+        enclave_dir=enclave_dir,
+    )
+    enclave = f"{resolved['enclave']}/{run_id}"
+    command = enclave_sign_command(
+        enclave_dir=enclave,
+        python=python,
+        repo=resolved["repo"],
+        workspace=resolved["workspace"],
+        arch_libdir=arch_libdir,
+        usr_libdir=usr_libdir,
+        enclave_size=enclave_size,
+        max_threads=max_threads,
+        stack_size=stack_size,
+    )
+    out_dir = Path(out_dir)
+    measurements: dict[str, str] = {}
+    digests: dict[str, str] = {}
+    with tempfile.TemporaryDirectory(prefix="a122-enclave-") as scratch:
+        key_local = Path(scratch) / "sign.pem"
+        key_remote = f"{enclave}/sign.pem"
+        for role in ROLES:
+            route = role_routes[role]
+            transport.run(route, f"mkdir -p {shlex.quote(enclave)}")
+            transport.put(
+                route, template, f"{enclave}/{ENCLAVE_NODE}.manifest.template"
+            )
+            if role != DRIVER:
+                # The peers sign with the driver's key so the measurement is
+                # the same on all three, not three unrelated enclaves.
+                transport.put(route, key_local, key_remote)
+            _status, out, err = transport.run(route, command, timeout=900)
+            text = out + (f"\n{err}" if err.strip() else "")
+            if ENCLAVE_SIGNED_MARKER not in text:
+                raise ThreeHostError(
+                    f"{role} could not sign the node enclave:\n{text.strip()}"
+                )
+            (out_dir / f"d4-enclave-{role.lower()}-sign.txt").write_text(
+                text if text.endswith("\n") else text + "\n",
+                encoding="utf-8",
+                newline="\n",
+            )
+            parsed = parse_sign_output(text)
+            measurements[role] = parsed["measurement"]
+            digests[role] = parsed["manifest_sha256"]
+            if not parsed["measurement"] or not parsed["manifest_sha256"]:
+                raise ThreeHostError(
+                    f"{role} signed the enclave but reported no measurement:\n"
+                    f"{text.strip()[-400:]}"
+                )
+            if role == DRIVER:
+                transport.get(route, key_remote, key_local)
+                # The three manifests have to be byte-identical, which the
+                # measurements and the per-host digests in the sign logs
+                # already show, so the bundle ships one copy rather than three.
+                transport.get(
+                    route,
+                    f"{enclave}/{ENCLAVE_NODE}.manifest",
+                    out_dir / "d4-enclave.manifest",
+                )
+    # Each instance signs the manifest it will load, and Gramine hashes whole
+    # trusted directories, so the measurements agree only when the trees agree.
+    # They do not have to: what the acceptance needs is that every rank ran
+    # under a measurement, and the summary records all three rather than
+    # pretending they are one enclave.
+    distinct = sorted(set(measurements.values()))
+    return {
+        "directory": enclave,
+        "wrapper": ["gramine-sgx", f"{enclave}/{ENCLAVE_NODE}"],
+        "measurements": dict(measurements),
+        "manifest_sha256": dict(digests),
+        "shared_measurement": len(distinct) == 1,
+        "distinct_measurements": len(distinct),
+        "enclave_size": enclave_size,
+        "max_threads": int(max_threads),
+        "stack_size": stack_size,
+        "template": template.name,
+    }
 
 
 def summary_header(
@@ -466,6 +726,11 @@ def run_three_hosts(
     node_timeout: float = 900.0,
     node_status_timeout: float = 240.0,
     expect_commit: str | None = None,
+    enclave_template: Path | None = None,
+    enclave_dir: str = DEFAULT_ENCLAVE_DIR,
+    enclave_size: str = DEFAULT_ENCLAVE_SIZE,
+    max_threads: int = DEFAULT_MAX_THREADS,
+    stack_size: str = DEFAULT_STACK_SIZE,
     dry_run: bool = False,
 ) -> dict[str, Any]:
     """Provision, distribute, run, collect and seal one three-instance run."""
@@ -522,6 +787,7 @@ def run_three_hosts(
             f"--vectors {int(vector_count)} --batch {int(batch)}"
         )
         captured: dict[str, dict[str, Any]] = {}
+        enclosure: dict[str, Any] | None = None
         transport.run(role_routes["P0"], f"rm -rf {remote_path(parent)}")
         transport.run(role_routes["P0"], provision, timeout=600)
         transport.run(
@@ -541,6 +807,25 @@ def run_three_hosts(
             )
 
         if not dry_run:
+            wrapper: Sequence[str] | None = None
+            if enclave_template is not None:
+                # Sign after the workspace has landed on all three: the
+                # manifest trusts it, so it has to be the real tree.
+                enclosure = prepare_enclave(
+                    transport,
+                    role_routes,
+                    template=Path(enclave_template),
+                    run_id=run_id,
+                    out_dir=out_dir,
+                    repo=repo,
+                    python=python,
+                    workspace=workspace,
+                    enclave_dir=enclave_dir,
+                    enclave_size=enclave_size,
+                    max_threads=max_threads,
+                    stack_size=stack_size,
+                )
+                wrapper = enclosure["wrapper"]
             for role in ROLES:
                 transport.run(
                     role_routes[role],
@@ -567,6 +852,7 @@ def run_three_hosts(
                         repo=repo,
                         config=f"{workspace}/configs/{role}.json",
                         log=node_logs[role],
+                        wrapper=wrapper,
                     ),
                 )
                 time.sleep(1.0)
@@ -686,7 +972,10 @@ def run_three_hosts(
             for role in ROLES
         },
         captures=captures,
-        details={"commit": expect_commit or None},
+        details={
+            "commit": expect_commit or None,
+            "enclosure": enclosure,
+        },
     )
 
 
@@ -755,6 +1044,7 @@ def probe_live_listeners(
     run_id: str,
     probe_timeout: float = 45.0,
     poll: float = 2.0,
+    wrapper: Sequence[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Send plaintext at every peer listener while it is really serving.
 
@@ -777,6 +1067,7 @@ def probe_live_listeners(
                     repo=repo,
                     config=f"{workspace}/configs/{role}.json",
                     log=logs[role],
+                    wrapper=wrapper,
                 ),
             )
             time.sleep(0.5)
@@ -832,6 +1123,7 @@ def run_one_negative_case(
     run_id: str,
     out_dir: Path,
     node_timeout: float,
+    wrapper: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     """Play one fail-closed case with the peers live on their own instances."""
     expected = EXPECTED_REFUSALS[case]
@@ -847,6 +1139,7 @@ def run_one_negative_case(
                     repo=repo,
                     config=f"{workspace}/configs/{role}.json",
                     log=peer_logs[role],
+                    wrapper=wrapper,
                 ),
             )
             time.sleep(0.5)
@@ -854,9 +1147,16 @@ def run_one_negative_case(
         # rejects them: a refusal has to hold against a reachable peer.
         time.sleep(2.0)
         started = time.monotonic()
+        # The driver is a node too, so it runs under the same measurements as
+        # its peers when the run is an enclave run.
+        driver_launcher = (
+            " ".join(remote_path(token) for token in wrapper)
+            if wrapper
+            else f"PYTHONPATH=. {remote_path(python)}"
+        )
         status, out, err = transport.run(
             role_routes[DRIVER],
-            f"cd {remote_path(repo)} && PYTHONPATH=. {remote_path(python)} "
+            f"cd {remote_path(repo)} && {driver_launcher} "
             f"-m tee.enclave.spu_node --config {remote_path(driver_config)}",
             timeout=node_timeout,
             check=False,
@@ -951,6 +1251,11 @@ def run_negative_cases(
     probe_timeout: float = 45.0,
     expect_commit: str | None = None,
     include_probes: bool = True,
+    enclave_template: Path | None = None,
+    enclave_dir: str = DEFAULT_ENCLAVE_DIR,
+    enclave_size: str = DEFAULT_ENCLAVE_SIZE,
+    max_threads: int = DEFAULT_MAX_THREADS,
+    stack_size: str = DEFAULT_STACK_SIZE,
 ) -> dict[str, Any]:
     """Run every fail-closed case with the peers on their own instances.
 
@@ -986,6 +1291,25 @@ def run_negative_cases(
         transport, role_routes, workspace=workspace, cases=tuple(cases)
     )
 
+    wrapper: Sequence[str] | None = None
+    enclosure: dict[str, Any] | None = None
+    if enclave_template is not None:
+        enclosure = prepare_enclave(
+            transport,
+            role_routes,
+            template=Path(enclave_template),
+            run_id=run_id,
+            out_dir=out_dir,
+            repo=repo,
+            python=python,
+            workspace=workspace,
+            enclave_dir=enclave_dir,
+            enclave_size=enclave_size,
+            max_threads=max_threads,
+            stack_size=stack_size,
+        )
+        wrapper = enclosure["wrapper"]
+
     try:
         probes = (
             probe_live_listeners(
@@ -997,6 +1321,7 @@ def run_negative_cases(
                 python=python,
                 run_id=run_id,
                 probe_timeout=probe_timeout,
+                wrapper=wrapper,
             )
             if include_probes
             else []
@@ -1012,6 +1337,7 @@ def run_negative_cases(
                 run_id=run_id,
                 out_dir=out_dir,
                 node_timeout=node_timeout,
+                wrapper=wrapper,
             )
             for case in cases
         }
@@ -1049,6 +1375,7 @@ def run_negative_cases(
             for role in ROLES
         },
         "workspace": workspace,
+        "enclosure": enclosure,
         "plaintext_probes": plaintext_probes,
         "cases": results,
         "all_refused": not failed,
@@ -1062,6 +1389,24 @@ def run_negative_cases(
             "the fail-closed cases did not all refuse: " + ", ".join(failed)
         )
     return {"summary": summary, "index": index}
+
+
+def _add_enclave_arguments(parser: argparse.ArgumentParser) -> None:
+    """Let a run put the nodes in ``gramine-sgx`` instead of bare processes."""
+    parser.add_argument(
+        "--enclave-template",
+        type=Path,
+        default=None,
+        help=(
+            "gramine manifest template to render and sign on every instance; "
+            "without it the nodes run as ordinary host processes"
+        ),
+    )
+    parser.add_argument(
+        "--enclave-dir",
+        default=DEFAULT_ENCLAVE_DIR,
+        help="where each instance keeps the signed manifest for this run",
+    )
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -1094,6 +1439,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="provision, distribute, then report what would run",
     )
+    _add_enclave_arguments(run)
     negatives = subparsers.add_parser(
         "negatives",
         help="replay the fail-closed cases with the peers on their own hosts",
@@ -1125,6 +1471,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         default="HEAD",
         help="commit every instance must be on, or 'HEAD' for this checkout",
     )
+    _add_enclave_arguments(negatives)
     args = parser.parse_args(argv)
 
     run_id = args.run_id or (
@@ -1154,6 +1501,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 probe_timeout=args.probe_timeout,
                 expect_commit=expect_commit or None,
                 include_probes=not args.no_probes,
+                enclave_template=args.enclave_template,
+                enclave_dir=args.enclave_dir,
             )
         else:
             result = run_three_hosts(
@@ -1171,6 +1520,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 batch=args.batch,
                 node_timeout=args.node_timeout,
                 expect_commit=expect_commit or None,
+                enclave_template=args.enclave_template,
+                enclave_dir=args.enclave_dir,
                 dry_run=args.dry_run,
             )
     except ThreeHostError as exc:
@@ -1185,17 +1536,20 @@ def main(argv: Sequence[str] | None = None) -> int:
 __all__ = [
     "CONFIGURED_CASES",
     "D4_PORTS",
+    "DEFAULT_ENCLAVE_DIR",
     "DEFAULT_IFACE",
     "DEFAULT_PYTHON",
     "DEFAULT_REPO",
     "DEFAULT_WORKSPACE",
     "DONE_MARKER",
+    "ENCLAVE_TEMPLATE",
     "READY_MARKER",
     "SSHRoute",
     "ThreeHostError",
     "Transport",
     "capture_command",
     "capture_filter",
+    "enclave_sign_command",
     "endpoints",
     "kill_nodes",
     "load_cluster",
@@ -1203,6 +1557,7 @@ __all__ = [
     "node_command",
     "probe_command",
     "probe_live_listeners",
+    "prepare_enclave",
     "remote_path",
     "require_workspace",
     "routes",
