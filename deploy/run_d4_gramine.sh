@@ -95,7 +95,9 @@ sed -e "s|@PYTHON@|$UV_PYTHON|g" \
     gramine-sgx-gen-private-key sign.pem
     gramine-sgx-sign --manifest spu_node.manifest \
         --output spu_node.manifest.sgx --key sign.pem
-)
+) > "$OUT/spu_node-sign.txt" 2>&1
+# The measurement the three nodes share; the signer prints it while sealing.
+grep -i -m1 "^Measurement" "$OUT/spu_node-sign.txt" || true
 cp "$WORK/enclave/spu_node.manifest" "$OUT/spu_node.manifest"
 {
     echo "# run_id"
