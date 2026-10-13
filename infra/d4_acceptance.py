@@ -105,8 +105,13 @@ class NodeProcess:
         self.config_path = Path(config_path)
         self.log_path = Path(log_path)
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
+        # A wrapper replaces the interpreter instead of prefixing it: inside
+        # gramine-sgx the entrypoint *is* the interpreter, and the LibOS builds
+        # the app argv as [entrypoint, *arguments], so handing it the
+        # interpreter again would make the node try to open the interpreter as
+        # a script.
         command = (
-            [*wrapper, *(_node_command(self.config_path))]
+            [*wrapper, *(_node_command(self.config_path)[1:])]
             if wrapper
             else [python or sys.executable, "-m", NODE_MODULE, "--config", str(self.config_path)]
         )
@@ -687,10 +692,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--node-wrapper",
         default=None,
         help=(
-            "command prefix that launches each node, e.g. "
+            "launcher that starts each node in place of the interpreter, e.g. "
             "'gramine-sgx /path/to/spu_node.manifest'; the node module and its "
-            "--config argument are appended to it, so the same grid and the "
-            "same refusal cases run inside an enclave"
+            "--config argument are appended to it, so the same grid and the same "
+            "refusal cases run inside an enclave. --python is unused when a "
+            "wrapper is set."
         ),
     )
     parser.add_argument("--cluster-file", type=Path, default=None)
