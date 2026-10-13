@@ -1,0 +1,13 @@
+{
+  "batch_share_digest": "797efbe42846f08ba46ec11d847fafce47f3b24dbaee54a92a5b8df82912d185",
+  "grid_digest": "96b6c83502203292840fd9836f0efbe6f5fe49225aa5b110a6f2b3c27f3695d5",
+  "identity_sha256": "00641232b6d16516fa6d1f9727e9bd775dc7cb7ff5d561c7091ea7addd1c9159",
+  "peer_certificates": {
+    "P1": "9d12d7dd7a892de5ac38746fd82c44235be68fce8a11f6639079861e0237a993",
+    "P2": "9900788b2d651463d6cf1db59872bc081c84181cf4d92ee469b378f2ee0779a9"
+  },
+  "role": "P0",
+  "run_id": "d4-enclave-20261013T0530Z",
+  "teardown_finished": true,
+  "verdicts": "passed"
+}

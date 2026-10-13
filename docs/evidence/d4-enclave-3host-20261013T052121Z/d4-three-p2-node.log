@@ -1,0 +1,76 @@
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+warning: Could not set up Invariant TSC (CPU is too old or you run on a VM that does not expose corresponding CPUID leaves). This degrades performance.
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+[P1:T1:python3.11] warning: Unsupported system call rseq
+[P1:T1:python3.11] warning: Unsupported system call clone3
+W1013 05:22:31.550638     1     0 external/brpc~/src/bvar/default_variables.cpp:434] Fail to open /proc/self/io: No such file or directory
+[P1:T1:python3.11] warning: Unsupported system call getrusage
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call prctl
+E1013 05:22:31.738304     2     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+W1013 05:22:31.748610     2     0 external/brpc~/src/bvar/default_variables.cpp:281] Fail to open /proc/loadavg: No such file or directory
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T4:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.064412     4     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T12:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.107498    12     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T5:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.288318     5     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T6:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.296422     6     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T16:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.331337    16     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T7:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.417215     7     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T8:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.422864     8     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T18:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.435072    18     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T9:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.458056     9     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T19:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.476649    19     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T10:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.543069    10     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T13:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.626361    13     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T11:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.637364    11     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T17:python3.11] warning: Unsupported system call prctl
+E1013 05:22:32.739939    17     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+A122-D4-NODE-READY {"identity_sha256": "aa932638b501895746f303f3a61b4885651ec893ad21499a53f50355aa73a999", "link_seconds": 6.651, "partition_id": "a122-d4-d4-enclave-3host-20261013T052121Z", "peer_certificates": {"P0": "513cfc56e545e0e792cbbb359d691febcb51407d996c1549bf083072b7ecdb9c", "P1": "93c7c7824ec3bdff2f8a36447a62f99fbcbb9137763b5957755934667efab754"}, "rank": 2, "role": "P2", "run_id": "d4-enclave-3host-20261013T052121Z", "share_port": 47202, "tls": {"client_verify_depth": 4, "enable_ssl": true, "min_version": "TLS1.3", "require_client_certificate": true, "server_verify_depth": 4}}
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+A122-D4-NODE-DONE P2

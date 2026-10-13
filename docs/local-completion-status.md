@@ -16,15 +16,19 @@
 > 复跑正向网格、抓包（运行 `d4-3host-20261012T152216Z`）和四类 fail-closed
 > 负例（运行 `d4-negs-3host-20261012T154315Z`），两次都由
 > `infra.d4_three_hosts` 一条命令驱动，见
-> [d4-acceptance.md](d4-acceptance.md)。D5 及之后仍待执行；D4 还差三个
-> `gramine-sgx` enclave 内的执行与真实 attestation 放行。
+> [d4-acceptance.md](d4-acceptance.md)。2026-10-13 又把三个节点放进
+> `gramine-sgx`：单实例运行 `d4-enclave-20261013T0530Z` 三个进程共享一个
+> MRENCLAVE，三实例运行 `d4-enclave-3host-20261013T052121Z` 与负例
+> `d4-enclave-negs-3host-20261013T052407Z` 每台各自签名自己的 manifest，
+> 正向与四个负例同样全过。D5 及之后仍待执行；D4 还差真实 attestation 放行，
+> 以及让三台共享同一份受测代码树（现在三份测量值不同）。
 
 ## 状态矩阵
 
 | 阶段 | 本地完成内容 | 服务器待办 |
 |---|---|---|
 | D3 | encrypted-FS mock、错误 key/epoch/篡改拒绝、Worker 固定入口、Lease + storage key 状态机、失败清理 | 真实 Gramine encrypted FS、宿主读取证明、KAS 驱动的 `K_disk_i` 放行、Worker startup/epoch/Lease 校验均已在同一实例通过；剩余镜像与 core dump 扫描（D9） |
-| D4 | 3PC RSS topology、add/mul/matmul/truncate/compare/reciprocal、固定点 adapter、1,000 组向量、MaterialLedger、mTLS policy mock | 真实 YACL/BRPC TLS 1.3、证书与 SAN/CA 校验、抓包、关闭 TLS 时 fail-closed 已在同一实例（三进程）通过；正向网格、抓包与四类 fail-closed 负例已在三台独立实例通过；剩余三个 enclave 内执行、真实 attestation 放行 |
+| D4 | 3PC RSS topology、add/mul/matmul/truncate/compare/reciprocal、固定点 adapter、1,000 组向量、MaterialLedger、mTLS policy mock | 真实 YACL/BRPC TLS 1.3、证书与 SAN/CA 校验、抓包、关闭 TLS 时 fail-closed 已在同一实例（三进程）通过；正向网格、抓包与四类 fail-closed 负例已在三台独立实例通过；三个节点也已在 `gramine-sgx` 内跑通单实例与三实例两种形态；剩余真实 attestation 放行与三方共享同一份受测代码树 |
 | D5 | secure embedding、QKV、causal attention、稳定 Softmax、A*V、残差、LayerNorm、FFN、GELU、Argmax、脱敏 trace | 三个 enclave 内执行、secure nonlinear operator、真实通信 profile |
 | D6 | Session runtime、ResultFrame、三帧一致性与篡改拒绝、KV cache、secure wipe | 真实两 token 自回归、enclave tmpfs 扫描、真实回执签名 |
 | D7 | Torch/HuggingFace 风格权重导出、模型 hash、dyadic 量化、precision plan、静态图、份额拆分/导入 | 正式英文 GPT-2（`gpt2`）权重、真实三节点模型加载和 token 生成 |

@@ -1,0 +1,8 @@
+{
+  "case": "tls-disabled",
+  "elapsed_seconds": 8.525,
+  "exit_status": 3,
+  "expected": "must not run without TLS",
+  "output_tail": "-----------------------------------------------------------------------------------------------------------------------\nGramine detected the following insecure configurations:\n\n  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)\n  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)\n  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)\n\nGramine will continue application execution, but this configuration must not be used in production!\n-----------------------------------------------------------------------------------------------------------------------\n\n[P1:T1:python3.11] warning: Unsupported system call rseq\nA122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS",
+  "verdict": "refused"
+}

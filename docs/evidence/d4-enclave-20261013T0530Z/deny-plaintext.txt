@@ -1,0 +1,8 @@
+# plaintext probe against the live SPU listeners
+
+127.0.0.1:47201 connected=True reply_bytes=0 outcome=connection_reset
+127.0.0.1:47101 connected=True reply_bytes=0 outcome=no_plaintext_reply
+127.0.0.1:47202 connected=True reply_bytes=0 outcome=connection_reset
+127.0.0.1:47102 connected=True reply_bytes=0 outcome=no_plaintext_reply
+
+verdict: refused

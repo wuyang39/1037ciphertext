@@ -1,0 +1,22 @@
+# run_id
+d4-enclave-20261013T0530Z
+
+# gramine
+gramine 1.9
+gramine-ratls-dcap 1.9
+Gramine 1.9 (0d1a4b7607592dab4c8a720c962acee3de6b4ca8)
+
+# interpreter
+Python 3.11.17
+/home/jiahao/.local/share/uv/python/cpython-3.11.17-linux-x86_64-gnu/bin/python3.11
+
+# libspu
+-rwxrwxr-x 2 jiahao jiahao 288522704 Oct 12 22:18 /home/jiahao/a122-venv311/lib/python3.11/site-packages/spu/libspu.so
+
+# sgx devices and aesmd
+crw-rw---- 1 root sgx     10, 125 Oct 13 12:19 /dev/sgx_enclave
+crw-rw---- 1 root sgx_prv 10, 126 Oct 13 12:19 /dev/sgx_provision
+active
+
+# manifest parameters
+enclave_size=4G max_threads=64 stack=2M

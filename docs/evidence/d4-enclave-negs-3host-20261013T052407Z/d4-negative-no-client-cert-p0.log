@@ -1,0 +1,151 @@
+# no-client-cert driver (P0)
+config: ~/a122-d4/three/workspace/negative/no-client-cert.json
+exit status: 3
+expected refusal: certificate
+W1013 05:26:14.292607     1     0 external/brpc~/src/bvar/default_variables.cpp:434] Fail to open /proc/self/io: No such file or directory
+E1013 05:26:14.602609     2     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.266793     3     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.266805     4     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.266871     5     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.266972     6     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.267017     7     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.268772     8     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.269423     9     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.358662    10     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.420326    12     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.421641    11     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.621950    15     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.654998    17     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:26:15.660950    16     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+F1013 05:26:21.982375     5 4294969344 external/brpc~/src/brpc/socket.cpp:1382] Check failed: err != 115 (115 vs 115). 
+#0 0x000044918c39 mlir::cf::CondBranchOp::getTrueDestOperands()
+#1 0x0000449167d7 _ZNSt11_Tuple_implILm1EJSt14default_deleteIN4mlir14RewritePatternEEEEC2IS0_IN12_GLOBAL__N_127SimplifyConstCondBranchPredEEEEOT_
+#2 0x0000447a5443 std::__equal4<>()
+#3 0x0000447a50db _ZN4mlir2OpINS_4math6PowFOpEJNS_7OpTrait11ZeroRegionsENS3_9OneResultENS3_14OneTypedResultINS_4TypeEE4ImplENS3_14ZeroSuccessorsENS3_9NOperandsILj2EE4ImplENS3_12OpInvariantsENS_19BytecodeOpInterface5TraitENS3_25SameOperandsAndResultTypeENS_5arith22ArithFastMathInterface5TraitENS_25ConditionallySpeculatable5TraitENS3_27AlwaysSpeculatableImplTraitENS_23MemoryEffectOpInterface5TraitENS_23VectorUnrollOpInterface5TraitENS3_11ElementwiseENS3_12ScalarizableENS3_12VectorizableENS3_12TensorizableENS_20InferTypeOpInterface5TraitEEE7classofEPNS_9OperationE
+#4 0x0000447ab719 _ZSt7none_ofIN4llvm6detail27indexed_accessor_range_baseIN4mlir12OperandRangeEPNS3_9OpOperandENS3_5ValueES7_S7_E8iteratorEZNS3_6detail32DestinationStyleOpInterfaceTraitINS3_6linalg14Conv1DNwcWcfOpEE22hasPureTensorSemanticsEvEUlS7_E_EbT_SG_T0_
+#5 0x0000447abbc0 _ZSt7none_ofIN4llvm6detail27indexed_accessor_range_baseIN4mlir12OperandRangeEPNS3_9OpOperandENS3_5ValueES7_S7_E8iteratorEZNS3_6detail32DestinationStyleOpInterfaceTraitINS3_6linalg17Conv2DNhwcHwcfQOpEE22hasPureTensorSemanticsEvEUlS7_E0_EbT_SG_T0_
+#6 0x0000447bbc66 _ZSt7find_ifIN4llvm6detail27indexed_accessor_range_baseIN4mlir12OperandRangeEPNS3_9OpOperandENS3_5ValueES7_S7_E8iteratorEZNS3_6detail32DestinationStyleOpInterfaceTraitINS3_6linalg18MatmulTransposeBOpEE22hasPureTensorSemanticsEvEUlS7_E0_ET_SG_SG_T0_
+#7 0x0000447bcff8 _ZSt7find_ifIN4llvm6detail27indexed_accessor_range_baseIN4mlir12OperandRangeEPNS3_9OpOperandENS3_5ValueES7_S7_E8iteratorEZNS3_6detail32DestinationStyleOpInterfaceTraitINS3_6linalg25DepthwiseConv2DNhwcHwcmOpEE22hasPureTensorSemanticsEvEUlS7_E_ET_SG_SG_T0_
+#8 0x0000448568a8 _ZN4mlir2OpINS_4math7FloorOpEJNS_7OpTrait11ZeroRegionsENS3_9OneResultENS3_14OneTypedResultINS_4TypeEE4ImplENS3_14ZeroSuccessorsENS3_10OneOperandENS3_12OpInvariantsENS_19BytecodeOpInterface5TraitENS3_25SameOperandsAndResultTypeENS_5arith22ArithFastMathInterface5TraitENS_25ConditionallySpeculatable5TraitENS3_27AlwaysSpeculatableImplTraitENS_23MemoryEffectOpInterface5TraitENS_23VectorUnrollOpInterface5TraitENS3_11ElementwiseENS3_12ScalarizableENS3_12VectorizableENS3_12TensorizableENS_20InferTypeOpInterface5TraitEEE22verifyRegionInvariantsEPNS_9OperationE
+#9 0x000044831461 mlir::arith::detail::ArithFastMathInterfaceTrait<>::getFastMathFlagsAttr()
+
+[2026-10-13 05:27:17.443] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+[2026-10-13 05:27:17.444] [warning] [channel.h:163] Channel destructor is called before WaitLinkTaskFinish, try stop send thread
+A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: 
+	[external/yacl~/yacl/link/context.cc:194] connect to mesh failed, failed to setup connection to rank=1
+stacktrace: 
+#0 yacl::link::Context::ConnectToMesh()+0x445930b9
+#1 spu::BindLink()::{lambda()#18}::operator()()+0x4046d487
+#2 pybind11::detail::argument_loader<>::call_impl<>()+0x4048845f
+#3 pybind11::detail::argument_loader<>::call<>()+0x40484f11
+#4 pybind11::cpp_function::initialize<>()::{lambda()#3}::operator()()+0x4047e171
+#5 pybind11::cpp_function::initialize<>()::{lambda()#3}::_FUN()+0x4047e205
+#6 pybind11::cpp_function::dispatcher()+0x404a08ef
+#7 cfunction_call+0x4942d8f5
+#8 _PyEval_EvalFrameDefault+0x4949ed6c
+#9 _PyEval_Vector+0x49475ff6
+#10 builtin_exec+0x495ba86b
+#11 cfunction_vectorcall_FASTCALL_KEYWORDS+0x4942d36b
+#12 _PyEval_EvalFrameDefault+0x4949e9a9
+#13 _PyFunction_Vectorcall+0x494001f9
+#14 pymain_run_module+0x495f962a
+#15 Py_RunMain+0x495f8e47
+
+
+
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+warning: Could not set up Invariant TSC (CPU is too old or you run on a VM that does not expose corresponding CPUID leaves). This degrades performance.
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+[P1:T1:python3.11] warning: Unsupported system call rseq
+[P1:T1:python3.11] warning: Unsupported system call clone3
+[P1:T1:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call prctl
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T3:python3.11] warning: Unsupported system call prctl
+[P1:T4:python3.11] warning: Unsupported system call prctl
+[P1:T5:python3.11] warning: Unsupported system call prctl
+[P1:T6:python3.11] warning: Unsupported system call prctl
+[P1:T7:python3.11] warning: Unsupported system call prctl
+[P1:T8:python3.11] warning: Unsupported system call prctl
+[P1:T9:python3.11] warning: Unsupported system call prctl
+[P1:T10:python3.11] warning: Unsupported system call prctl
+[P1:T12:python3.11] warning: Unsupported system call prctl
+[P1:T11:python3.11] warning: Unsupported system call prctl
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T15:python3.11] warning: Unsupported system call prctl
+[P1:T17:python3.11] warning: Unsupported system call prctl
+[P1:T16:python3.11] warning: Unsupported system call prctl
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG

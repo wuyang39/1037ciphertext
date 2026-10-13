@@ -1,0 +1,44 @@
+{
+  "all_listeners_connected": true,
+  "any_plaintext_service": false,
+  "driver": "P0",
+  "marker": "A1-22-PLAINTEXT-PROBE",
+  "probes": [
+    {
+      "connected": true,
+      "host": "172.27.172.202",
+      "listener": "brpc",
+      "outcome": "no_plaintext_reply",
+      "port": 47101,
+      "reply_bytes": 0,
+      "role": "P1"
+    },
+    {
+      "connected": true,
+      "host": "172.27.172.202",
+      "listener": "share",
+      "outcome": "connection_reset",
+      "port": 47201,
+      "reply_bytes": 0,
+      "role": "P1"
+    },
+    {
+      "connected": true,
+      "host": "172.27.172.203",
+      "listener": "brpc",
+      "outcome": "no_plaintext_reply",
+      "port": 47102,
+      "reply_bytes": 0,
+      "role": "P2"
+    },
+    {
+      "connected": true,
+      "host": "172.27.172.203",
+      "listener": "share",
+      "outcome": "connection_reset",
+      "port": 47202,
+      "reply_bytes": 0,
+      "role": "P2"
+    }
+  ]
+}

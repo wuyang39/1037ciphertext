@@ -1,0 +1,165 @@
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+warning: Could not set up Invariant TSC (CPU is too old or you run on a VM that does not expose corresponding CPUID leaves). This degrades performance.
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+[P1:T1:python3.11] warning: Unsupported system call rseq
+[P1:T1:python3.11] warning: Unsupported system call clone3
+W1013 05:22:32.981922     1     0 external/brpc~/src/bvar/default_variables.cpp:434] Fail to open /proc/self/io: No such file or directory
+[P1:T1:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call prctl
+E1013 05:22:33.227803     2     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T3:python3.11] warning: Unsupported system call prctl
+[P1:T4:python3.11] warning: Unsupported system call prctl
+[P1:T5:python3.11] warning: Unsupported system call prctl
+E1013 05:22:33.956177     3     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:22:33.956177     4     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T6:python3.11] warning: Unsupported system call prctl
+[P1:T7:python3.11] warning: Unsupported system call prctl
+E1013 05:22:33.956298     6     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:22:33.956323     7     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T8:python3.11] warning: Unsupported system call prctl
+[P1:T9:python3.11] warning: Unsupported system call prctl
+E1013 05:22:33.956585     8     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:22:33.956612     9     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T11:python3.11] warning: Unsupported system call prctl
+E1013 05:22:33.956682    11     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+E1013 05:22:33.956220     5     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T12:python3.11] warning: Unsupported system call prctl
+E1013 05:22:33.965154    12     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T10:python3.11] warning: Unsupported system call prctl
+E1013 05:22:33.967257    10     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T15:python3.11] warning: Unsupported system call prctl
+E1013 05:22:34.175077    15     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+A122-D4-NODE-READY {"identity_sha256": "513cfc56e545e0e792cbbb359d691febcb51407d996c1549bf083072b7ecdb9c", "link_seconds": 5.411, "partition_id": "a122-d4-d4-enclave-3host-20261013T052121Z", "peer_certificates": {"P1": "93c7c7824ec3bdff2f8a36447a62f99fbcbb9137763b5957755934667efab754", "P2": "aa932638b501895746f303f3a61b4885651ec893ad21499a53f50355aa73a999"}, "rank": 0, "role": "P0", "run_id": "d4-enclave-3host-20261013T052121Z", "share_port": null, "tls": {"client_verify_depth": 4, "enable_ssl": true, "min_version": "TLS1.3", "require_client_certificate": true, "server_verify_depth": 4}}
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T17:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T17:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T17:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T17:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T17:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T16:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 1/16 vectors=64 passed=64 failed=0
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 2/16 vectors=64 passed=64 failed=0
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 3/16 vectors=64 passed=64 failed=0
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 4/16 vectors=64 passed=64 failed=0
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 5/16 vectors=64 passed=64 failed=0
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 6/16 vectors=64 passed=64 failed=0
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 7/16 vectors=64 passed=64 failed=0
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 8/16 vectors=64 passed=64 failed=0
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 9/16 vectors=64 passed=64 failed=0
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 10/16 vectors=64 passed=64 failed=0
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 11/16 vectors=64 passed=64 failed=0
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 12/16 vectors=64 passed=64 failed=0
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 13/16 vectors=64 passed=64 failed=0
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 14/16 vectors=64 passed=64 failed=0
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 15/16 vectors=64 passed=64 failed=0
+[P1:T22:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+batch 16/16 vectors=64 passed=64 failed=0
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T23:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T23:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T23:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T23:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+A122-D4-NODE-DONE P0
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG

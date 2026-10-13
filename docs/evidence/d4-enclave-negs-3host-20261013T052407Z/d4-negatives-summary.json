@@ -1,0 +1,177 @@
+{
+  "all_refused": true,
+  "cases": {
+    "no-client-cert": {
+      "case": "no-client-cert",
+      "elapsed_seconds": 76.172,
+      "exit_status": 3,
+      "expected": "certificate",
+      "output_tail": "[P1:T2:python3.11] warning: Unsupported system call getrusage\n[P1:T2:python3.11] warning: Unsupported system call getrusage\n[P1:T2:python3.11] warning: Unsupported system call getrusage\n[P1:T2:python3.11] warning: Unsupported system call getrusage\n[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag\n[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG\n[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag\n[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG",
+      "peers": {
+        "P1": {
+          "bytes": 2227,
+          "reported_failure": false
+        },
+        "P2": {
+          "bytes": 2227,
+          "reported_failure": false
+        }
+      },
+      "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: ",
+      "verdict": "refused"
+    },
+    "tls-disabled": {
+      "case": "tls-disabled",
+      "elapsed_seconds": 8.063,
+      "exit_status": 3,
+      "expected": "must not run without TLS",
+      "output_tail": "  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)\n  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)\n  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)\n\nGramine will continue application execution, but this configuration must not be used in production!\n-----------------------------------------------------------------------------------------------------------------------\n\n[P1:T1:python3.11] warning: Unsupported system call rseq",
+      "peers": {
+        "P1": {
+          "bytes": 1002,
+          "reported_failure": false
+        },
+        "P2": {
+          "bytes": 1002,
+          "reported_failure": false
+        }
+      },
+      "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS",
+      "verdict": "refused"
+    },
+    "wrong-ca": {
+      "case": "wrong-ca",
+      "elapsed_seconds": 8.063,
+      "exit_status": 3,
+      "expected": "was not signed by the KAS CA",
+      "output_tail": "  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)\n  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)\n  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)\n\nGramine will continue application execution, but this configuration must not be used in production!\n-----------------------------------------------------------------------------------------------------------------------\n\n[P1:T1:python3.11] warning: Unsupported system call rseq",
+      "peers": {
+        "P1": {
+          "bytes": 1002,
+          "reported_failure": false
+        },
+        "P2": {
+          "bytes": 1002,
+          "reported_failure": false
+        }
+      },
+      "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA",
+      "verdict": "refused"
+    },
+    "wrong-san": {
+      "case": "wrong-san",
+      "elapsed_seconds": 8.25,
+      "exit_status": 3,
+      "expected": "SAN does not match its role",
+      "output_tail": "  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)\n  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)\n  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)\n\nGramine will continue application execution, but this configuration must not be used in production!\n-----------------------------------------------------------------------------------------------------------------------\n\n[P1:T1:python3.11] warning: Unsupported system call rseq",
+      "peers": {
+        "P1": {
+          "bytes": 1002,
+          "reported_failure": false
+        },
+        "P2": {
+          "bytes": 1002,
+          "reported_failure": false
+        }
+      },
+      "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate SAN does not match its role",
+      "verdict": "refused"
+    }
+  },
+  "commit": "63937a045b27129f93e1dad7dd38b049cd1e9568",
+  "enclosure": {
+    "directory": "/home/jiahao/a122-enclave/d4-enclave-negs-3host-20261013T052407Z",
+    "distinct_measurements": 3,
+    "enclave_size": "4G",
+    "manifest_sha256": {
+      "P0": "cb541be77d42adec8a6bd7f70dc17a1c0a01ddc135d23204701c5f877c6d7982",
+      "P1": "c18c69829e0820153e134e4818b930e0e7a118929b685c5a52c70ef323bed2b6",
+      "P2": "c4c583478325b55c80fc7eb9fb7c5beb3c95537efb68c3d4c5851dc38dd9fc01"
+    },
+    "max_threads": 64,
+    "measurements": {
+      "P0": "2c7131100e0a57af7f08b6bb44413703564b6aa7629ef62b91d6166711ee3829",
+      "P1": "2aada0026f43f79a77ae46264905f50164e6fd5602e4a958d8620deb3e314d89",
+      "P2": "ecb6c36aeb45a4dd6e36d1423783fe42857a6d6b0d46abd9abf84ae47b8284d9"
+    },
+    "shared_measurement": false,
+    "stack_size": "2M",
+    "template": "spu_node.manifest.template",
+    "wrapper": [
+      "gramine-sgx",
+      "/home/jiahao/a122-enclave/d4-enclave-negs-3host-20261013T052407Z/spu_node"
+    ]
+  },
+  "mode": "three-instances-negatives",
+  "phase": "D4",
+  "plaintext_probes": {
+    "all_listeners_connected": true,
+    "any_plaintext_service": false,
+    "driver": "P0",
+    "marker": "A1-22-PLAINTEXT-PROBE",
+    "probes": [
+      {
+        "connected": true,
+        "host": "172.27.172.202",
+        "listener": "brpc",
+        "outcome": "no_plaintext_reply",
+        "port": 47101,
+        "reply_bytes": 0,
+        "role": "P1"
+      },
+      {
+        "connected": true,
+        "host": "172.27.172.202",
+        "listener": "share",
+        "outcome": "connection_reset",
+        "port": 47201,
+        "reply_bytes": 0,
+        "role": "P1"
+      },
+      {
+        "connected": true,
+        "host": "172.27.172.203",
+        "listener": "brpc",
+        "outcome": "no_plaintext_reply",
+        "port": 47102,
+        "reply_bytes": 0,
+        "role": "P2"
+      },
+      {
+        "connected": true,
+        "host": "172.27.172.203",
+        "listener": "share",
+        "outcome": "connection_reset",
+        "port": 47202,
+        "reply_bytes": 0,
+        "role": "P2"
+      }
+    ]
+  },
+  "roles": {
+    "P0": {
+      "brpc_port": 47100,
+      "instance_id": "iZuf6bjvfplpwleemaipwmZ",
+      "private_address": "172.27.172.201",
+      "public_address": "106.14.207.224",
+      "share_port": 47200
+    },
+    "P1": {
+      "brpc_port": 47101,
+      "instance_id": "iZuf6bd6qnhgtveg5khyf1Z",
+      "private_address": "172.27.172.202",
+      "public_address": "47.117.34.67",
+      "share_port": 47201
+    },
+    "P2": {
+      "brpc_port": 47102,
+      "instance_id": "iZuf6bd6qnhgtveg5khygdZ",
+      "private_address": "172.27.172.203",
+      "public_address": "47.116.200.143",
+      "share_port": 47202
+    }
+  },
+  "run_id": "d4-enclave-negs-3host-20261013T052407Z",
+  "unexpected_cases": [],
+  "workspace": "~/a122-d4/three/workspace"
+}

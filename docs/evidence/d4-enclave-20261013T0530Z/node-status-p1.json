@@ -1,0 +1,13 @@
+{
+  "batches_served": 16,
+  "identity_sha256": "9d12d7dd7a892de5ac38746fd82c44235be68fce8a11f6639079861e0237a993",
+  "link_seconds": 6.137,
+  "peer_certificates": {
+    "P0": "00641232b6d16516fa6d1f9727e9bd775dc7cb7ff5d561c7091ea7addd1c9159",
+    "P2": "9900788b2d651463d6cf1db59872bc081c84181cf4d92ee469b378f2ee0779a9"
+  },
+  "role": "P1",
+  "run_id": "d4-enclave-20261013T0530Z",
+  "teardown_finished": true,
+  "verdicts": "served"
+}

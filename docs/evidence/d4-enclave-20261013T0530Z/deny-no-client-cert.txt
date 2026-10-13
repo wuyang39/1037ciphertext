@@ -1,0 +1,18 @@
+# case: no-client-cert
+expected refusal: certificate
+verdict: refused
+exit status: 3
+elapsed seconds: 94.562
+
+#4 pybind11::cpp_function::initialize<>()::{lambda()#3}::operator()()+0x33872171
+#5 pybind11::cpp_function::initialize<>()::{lambda()#3}::_FUN()+0x33872205
+#6 pybind11::cpp_function::dispatcher()+0x338948ef
+#7 cfunction_call+0x3c8148f5
+#8 _PyEval_EvalFrameDefault+0x3c885d6c
+#9 _PyEval_Vector+0x3c85cff6
+#10 builtin_exec+0x3c9a186b
+#11 cfunction_vectorcall_FASTCALL_KEYWORDS+0x3c81436b
+#12 _PyEval_EvalFrameDefault+0x3c8859a9
+#13 _PyFunction_Vectorcall+0x3c7e71f9
+#14 pymain_run_module+0x3c9e062a
+#15 Py_RunMain+0x3c9dfe47

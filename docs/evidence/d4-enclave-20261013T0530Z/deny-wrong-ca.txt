@@ -1,0 +1,18 @@
+# case: wrong-ca
+expected refusal: was not signed by the KAS CA
+verdict: refused
+exit status: 3
+elapsed seconds: 8.575
+
+Gramine detected the following insecure configurations:
+
+  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+[P1:T1:python3.11] warning: Unsupported system call rseq
+[P1:T1:python3.11] warning: Unsupported system call mremap
+A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA

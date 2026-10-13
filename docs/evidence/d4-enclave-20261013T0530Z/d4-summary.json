@@ -1,0 +1,5036 @@
+{
+  "capture": {
+    "application_data_records": 184339,
+    "capture": "tls-pcap.pcap",
+    "capture_complete": true,
+    "ciphertext_only": true,
+    "expected_ports": [
+      47100,
+      47101,
+      47102,
+      47200,
+      47201,
+      47202
+    ],
+    "expected_probe_bytes": 92,
+    "flows": [
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47100,
+          "dst": "127.0.0.1",
+          "sport": 41370,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 0,
+        "flow": {
+          "dport": 41370,
+          "dst": "127.0.0.1",
+          "sport": 47100,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47100,
+          "dst": "127.0.0.1",
+          "sport": 41372,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 0,
+        "flow": {
+          "dport": 41372,
+          "dst": "127.0.0.1",
+          "sport": 47100,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 42710,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 0,
+        "flow": {
+          "dport": 42710,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2053,
+        "connections": 1,
+        "flow": {
+          "dport": 47100,
+          "dst": "127.0.0.1",
+          "sport": 41374,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 8,
+        "payload_bytes": 2053,
+        "record_types": {
+          "application_data": 3,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2075,
+        "connections": 1,
+        "flow": {
+          "dport": 41374,
+          "dst": "127.0.0.1",
+          "sport": 47100,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 7,
+        "payload_bytes": 2075,
+        "record_types": {
+          "application_data": 6,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 60094,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 0,
+        "flow": {
+          "dport": 60094,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 60096,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 0,
+        "flow": {
+          "dport": 60096,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 33507611,
+        "connections": 1,
+        "flow": {
+          "dport": 47100,
+          "dst": "127.0.0.1",
+          "sport": 38564,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 9687,
+        "payload_bytes": 33507611,
+        "record_types": {
+          "application_data": 17284,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 4619,
+        "retransmitted_packets": 16,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 481884,
+        "connections": 1,
+        "flow": {
+          "dport": 38564,
+          "dst": "127.0.0.1",
+          "sport": 47100,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 8452,
+        "payload_bytes": 481884,
+        "record_types": {
+          "application_data": 13343,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 504,
+        "retransmitted_packets": 7,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 60098,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 0,
+        "flow": {
+          "dport": 60098,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 60100,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 0,
+        "flow": {
+          "dport": 60100,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 1,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 33507270,
+        "connections": 1,
+        "flow": {
+          "dport": 47100,
+          "dst": "127.0.0.1",
+          "sport": 38572,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 9742,
+        "payload_bytes": 33507270,
+        "record_types": {
+          "application_data": 17275,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 3976,
+        "retransmitted_packets": 13,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 481992,
+        "connections": 1,
+        "flow": {
+          "dport": 38572,
+          "dst": "127.0.0.1",
+          "sport": 47100,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 8480,
+        "payload_bytes": 481992,
+        "record_types": {
+          "application_data": 13341,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 216,
+        "retransmitted_packets": 3,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2052,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 60110,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 8,
+        "payload_bytes": 2052,
+        "record_types": {
+          "application_data": 3,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2076,
+        "connections": 1,
+        "flow": {
+          "dport": 60110,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 7,
+        "payload_bytes": 2076,
+        "record_types": {
+          "application_data": 6,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 33520392,
+        "connections": 1,
+        "flow": {
+          "dport": 47102,
+          "dst": "127.0.0.1",
+          "sport": 33004,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 9822,
+        "payload_bytes": 33520392,
+        "record_types": {
+          "application_data": 17271,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 17383,
+        "retransmitted_packets": 31,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 482163,
+        "connections": 1,
+        "flow": {
+          "dport": 33004,
+          "dst": "127.0.0.1",
+          "sport": 47102,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 8487,
+        "payload_bytes": 482163,
+        "record_types": {
+          "application_data": 13340,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 431,
+        "retransmitted_packets": 6,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2053,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 60124,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 9,
+        "payload_bytes": 2053,
+        "record_types": {
+          "application_data": 3,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2077,
+        "connections": 1,
+        "flow": {
+          "dport": 60124,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 6,
+        "payload_bytes": 2077,
+        "record_types": {
+          "application_data": 6,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 33517276,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 60138,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 9779,
+        "payload_bytes": 33517276,
+        "record_types": {
+          "application_data": 17268,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 14712,
+        "retransmitted_packets": 24,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 481599,
+        "connections": 1,
+        "flow": {
+          "dport": 60138,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 8465,
+        "payload_bytes": 481599,
+        "record_types": {
+          "application_data": 13341,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 286,
+        "retransmitted_packets": 4,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 33502262,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 54362,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 10076,
+        "payload_bytes": 33502262,
+        "record_types": {
+          "application_data": 17271,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 13310,
+        "retransmitted_packets": 17,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 481467,
+        "connections": 1,
+        "flow": {
+          "dport": 54362,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 8646,
+        "payload_bytes": 481467,
+        "record_types": {
+          "application_data": 13344,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 432,
+        "retransmitted_packets": 6,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 33511866,
+        "connections": 1,
+        "flow": {
+          "dport": 47102,
+          "dst": "127.0.0.1",
+          "sport": 54298,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304",
+          "0x0303",
+          "0x0304",
+          "0x0303"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 9803,
+        "payload_bytes": 33511866,
+        "record_types": {
+          "application_data": 17267,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 22901,
+        "retransmitted_packets": 23,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 481441,
+        "connections": 1,
+        "flow": {
+          "dport": 54298,
+          "dst": "127.0.0.1",
+          "sport": 47102,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 2
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 8433,
+        "payload_bytes": 481441,
+        "record_types": {
+          "application_data": 13341,
+          "change_cipher_spec": 1,
+          "handshake": 2
+        },
+        "retransmitted_bytes": 430,
+        "retransmitted_packets": 6,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 23,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34134,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 23,
+        "malformed_prefix": "41312d32322d504c41494e544558542d50524f42450d0a",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 3,
+        "payload_bytes": 23,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 34134,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 3,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 23,
+        "connections": 1,
+        "flow": {
+          "dport": 47101,
+          "dst": "127.0.0.1",
+          "sport": 54370,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 23,
+        "malformed_prefix": "41312d32322d504c41494e544558542d50524f42450d0a",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 5,
+        "payload_bytes": 23,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 54370,
+          "dst": "127.0.0.1",
+          "sport": 47101,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 3,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34146,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 4,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [
+          562
+        ],
+        "bytes": 7,
+        "connections": 1,
+        "flow": {
+          "dport": 34146,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 2,
+        "payload_bytes": 7,
+        "record_types": {
+          "alert": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39850,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 4,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [
+          562
+        ],
+        "bytes": 7,
+        "connections": 1,
+        "flow": {
+          "dport": 39850,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 2,
+        "payload_bytes": 7,
+        "record_types": {
+          "alert": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2520,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34160,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 10,
+        "payload_bytes": 2520,
+        "record_types": {
+          "application_data": 4,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 3876,
+        "connections": 1,
+        "flow": {
+          "dport": 34160,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 7,
+        "payload_bytes": 3876,
+        "record_types": {
+          "application_data": 9,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2521,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39858,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 10,
+        "payload_bytes": 2521,
+        "record_types": {
+          "application_data": 4,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 3861,
+        "connections": 1,
+        "flow": {
+          "dport": 39858,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 7,
+        "payload_bytes": 3861,
+        "record_types": {
+          "application_data": 9,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24590,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34164,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 24590,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 34164,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 10,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24590,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39874,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24590,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70099,
+        "connections": 1,
+        "flow": {
+          "dport": 39874,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70099,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34172,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70101,
+        "connections": 1,
+        "flow": {
+          "dport": 34172,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70101,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39880,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 39880,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39892,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 39892,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34186,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 34186,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39898,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70084,
+        "connections": 1,
+        "flow": {
+          "dport": 39898,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70084,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70102,
+        "connections": 1,
+        "flow": {
+          "dport": 34202,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70102,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 23,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39906,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 23,
+        "malformed_prefix": "41312d32322d504c41494e544558542d50524f42450d0a",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 3,
+        "payload_bytes": 23,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 39906,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 3,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 23,
+        "connections": 1,
+        "flow": {
+          "dport": 47102,
+          "dst": "127.0.0.1",
+          "sport": 54312,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 23,
+        "malformed_prefix": "41312d32322d504c41494e544558542d50524f42450d0a",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 5,
+        "payload_bytes": 23,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 0,
+        "connections": 1,
+        "flow": {
+          "dport": 54312,
+          "dst": "127.0.0.1",
+          "sport": 47102,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {},
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 3,
+        "payload_bytes": 0,
+        "record_types": {},
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39910,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 39910,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34210,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70069,
+        "connections": 1,
+        "flow": {
+          "dport": 34210,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70069,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24590,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39920,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24590,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70086,
+        "connections": 1,
+        "flow": {
+          "dport": 39920,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70086,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34212,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 34212,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34222,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70068,
+        "connections": 1,
+        "flow": {
+          "dport": 34222,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70068,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39932,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 39932,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39938,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34232,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70086,
+        "connections": 1,
+        "flow": {
+          "dport": 34232,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70086,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 39938,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 10,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 34234,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 39948,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70101,
+        "connections": 1,
+        "flow": {
+          "dport": 39948,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70101,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70086,
+        "connections": 1,
+        "flow": {
+          "dport": 34234,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70086,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24590,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 45782,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24590,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 36378,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70084,
+        "connections": 1,
+        "flow": {
+          "dport": 45782,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70084,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70070,
+        "connections": 1,
+        "flow": {
+          "dport": 36378,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70070,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 36384,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70087,
+        "connections": 1,
+        "flow": {
+          "dport": 36384,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70087,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 45786,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70103,
+        "connections": 1,
+        "flow": {
+          "dport": 45786,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70103,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24591,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 36398,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24591,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70102,
+        "connections": 1,
+        "flow": {
+          "dport": 36398,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70102,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 45796,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70085,
+        "connections": 1,
+        "flow": {
+          "dport": 45796,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70085,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24593,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 45804,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24593,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70086,
+        "connections": 1,
+        "flow": {
+          "dport": 45804,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70086,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 36406,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70102,
+        "connections": 1,
+        "flow": {
+          "dport": 36406,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70102,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 45818,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70102,
+        "connections": 1,
+        "flow": {
+          "dport": 45818,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70102,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 36412,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70087,
+        "connections": 1,
+        "flow": {
+          "dport": 36412,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70087,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 36420,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24593,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 45820,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24593,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70102,
+        "connections": 1,
+        "flow": {
+          "dport": 36420,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70102,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70087,
+        "connections": 1,
+        "flow": {
+          "dport": 45820,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70087,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24593,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 45828,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24593,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 24592,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 36430,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 14,
+        "payload_bytes": 24592,
+        "record_types": {
+          "application_data": 5,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70071,
+        "connections": 1,
+        "flow": {
+          "dport": 45828,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70071,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 70086,
+        "connections": 1,
+        "flow": {
+          "dport": 36430,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 11,
+        "payload_bytes": 70086,
+        "record_types": {
+          "application_data": 13,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2525,
+        "connections": 1,
+        "flow": {
+          "dport": 47201,
+          "dst": "127.0.0.1",
+          "sport": 36438,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 8,
+        "payload_bytes": 2525,
+        "record_types": {
+          "application_data": 4,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 3794,
+        "connections": 1,
+        "flow": {
+          "dport": 36438,
+          "dst": "127.0.0.1",
+          "sport": 47201,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 7,
+        "payload_bytes": 3794,
+        "record_types": {
+          "application_data": 8,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 2524,
+        "connections": 1,
+        "flow": {
+          "dport": 47202,
+          "dst": "127.0.0.1",
+          "sport": 45834,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "client_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": null,
+        "offered_versions": [
+          "0x0304"
+        ],
+        "out_of_order_packets": 0,
+        "packets": 8,
+        "payload_bytes": 2524,
+        "record_types": {
+          "application_data": 4,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      },
+      {
+        "alerts": [],
+        "bytes": 3826,
+        "connections": 1,
+        "flow": {
+          "dport": 45834,
+          "dst": "127.0.0.1",
+          "sport": 47202,
+          "src": "127.0.0.1"
+        },
+        "gap_packets": 0,
+        "handshake_types": {
+          "server_hello": 1
+        },
+        "malformed_bytes": 0,
+        "malformed_prefix": "",
+        "negotiated_version": "0x0304",
+        "offered_versions": [],
+        "out_of_order_packets": 0,
+        "packets": 7,
+        "payload_bytes": 3826,
+        "record_types": {
+          "application_data": 8,
+          "change_cipher_spec": 1,
+          "handshake": 1
+        },
+        "retransmitted_bytes": 0,
+        "retransmitted_packets": 0,
+        "unreassembled_bytes": 0
+      }
+    ],
+    "gap_packets": 0,
+    "handshake_messages": 108,
+    "non_tls_payload_bytes": 0,
+    "out_of_order_packets": 0,
+    "packets_on_expected_ports": 110824,
+    "probe_endpoints": [
+      "127.0.0.1:47101",
+      "127.0.0.1:47102",
+      "127.0.0.1:47201",
+      "127.0.0.1:47202"
+    ],
+    "probe_marker": "41312d32322d504c41494e544558542d50524f42450d0a",
+    "retransmitted_bytes": 79200,
+    "retransmitted_packets": 156,
+    "sessions": {
+      "count": 58,
+      "sessions": [
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              41370,
+              "127.0.0.1",
+              47100
+            ],
+            [
+              "127.0.0.1",
+              47100,
+              "127.0.0.1",
+              41370
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              41372,
+              "127.0.0.1",
+              47100
+            ],
+            [
+              "127.0.0.1",
+              47100,
+              "127.0.0.1",
+              41372
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              42710,
+              "127.0.0.1",
+              47101
+            ],
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              42710
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              41374,
+              "127.0.0.1",
+              47100
+            ],
+            [
+              "127.0.0.1",
+              47100,
+              "127.0.0.1",
+              41374
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              60094
+            ],
+            [
+              "127.0.0.1",
+              60094,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              60096
+            ],
+            [
+              "127.0.0.1",
+              60096,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              38564,
+              "127.0.0.1",
+              47100
+            ],
+            [
+              "127.0.0.1",
+              47100,
+              "127.0.0.1",
+              38564
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              60098
+            ],
+            [
+              "127.0.0.1",
+              60098,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              60100
+            ],
+            [
+              "127.0.0.1",
+              60100,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              38572,
+              "127.0.0.1",
+              47100
+            ],
+            [
+              "127.0.0.1",
+              47100,
+              "127.0.0.1",
+              38572
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              60110
+            ],
+            [
+              "127.0.0.1",
+              60110,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              33004,
+              "127.0.0.1",
+              47102
+            ],
+            [
+              "127.0.0.1",
+              47102,
+              "127.0.0.1",
+              33004
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              60124
+            ],
+            [
+              "127.0.0.1",
+              60124,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              60138
+            ],
+            [
+              "127.0.0.1",
+              60138,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              54362
+            ],
+            [
+              "127.0.0.1",
+              54362,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47102,
+              "127.0.0.1",
+              54298
+            ],
+            [
+              "127.0.0.1",
+              54298,
+              "127.0.0.1",
+              47102
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0303",
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34134,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34134
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47101,
+              "127.0.0.1",
+              54370
+            ],
+            [
+              "127.0.0.1",
+              54370,
+              "127.0.0.1",
+              47101
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34146,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34146
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39850,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39850
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34160,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34160
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39858,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39858
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34164,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34164
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39874,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39874
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34172,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34172
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39880,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39880
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39892,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39892
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34186,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34186
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34202,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34202
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39898,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39898
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39906,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39906
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              47102,
+              "127.0.0.1",
+              54312
+            ],
+            [
+              "127.0.0.1",
+              54312,
+              "127.0.0.1",
+              47102
+            ]
+          ],
+          "handshake_types": [],
+          "negotiated_versions": [],
+          "offered_versions": [],
+          "verdict": "unclassified"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39910,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39910
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34210,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34210
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39920,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39920
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34212,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34212
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34222,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34222
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39932,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39932
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39938,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39938
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34232,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34232
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              34234,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              34234
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              39948,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              39948
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              45782,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              45782
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              36378,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              36378
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              36384,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              36384
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              45786,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              45786
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              36398,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              36398
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              45796,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              45796
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              45804,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              45804
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              36406,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              36406
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              45818,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              45818
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              36412,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              36412
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              36420,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              36420
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              45820,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              45820
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              45828,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              45828
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              36430,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              36430
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              36438,
+              "127.0.0.1",
+              47201
+            ],
+            [
+              "127.0.0.1",
+              47201,
+              "127.0.0.1",
+              36438
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        },
+        {
+          "endpoints": [
+            [
+              "127.0.0.1",
+              45834,
+              "127.0.0.1",
+              47202
+            ],
+            [
+              "127.0.0.1",
+              47202,
+              "127.0.0.1",
+              45834
+            ]
+          ],
+          "handshake_types": [
+            "client_hello",
+            "server_hello"
+          ],
+          "negotiated_versions": [
+            "0x0304"
+          ],
+          "offered_versions": [
+            "0x0304"
+          ],
+          "verdict": "tls13"
+        }
+      ],
+      "tls12_or_lower_sessions": 0,
+      "tls13_sessions": 45
+    },
+    "tls12_or_lower_flows": 0,
+    "tls13_flows": 45,
+    "tls_only": true,
+    "unreassembled_bytes": 0,
+    "verdict": "tls13_only"
+  },
+  "certificates": {
+    "P0": "46d8286fe633f714be33848cfbb25e0c35ae0354b592ab6972610d39877e5fbd",
+    "P1": "5bc75be5bcb84d773518c0132ab0ee4465bd273327586003278361b56ebaf3c2",
+    "P2": "09c59c15490562d91c9af9a8a88eeca23314139182bbc51288c5c2303df30a6c"
+  },
+  "cloud_region": "cn-shanghai",
+  "evidence_complete": true,
+  "grid": {
+    "batch": 64,
+    "count": 1024,
+    "digest": "96b6c83502203292840fd9836f0efbe6f5fe49225aa5b110a6f2b3c27f3695d5",
+    "failed": 0,
+    "operators": [
+      "add",
+      "mul",
+      "matmul",
+      "truncate",
+      "compare",
+      "reciprocal"
+    ],
+    "passed": 1024
+  },
+  "instance_id": "iZuf6bd6qnhgtveg5khygdZ",
+  "missing_files": [],
+  "mode": "loopback",
+  "pcap_sha256": "4f770345cae217bce61e109115460936522a9263dfc759c6ca723c5a01ffd2bc",
+  "phase": "D4",
+  "required_files": [
+    "p0-cert.pem",
+    "p1-cert.pem",
+    "p2-cert.pem",
+    "tls-pcap.pcap",
+    "tls-summary.txt",
+    "rss-vectors.json",
+    "communication-trace.json",
+    "deny-plaintext.txt",
+    "deny-wrong-ca.txt",
+    "deny-wrong-san.txt",
+    "deny-no-client-cert.txt",
+    "deny-tls-disabled.txt",
+    "material-ledger.json"
+  ],
+  "run_id": "d4-enclave-20261013T0530Z",
+  "runtime": {
+    "inside_enclave": true,
+    "transport": "SPU/YACL/BRPC over TLS 1.3 inside a Gramine-SGX enclave"
+  },
+  "verdicts": {
+    "negative_cases": {
+      "no-client-cert": "refused",
+      "tls-disabled": "refused",
+      "wrong-ca": "refused",
+      "wrong-san": "refused"
+    },
+    "one_time_consumption": true,
+    "rss_vectors": "passed",
+    "tls_capture": "tls13_only"
+  }
+}

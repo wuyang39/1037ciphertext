@@ -1,0 +1,37 @@
+# no-client-cert peer P2
+the peer ran its strict configuration against the driver's
+mutated one; this is the tail of its own log when the case ended
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+warning: Could not set up Invariant TSC (CPU is too old or you run on a VM that does not expose corresponding CPUID leaves). This degrades performance.
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+[P1:T1:python3.11] warning: Unsupported system call rseq
+[P1:T1:python3.11] warning: Unsupported system call clone3
+W1013 05:26:11.895014     1     0 external/brpc~/src/bvar/default_variables.cpp:434] Fail to open /proc/self/io: No such file or directory
+[P1:T1:python3.11] warning: Unsupported system call getrusage
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/jiahao/1037ciphertext/tee/enclave/spu_node.py", line 738, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/jiahao/1037ciphertext/tee/enclave/spu_node.py", line 731, in main
+    return run_node(config)
+           ^^^^^^^^^^^^^^^^
+  File "/home/jiahao/1037ciphertext/tee/enclave/spu_node.py", line 452, in run_node
+    server = _serve_share_channel(config, holder, stop_event, served)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jiahao/1037ciphertext/tee/enclave/spu_node.py", line 337, in _serve_share_channel
+    server = TLSFrameServer(
+             ^^^^^^^^^^^^^^^
+  File "/home/jiahao/1037ciphertext/mpc/spu_backend/transport.py", line 228, in __init__
+    self._listener.bind((host, port))
+OSError: [Errno 98] Address already in use

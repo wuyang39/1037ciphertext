@@ -1,0 +1,60 @@
+{
+  "batch": 64,
+  "ca_certificate": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/pki/ca/ca-cert.pem",
+  "certificates": {
+    "P0": {
+      "certificate": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/pki/nodes/P0/P0-cert.pem",
+      "lease_expires_utc": "2026-10-14T04:47:56+00:00",
+      "san_role": "P0",
+      "sha256_pem": "46d8286fe633f714be33848cfbb25e0c35ae0354b592ab6972610d39877e5fbd"
+    },
+    "P1": {
+      "certificate": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/pki/nodes/P1/P1-cert.pem",
+      "lease_expires_utc": "2026-10-14T04:47:56+00:00",
+      "san_role": "P1",
+      "sha256_pem": "5bc75be5bcb84d773518c0132ab0ee4465bd273327586003278361b56ebaf3c2"
+    },
+    "P2": {
+      "certificate": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/pki/nodes/P2/P2-cert.pem",
+      "lease_expires_utc": "2026-10-14T04:47:56+00:00",
+      "san_role": "P2",
+      "sha256_pem": "09c59c15490562d91c9af9a8a88eeca23314139182bbc51288c5c2303df30a6c"
+    }
+  },
+  "cluster": {
+    "P0": {
+      "brpc_port": 47100,
+      "host": "127.0.0.1",
+      "share_port": 47200
+    },
+    "P1": {
+      "brpc_port": 47101,
+      "host": "127.0.0.1",
+      "share_port": 47201
+    },
+    "P2": {
+      "brpc_port": 47102,
+      "host": "127.0.0.1",
+      "share_port": 47202
+    }
+  },
+  "cols": 4,
+  "configs": {
+    "P0": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/configs/P0.json",
+    "P1": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/configs/P1.json",
+    "P2": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/configs/P2.json"
+  },
+  "grid_digest": "96b6c83502203292840fd9836f0efbe6f5fe49225aa5b110a6f2b3c27f3695d5",
+  "negative_configs": {
+    "no-client-cert": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/negative/no-client-cert.json",
+    "tls-disabled": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/negative/tls-disabled.json",
+    "wrong-ca": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/negative/wrong-ca.json",
+    "wrong-san": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/negative/wrong-san.json"
+  },
+  "rows": 4,
+  "run_id": "d4-enclave-20261013T0530Z",
+  "seed": 20261012,
+  "vector_count": 1024,
+  "vectors": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace/vectors.json",
+  "workspace": "/home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/work/d4/workspace"
+}

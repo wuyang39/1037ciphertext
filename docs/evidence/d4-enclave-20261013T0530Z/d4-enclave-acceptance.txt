@@ -1,0 +1,14 @@
+[d4] starting the capture: tcpdump -i any -s 0 -w /home/jiahao/1037ciphertext/artifacts/server/d4-enclave-20261013T0530Z/d4/tls-pcap.pcap port 47100 or port 47101 or port 47102 or port 47200 or port 47201 or port 47202
+[d4] P1 link is up inside its process
+[d4] P2 link is up inside its process
+{
+  "negative_cases": {
+    "no-client-cert": "refused",
+    "tls-disabled": "refused",
+    "wrong-ca": "refused",
+    "wrong-san": "refused"
+  },
+  "one_time_consumption": true,
+  "rss_vectors": "passed",
+  "tls_capture": "tls13_only"
+}

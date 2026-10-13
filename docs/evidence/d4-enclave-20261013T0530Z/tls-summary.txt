@@ -1,0 +1,196 @@
+# A1-22 D4 TLS capture summary
+capture: tls-pcap.pcap
+expected ports: [47100, 47101, 47102, 47200, 47201, 47202]
+packets on expected ports: 110824
+TLS 1.3 flows: 45
+TLS 1.2-or-lower flows: 0
+handshake messages: 108
+application-data records: 184339
+non-TLS payload bytes: 0
+TCP retransmissions: 156 (79200 bytes, deduplicated)
+capture gaps: 0 (unreassembled bytes: 0)
+verdict: tls13_only
+
+# deliberate plaintext probes
+probe endpoints: ['127.0.0.1:47101', '127.0.0.1:47102', '127.0.0.1:47201', '127.0.0.1:47202']
+probe marker: 41312d32322d504c41494e544558542d50524f42450d0a
+expected probe bytes: 92
+those bytes are the refused probe itself and are not a protocol leak
+
+# flows
+127.0.0.1:41370 -> 127.0.0.1:47100 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47100 -> 127.0.0.1:41370 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:41372 -> 127.0.0.1:47100 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47100 -> 127.0.0.1:41372 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:42710 -> 127.0.0.1:47101 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:42710 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:41374 -> 127.0.0.1:47100 packets=8 bytes=2053 records={'application_data': 3, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47100 -> 127.0.0.1:41374 packets=7 bytes=2075 records={'application_data': 6, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:60094 -> 127.0.0.1:47101 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:60094 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:60096 -> 127.0.0.1:47101 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:60096 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:38564 -> 127.0.0.1:47100 packets=9687 bytes=33507611 records={'application_data': 17284, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=16 non_tls_prefix=
+127.0.0.1:47100 -> 127.0.0.1:38564 packets=8452 bytes=481884 records={'application_data': 13343, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=7 non_tls_prefix=
+127.0.0.1:60098 -> 127.0.0.1:47101 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:60098 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:60100 -> 127.0.0.1:47101 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:60100 packets=1 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:38572 -> 127.0.0.1:47100 packets=9742 bytes=33507270 records={'application_data': 17275, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=13 non_tls_prefix=
+127.0.0.1:47100 -> 127.0.0.1:38572 packets=8480 bytes=481992 records={'application_data': 13341, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=3 non_tls_prefix=
+127.0.0.1:60110 -> 127.0.0.1:47101 packets=8 bytes=2052 records={'application_data': 3, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:60110 packets=7 bytes=2076 records={'application_data': 6, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:33004 -> 127.0.0.1:47102 packets=9822 bytes=33520392 records={'application_data': 17271, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=31 non_tls_prefix=
+127.0.0.1:47102 -> 127.0.0.1:33004 packets=8487 bytes=482163 records={'application_data': 13340, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=6 non_tls_prefix=
+127.0.0.1:60124 -> 127.0.0.1:47101 packets=9 bytes=2053 records={'application_data': 3, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:60124 packets=6 bytes=2077 records={'application_data': 6, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:60138 -> 127.0.0.1:47101 packets=9779 bytes=33517276 records={'application_data': 17268, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=24 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:60138 packets=8465 bytes=481599 records={'application_data': 13341, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=4 non_tls_prefix=
+127.0.0.1:54362 -> 127.0.0.1:47101 packets=10076 bytes=33502262 records={'application_data': 17271, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=17 non_tls_prefix=
+127.0.0.1:47101 -> 127.0.0.1:54362 packets=8646 bytes=481467 records={'application_data': 13344, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=6 non_tls_prefix=
+127.0.0.1:54298 -> 127.0.0.1:47102 packets=9803 bytes=33511866 records={'application_data': 17267, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'client_hello': 2} offered=['0x0304', '0x0303', '0x0304', '0x0303'] negotiated=None alerts=[] non_tls=0 retransmits=23 non_tls_prefix=
+127.0.0.1:47102 -> 127.0.0.1:54298 packets=8433 bytes=481441 records={'application_data': 13341, 'change_cipher_spec': 1, 'handshake': 2} handshakes={'server_hello': 2} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=6 non_tls_prefix=
+127.0.0.1:34134 -> 127.0.0.1:47201 packets=3 bytes=23 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=23 retransmits=0 non_tls_prefix=41312d32322d504c41494e544558542d50524f42450d0a
+127.0.0.1:47201 -> 127.0.0.1:34134 packets=3 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:54370 -> 127.0.0.1:47101 packets=5 bytes=23 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=23 retransmits=0 non_tls_prefix=41312d32322d504c41494e544558542d50524f42450d0a
+127.0.0.1:47101 -> 127.0.0.1:54370 packets=3 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34146 -> 127.0.0.1:47201 packets=4 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34146 packets=2 bytes=7 records={'alert': 1} handshakes={} offered=[] negotiated=None alerts=[562] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39850 -> 127.0.0.1:47202 packets=4 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39850 packets=2 bytes=7 records={'alert': 1} handshakes={} offered=[] negotiated=None alerts=[562] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34160 -> 127.0.0.1:47201 packets=10 bytes=2520 records={'application_data': 4, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34160 packets=7 bytes=3876 records={'application_data': 9, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39858 -> 127.0.0.1:47202 packets=10 bytes=2521 records={'application_data': 4, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39858 packets=7 bytes=3861 records={'application_data': 9, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34164 -> 127.0.0.1:47201 packets=11 bytes=24590 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34164 packets=10 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39874 -> 127.0.0.1:47202 packets=14 bytes=24590 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39874 packets=11 bytes=70099 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34172 -> 127.0.0.1:47201 packets=11 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34172 packets=11 bytes=70101 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39880 -> 127.0.0.1:47202 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39880 packets=11 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39892 -> 127.0.0.1:47202 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39892 packets=11 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34186 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34186 packets=11 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34202 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39898 -> 127.0.0.1:47202 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39898 packets=11 bytes=70084 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34202 packets=11 bytes=70102 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39906 -> 127.0.0.1:47202 packets=3 bytes=23 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=23 retransmits=0 non_tls_prefix=41312d32322d504c41494e544558542d50524f42450d0a
+127.0.0.1:47202 -> 127.0.0.1:39906 packets=3 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:54312 -> 127.0.0.1:47102 packets=5 bytes=23 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=23 retransmits=0 non_tls_prefix=41312d32322d504c41494e544558542d50524f42450d0a
+127.0.0.1:47102 -> 127.0.0.1:54312 packets=3 bytes=0 records={} handshakes={} offered=[] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39910 -> 127.0.0.1:47202 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39910 packets=11 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34210 -> 127.0.0.1:47201 packets=14 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34210 packets=11 bytes=70069 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39920 -> 127.0.0.1:47202 packets=14 bytes=24590 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39920 packets=11 bytes=70086 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34212 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34212 packets=11 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34222 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34222 packets=11 bytes=70068 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39932 -> 127.0.0.1:47202 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39932 packets=11 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39938 -> 127.0.0.1:47202 packets=11 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34232 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34232 packets=11 bytes=70086 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39938 packets=10 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:34234 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:39948 -> 127.0.0.1:47202 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:39948 packets=11 bytes=70101 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:34234 packets=11 bytes=70086 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:45782 -> 127.0.0.1:47202 packets=14 bytes=24590 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:36378 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:45782 packets=11 bytes=70084 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:36378 packets=11 bytes=70070 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:36384 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:36384 packets=11 bytes=70087 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:45786 -> 127.0.0.1:47202 packets=14 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:45786 packets=11 bytes=70103 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:36398 -> 127.0.0.1:47201 packets=14 bytes=24591 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:36398 packets=11 bytes=70102 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:45796 -> 127.0.0.1:47202 packets=14 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:45796 packets=11 bytes=70085 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:45804 -> 127.0.0.1:47202 packets=14 bytes=24593 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:45804 packets=11 bytes=70086 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:36406 -> 127.0.0.1:47201 packets=14 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:36406 packets=11 bytes=70102 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:45818 -> 127.0.0.1:47202 packets=14 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:45818 packets=11 bytes=70102 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:36412 -> 127.0.0.1:47201 packets=14 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:36412 packets=11 bytes=70087 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:36420 -> 127.0.0.1:47201 packets=14 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:45820 -> 127.0.0.1:47202 packets=14 bytes=24593 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:36420 packets=11 bytes=70102 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:45820 packets=11 bytes=70087 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:45828 -> 127.0.0.1:47202 packets=14 bytes=24593 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:36430 -> 127.0.0.1:47201 packets=14 bytes=24592 records={'application_data': 5, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:45828 packets=11 bytes=70071 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:36430 packets=11 bytes=70086 records={'application_data': 13, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:36438 -> 127.0.0.1:47201 packets=8 bytes=2525 records={'application_data': 4, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47201 -> 127.0.0.1:36438 packets=7 bytes=3794 records={'application_data': 8, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:45834 -> 127.0.0.1:47202 packets=8 bytes=2524 records={'application_data': 4, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'client_hello': 1} offered=['0x0304'] negotiated=None alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+127.0.0.1:47202 -> 127.0.0.1:45834 packets=7 bytes=3826 records={'application_data': 8, 'change_cipher_spec': 1, 'handshake': 1} handshakes={'server_hello': 1} offered=[] negotiated=0x0304 alerts=[] non_tls=0 retransmits=0 non_tls_prefix=
+
+# sessions
+['127.0.0.1', 41370, '127.0.0.1', 47100] <-> ['127.0.0.1', 47100, '127.0.0.1', 41370] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 41372, '127.0.0.1', 47100] <-> ['127.0.0.1', 47100, '127.0.0.1', 41372] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 42710, '127.0.0.1', 47101] <-> ['127.0.0.1', 47101, '127.0.0.1', 42710] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 41374, '127.0.0.1', 47100] <-> ['127.0.0.1', 47100, '127.0.0.1', 41374] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 47101, '127.0.0.1', 60094] <-> ['127.0.0.1', 60094, '127.0.0.1', 47101] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 47101, '127.0.0.1', 60096] <-> ['127.0.0.1', 60096, '127.0.0.1', 47101] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 38564, '127.0.0.1', 47100] <-> ['127.0.0.1', 47100, '127.0.0.1', 38564] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 47101, '127.0.0.1', 60098] <-> ['127.0.0.1', 60098, '127.0.0.1', 47101] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 47101, '127.0.0.1', 60100] <-> ['127.0.0.1', 60100, '127.0.0.1', 47101] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 38572, '127.0.0.1', 47100] <-> ['127.0.0.1', 47100, '127.0.0.1', 38572] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 47101, '127.0.0.1', 60110] <-> ['127.0.0.1', 60110, '127.0.0.1', 47101] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 33004, '127.0.0.1', 47102] <-> ['127.0.0.1', 47102, '127.0.0.1', 33004] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 47101, '127.0.0.1', 60124] <-> ['127.0.0.1', 60124, '127.0.0.1', 47101] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 47101, '127.0.0.1', 60138] <-> ['127.0.0.1', 60138, '127.0.0.1', 47101] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 47101, '127.0.0.1', 54362] <-> ['127.0.0.1', 54362, '127.0.0.1', 47101] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 47102, '127.0.0.1', 54298] <-> ['127.0.0.1', 54298, '127.0.0.1', 47102] offered=['0x0303', '0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34134, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34134] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 47101, '127.0.0.1', 54370] <-> ['127.0.0.1', 54370, '127.0.0.1', 47101] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 34146, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34146] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 39850, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39850] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 34160, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34160] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39858, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39858] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34164, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34164] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39874, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39874] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34172, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34172] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39880, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39880] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39892, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39892] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34186, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34186] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34202, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34202] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39898, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39898] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39906, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39906] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 47102, '127.0.0.1', 54312] <-> ['127.0.0.1', 54312, '127.0.0.1', 47102] offered=[] negotiated=[] handshakes=[] verdict=unclassified
+['127.0.0.1', 39910, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39910] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34210, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34210] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39920, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39920] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34212, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34212] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34222, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34222] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39932, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39932] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39938, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39938] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34232, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34232] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 34234, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 34234] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 39948, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 39948] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 45782, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 45782] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 36378, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 36378] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 36384, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 36384] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 45786, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 45786] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 36398, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 36398] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 45796, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 45796] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 45804, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 45804] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 36406, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 36406] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 45818, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 45818] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 36412, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 36412] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 36420, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 36420] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 45820, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 45820] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 45828, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 45828] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 36430, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 36430] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 36438, '127.0.0.1', 47201] <-> ['127.0.0.1', 47201, '127.0.0.1', 36438] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13
+['127.0.0.1', 45834, '127.0.0.1', 47202] <-> ['127.0.0.1', 47202, '127.0.0.1', 45834] offered=['0x0304'] negotiated=['0x0304'] handshakes=['client_hello', 'server_hello'] verdict=tls13

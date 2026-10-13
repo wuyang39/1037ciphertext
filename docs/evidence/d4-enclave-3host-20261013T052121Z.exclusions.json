@@ -1,0 +1,25 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "excluded": [
+    {
+      "bytes": 145054142,
+      "path": "d4-three-P0.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on iZuf6bjvfplpwleemaipwmZ under /tmp/d4-enclave-3host-20261013T052121Z-P0.pcap and only its digest and the derived summary are committed",
+      "sha256": "e20b6898c82b839af3798268210ee357bef3734e1ae714cc5d9aadca1a2ec886"
+    },
+    {
+      "bytes": 143475921,
+      "path": "d4-three-P1.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on iZuf6bd6qnhgtveg5khyf1Z under /tmp/d4-enclave-3host-20261013T052121Z-P1.pcap and only its digest and the derived summary are committed",
+      "sha256": "0adbfb1e3ea22f09b319151a94ef43dc151ca61cc87d73303c0d77470d7e55a5"
+    },
+    {
+      "bytes": 143478805,
+      "path": "d4-three-P2.pcap",
+      "reason": "GitHub rejects blobs above 100 MB; the raw capture stays on iZuf6bd6qnhgtveg5khygdZ under /tmp/d4-enclave-3host-20261013T052121Z-P2.pcap and only its digest and the derived summary are committed",
+      "sha256": "34a4a61e101c93bc9215a15a9c7854923c23937648a36b24156d3307a7ca9126"
+    }
+  ],
+  "note": "Raw artifacts too large to commit are named here. Every excluded file still has to match the sealed index if it is present, so restoring the original capture tightens the check instead of bypassing it.",
+  "run_id": "d4-enclave-3host-20261013T052121Z"
+}

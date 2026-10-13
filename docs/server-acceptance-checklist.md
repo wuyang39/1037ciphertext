@@ -60,8 +60,15 @@ Gramine 运行 `d1-20261012T1830`，证据在
 - [x] 三台独立实例上复跑四类 fail-closed 负例与明文探针。（运行
   `d4-negs-3host-20261012T154315Z`：变异方在 P0、严格方分居 P1/P2，四个负例
   均退出码 3 且理由与单实例一致，四个明文探针都建到 TCP 却拿不到业务应答）
-- [ ] 三个 `gramine-sgx` enclave 内复跑上述所有项目，并让证书来自真实
-  attestation 放行。
+- [x] 三个 `gramine-sgx` enclave 内复跑上述所有项目。（单实例运行
+  `d4-enclave-20261013T0530Z`：三个进程共享 MRENCLAVE
+  `b28084fe...`，1024 组全过、四个负例全拒、抓包 `tls13_only`、非 TLS 字节
+  0；三实例运行 `d4-enclave-3host-20261013T052121Z` 与负例
+  `d4-enclave-negs-3host-20261013T052407Z`：三台各自签名自己的 manifest，
+  正向与四个负例同样全过。三份测量值互不相同，原因见
+  [d4-acceptance.md](d4-acceptance.md) 4.8 节）
+- [ ] 证书来自真实 attestation 放行：Quote → 验证 → 签发短期身份/Lease 的
+  KAS 链路尚未实现。enclave 内执行已经跑通，缺的只是这一段。
 
 三台实例的基线已经就绪（正向运行在提交 `bcd8935`、负例运行在 `a2d8026`，
 `spu` 0.9.5、SGX 设备与 `aesmd` 正常、私网 `47100` 实测互通），见
@@ -74,10 +81,15 @@ Gramine 运行 `d1-20261012T1830`，证据在
 D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
 [docs/evidence/d4-20261012T143111Z](evidence/d4-20261012T143111Z)（单实例三进程）
 、[docs/evidence/d4-3host-20261012T152216Z](evidence/d4-3host-20261012T152216Z)
-（三实例正向）与
+（三实例正向）、
 [docs/evidence/d4-negs-3host-20261012T154315Z](evidence/d4-negs-3host-20261012T154315Z)
-（三实例负例）。链路、证书、抓包和拒绝路径是真的；`gramine-sgx` 内的执行与
-真实 attestation 放行仍未验证。
+（三实例负例），以及 2026-10-13 的三份 enclave 证据
+[docs/evidence/d4-enclave-20261013T0530Z](evidence/d4-enclave-20261013T0530Z)
+、[docs/evidence/d4-enclave-3host-20261013T052121Z](evidence/d4-enclave-3host-20261013T052121Z)
+与
+[docs/evidence/d4-enclave-negs-3host-20261013T052407Z](evidence/d4-enclave-negs-3host-20261013T052407Z)。
+链路、证书、抓包、拒绝路径和 `gramine-sgx` 内的执行都是实测；真实 attestation
+放行仍未验证。
 
 ## D7-D8 模型与指标
 
