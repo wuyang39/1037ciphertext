@@ -1,0 +1,47 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "file_count": 8,
+  "files": [
+    {
+      "bytes": 63956,
+      "path": "d7-calibration.json",
+      "sha256": "7109bdd1f4ecb6ab5d34aacbaaea1a210defefa5010fd61fcd952da27bc7de25"
+    },
+    {
+      "bytes": 1379,
+      "path": "d7-fidelity.json",
+      "sha256": "a7b47569d73c61a689c2434cafbadd7134af955ac9c119e7a3106a1a8f2ad677"
+    },
+    {
+      "bytes": 2648,
+      "path": "d7-freeze.json",
+      "sha256": "91b7ecfba0bea77a8e65c11592a2f62eaed14d2894f120fe340070542f90936b"
+    },
+    {
+      "bytes": 889,
+      "path": "d7-generation.json",
+      "sha256": "92bd5ac6785a8aaab2c11a629a19444bacb5e1788fe80209894255bad9458b8d"
+    },
+    {
+      "bytes": 6685,
+      "path": "d7-precision-plan.json",
+      "sha256": "950415f238b467f8f11d44da80bf47790d2b2bc5a77284a4f2775a0549b00fd6"
+    },
+    {
+      "bytes": 9321,
+      "path": "d7-run.json",
+      "sha256": "86a7dcd07f401462079d4e14d821f8d8451508ddbed94d206ccd4663c37ab3e0"
+    },
+    {
+      "bytes": 12331,
+      "path": "d7-summary.json",
+      "sha256": "61a1954879fce4a794fb8a0ff2acbf6d97f0b4d6215246ebe7bb04447f646a2e"
+    },
+    {
+      "bytes": 520,
+      "path": "README.md",
+      "sha256": "f9487f14e4f449a7f2356a8843ec1b3ee8f9830bc2706a447729a256b7476fc6"
+    }
+  ],
+  "root": "d7-local-model-20261013T1900Z"
+}

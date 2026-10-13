@@ -1,0 +1,40 @@
+{
+  "prompt": "the cipher key is secret",
+  "prompt_tokens": [
+    1169,
+    38012,
+    1994,
+    318,
+    3200
+  ],
+  "steps": [
+    {
+      "logit_max_abs_error": 5.821153625618081e-05,
+      "program_text": ",",
+      "program_token": 11,
+      "released_text": ",",
+      "released_token_over_candidates": 11,
+      "step": 1,
+      "token_agreement": true
+    },
+    {
+      "logit_max_abs_error": 5.196081126257468e-05,
+      "program_text": " and",
+      "program_token": 290,
+      "released_text": " and",
+      "released_token_over_candidates": 290,
+      "step": 2,
+      "token_agreement": true
+    },
+    {
+      "logit_max_abs_error": 4.6929003858053875e-05,
+      "program_text": " the",
+      "program_token": 262,
+      "released_text": " the",
+      "released_token_over_candidates": 262,
+      "step": 3,
+      "token_agreement": true
+    }
+  ],
+  "verdict": "passed"
+}

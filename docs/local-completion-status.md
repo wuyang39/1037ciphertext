@@ -42,7 +42,7 @@
 | D4 | 3PC RSS topology、add/mul/matmul/truncate/compare/reciprocal、固定点 adapter、1,000 组向量、MaterialLedger、mTLS policy mock | 真实 YACL/BRPC TLS 1.3、证书与 SAN/CA 校验、抓包、关闭 TLS 时 fail-closed 已在同一实例（三进程）通过；正向网格、抓包与四类 fail-closed 负例已在三台独立实例通过；三个节点也已在 `gramine-sgx` 内跑通单实例与三实例两种形态，enclave 内负例并连跑三次全部拒绝；三台在三实例 enclave 里跑同一份 staged 受测树、给出单一 MRENCLAVE；剩余真实 attestation 放行与 staging 的入口化 |
 | D5 | secure embedding、QKV、causal attention、稳定 Softmax、A*V、残差、LayerNorm、FFN、GELU、Argmax、脱敏 trace | 三个 `gramine-sgx` enclave 内执行完整 Block、真实 secure nonlinear operator、enclave 内通信 profile 均已通过（运行 `d5-enclave-3host-20261013T1057Z`，38/38、溢出 0、无生产 reveal）；剩余正式模型权重（D7）与端到端自回归（D6） |
 | D6 | Session runtime、ResultFrame、三帧一致性与篡改拒绝、KV cache、secure wipe | 三个 enclave 内的端到端自回归、五类篡改/重放负例、close 前后 tmpfs 扫描均已在三台实例通过（运行 `d6-enclave-3host-20261013T1324Z`，3 个 token、逐步 Argmax 一致、会话目录被覆写删除、扫描干净）；真实回执签名仍待 attestation 放行 |
-| D7 | Torch/HuggingFace 风格权重导出、模型 hash、dyadic 量化、precision plan、静态图、份额拆分/导入 | 正式英文 GPT-2（`gpt2`）权重、真实三节点模型加载和 token 生成 |
+| D7 | 正式英文 GPT-2（`gpt2` @ `607a30d7…`）冻结复核、safetensors 读取、候选词表规则、逐张量标定、静态图、纯 Python BPE、模型份额与加密份额包均已本地跑通；程序的浮点参考在候选列上与发布版最大差 5.8e-5、3 步贪心 token 完全一致，见 [d7-model-freeze.md](d7-model-freeze.md) 与 `docs/evidence/d7-local-model-20261013T1425Z` | 三个 enclave 内加载正式模型份额并生成 token；EPC/时延决定的层数与窗口需先做 1 层探针再定 |
 | D8 | StagePlanner、softmax/GELU/rsqrt 近似边界、脱敏 benchmark collector、网络 profile、报告脚本 | EPC/CPU/RAM、真实延迟、通信量、开关对照和安全回归 |
 | D9 | 本地负例脚本、证据采集脚本、拓扑模板、验收清单 | 三域部署、独立账号/安全组、pcap、宿主机材料演示、离线复现 |
 | D10 | 安装手册、模型卡、SBOM、复现文档、攻击演示、确定性 release 构建 | 干净账号答辩演练、最终实测结论和证据冻结 |
@@ -79,6 +79,10 @@ python infra.d1_environment_check.py --output artifacts/evidence/d1-environment.
 python infra.local_three_node.py --output artifacts/evidence/local-three-node.json
 python infra.build_model_package.py --output artifacts/model-package --encrypt-local
 python infra.build_model_package.py --output artifacts/model-package --verify
+python -m model.export --source artifacts/gpt2-frozen --out artifacts/d7-export --layers 12 --sequence 8 --candidates 1024 --prompt "the cipher key is secret" --license third_party/gpt2/LICENSE
+python -m infra.build_model_package --source artifacts/gpt2-frozen --output artifacts/d7-package --layers 12 --sequence 8 --candidates 1024 --prompt "the cipher key is secret" --license third_party/gpt2/LICENSE --encrypt-local
+python -m infra.build_model_package --output artifacts/d7-package --verify
+python -m infra.d7_local_evidence --source artifacts/gpt2-frozen --out docs/evidence/d7-local-model-<stamp> --license third_party/gpt2/LICENSE
 python infra.validate_gramine_manifest.py --values deploy/gramine-values.example.json
 ```
 

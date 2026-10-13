@@ -59,15 +59,23 @@ class StaticGraph:
         return canonical_hash(self.to_dict())
 
 
-def convert_tiny_decoder_graph(
+def convert_decoder_graph(
     *,
+    graph_version: str,
     num_layers: int,
     hidden_size: int,
     num_heads: int,
     intermediate_size: int,
+    vocab_size: int,
 ) -> StaticGraph:
-    """Create the fixed operator sequence used by the TEE runtime."""
-    if min(num_layers, hidden_size, num_heads, intermediate_size) <= 0:
+    """Create the fixed operator sequence used by the TEE runtime.
+
+    The node list is the same for every pre-norm decoder the project runs,
+    because the programs are: the difference between the Tiny decoder and the
+    official GPT-2 is the dimensions and the weight values, so the graph is
+    built from the geometry rather than from the model's name.
+    """
+    if min(num_layers, hidden_size, num_heads, intermediate_size, vocab_size) <= 0:
         raise GraphError("all model dimensions must be positive")
     nodes: list[GraphNode] = [
         GraphNode(
@@ -75,13 +83,14 @@ def convert_tiny_decoder_graph(
             op="secure_embedding/Idx2v",
             inputs=("input_ids",),
             outputs=("hidden",),
-            attrs=(("vocab_width", hidden_size),),
+            attrs=(("vocab_width", hidden_size), ("vocab_size", vocab_size)),
         ),
         GraphNode(
             node_id="position_embedding",
             op="secure_embedding/position",
             inputs=("position_ids",),
             outputs=("position",),
+            attrs=(("position_width", hidden_size),),
         ),
         GraphNode(
             node_id="embedding_add",
@@ -167,16 +176,61 @@ def convert_tiny_decoder_graph(
     nodes.extend(
         [
             GraphNode("final_norm", "layernorm", (current,), ("final_norm",)),
-            GraphNode("lm_head", "rss_matmul", ("final_norm",), ("logits",)),
+            GraphNode(
+                "lm_head",
+                "rss_matmul",
+                ("final_norm",),
+                ("logits",),
+                (("vocab_size", vocab_size),),
+            ),
             GraphNode("argmax", "secure_argmax", ("logits",), ("token_id",)),
         ]
     )
-    return StaticGraph("a122-tiny-decoder-graph-v1", tuple(nodes))
+    return StaticGraph(graph_version, tuple(nodes))
+
+
+def convert_tiny_decoder_graph(
+    *,
+    num_layers: int,
+    hidden_size: int,
+    num_heads: int,
+    intermediate_size: int,
+) -> StaticGraph:
+    """The Tiny decoder's graph: its vocabulary is its embedding width."""
+    return convert_decoder_graph(
+        graph_version="a122-tiny-decoder-graph-v1",
+        num_layers=num_layers,
+        hidden_size=hidden_size,
+        num_heads=num_heads,
+        intermediate_size=intermediate_size,
+        vocab_size=hidden_size,
+    )
+
+
+def convert_gpt2_graph(
+    *,
+    num_layers: int,
+    hidden_size: int,
+    num_heads: int,
+    intermediate_size: int,
+    vocab_size: int,
+) -> StaticGraph:
+    """The official GPT-2 graph, over the candidate vocabulary a run ranks."""
+    return convert_decoder_graph(
+        graph_version="a122-gpt2-decoder-graph-v1",
+        num_layers=num_layers,
+        hidden_size=hidden_size,
+        num_heads=num_heads,
+        intermediate_size=intermediate_size,
+        vocab_size=vocab_size,
+    )
 
 
 __all__ = [
     "GraphError",
     "GraphNode",
     "StaticGraph",
+    "convert_decoder_graph",
+    "convert_gpt2_graph",
     "convert_tiny_decoder_graph",
 ]

@@ -1,0 +1,76 @@
+{
+  "files": [
+    {
+      "expected_sha256": "0daed7749b4f02b8f76240d5444551d7b08712dab4d0adb8239c56ba823bb7b4",
+      "expected_size": 665,
+      "name": "config.json",
+      "present": true,
+      "sha256": "0daed7749b4f02b8f76240d5444551d7b08712dab4d0adb8239c56ba823bb7b4",
+      "size": 665,
+      "verified": true
+    },
+    {
+      "expected_sha256": "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5",
+      "expected_size": 456318,
+      "name": "merges.txt",
+      "present": true,
+      "sha256": "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5",
+      "size": 456318,
+      "verified": true
+    },
+    {
+      "expected_sha256": "248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707",
+      "expected_size": 548105171,
+      "name": "model.safetensors",
+      "present": true,
+      "sha256": "248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707",
+      "size": 548105171,
+      "verified": true
+    },
+    {
+      "expected_sha256": "0fcd631078093c2aa1d93438b898320b8a1167784e2a1ab37b8016e9de8b3c2e",
+      "expected_size": 8092,
+      "name": "README.md",
+      "present": true,
+      "sha256": "0fcd631078093c2aa1d93438b898320b8a1167784e2a1ab37b8016e9de8b3c2e",
+      "size": 8092,
+      "verified": true
+    },
+    {
+      "expected_sha256": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+      "expected_size": 1355256,
+      "name": "tokenizer.json",
+      "present": true,
+      "sha256": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+      "size": 1355256,
+      "verified": true
+    },
+    {
+      "expected_sha256": "196139668be63f3b5d6574427317ae82f612a97c5d1cdaf36ed2256dbf636783",
+      "expected_size": 1042301,
+      "name": "vocab.json",
+      "present": true,
+      "sha256": "196139668be63f3b5d6574427317ae82f612a97c5d1cdaf36ed2256dbf636783",
+      "size": 1042301,
+      "verified": true
+    }
+  ],
+  "license": "Modified MIT License (OpenAI, 2019)",
+  "license_file": "E:\\\u5bc6\u7801\u8d5b\\third_party\\gpt2\\LICENSE",
+  "license_sha256": "0dbeda4bc78823b1d67ec0ee414d8690ee4cad826bc9c147b215adc3af202436",
+  "parameters": 124439808,
+  "prompt": "the cipher key is secret",
+  "prompt_tokens": [
+    1169,
+    38012,
+    1994,
+    318,
+    3200
+  ],
+  "repository": "gpt2",
+  "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+  "tokenizer_encoder": "client/gpt2_bpe.py (pure Python, checked against the released tokenizer over a pinned corpus)",
+  "tokenizer_sha256": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+  "upstream": "https://github.com/openai/gpt-2",
+  "verified": true
+}

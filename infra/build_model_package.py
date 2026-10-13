@@ -36,16 +36,19 @@ def _pack_quantized_bundle(
     bundle: ModelBundle,
     *,
     fractional_bits: int,
+    scales: Mapping[str, int] | None = None,
+    plan_document: Mapping[str, Any] | None = None,
 ) -> tuple[bytes, dict[str, Any]]:
     payload = bytearray()
     tensors: list[dict[str, Any]] = []
     dyadic_tensors = {}
     for tensor in bundle.tensors:
         values = tensor_from_bundle(bundle, tensor.name)
+        bits = int(scales[tensor.name]) if scales is not None else int(fractional_bits)
         quantized = quantize_tensor(
             tensor.name,
             values,
-            fractional_bits=fractional_bits,
+            fractional_bits=bits,
         )
         dyadic_tensors[tensor.name] = quantized
         offset = len(payload)
@@ -58,12 +61,14 @@ def _pack_quantized_bundle(
                 "offset": offset,
                 "length": len(raw),
                 "sha256": hashlib.sha256(raw).hexdigest(),
-                "fractional_bits": fractional_bits,
+                "fractional_bits": bits,
             }
         )
     return bytes(payload), {
         "tensors": tensors,
-        "precision_plan": build_precision_plan(
+        "precision_plan": dict(plan_document)
+        if plan_document is not None
+        else build_precision_plan(
             dyadic_tensors,
             plan_id=f"{bundle.model_version}-dyadic-plan",
             error_thresholds={
@@ -92,6 +97,9 @@ def build_local_model_package(
     share_seed: int = 20261011,
     storage_keys: Mapping[str, StorageKey] | None = None,
     encrypt_with_local_seed: str | None = None,
+    scales: Mapping[str, int] | None = None,
+    plan_document: Mapping[str, Any] | None = None,
+    extra_manifest: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Write model, plan, raw shares, optional encrypted shares, and manifest."""
     if share_epoch < 0:
@@ -109,6 +117,8 @@ def build_local_model_package(
     quantized_payload, quantized = _pack_quantized_bundle(
         bundle,
         fractional_bits=fractional_bits,
+        scales=scales,
+        plan_document=plan_document,
     )
     quantized_path = output_dir / "quantized-tensors.bin"
     quantized_path.write_bytes(quantized_payload)
@@ -190,6 +200,18 @@ def build_local_model_package(
             "sgx_acceptance": False,
         },
     }
+    if extra_manifest:
+        for key, value in extra_manifest.items():
+            if key == "claim_boundary" and isinstance(value, Mapping):
+                # A caller that knows what it built narrows the boundary the
+                # package asserts; it does not get to drop the base flags.
+                merged = dict(manifest["claim_boundary"])
+                merged.update(value)
+                manifest["claim_boundary"] = merged
+                continue
+            if key in manifest:
+                raise ModelPackageError(f"extra manifest field collides: {key}")
+            manifest[key] = value
     manifest_path = output_dir / "package-manifest.json"
     write_json(manifest_path, manifest)
     return {
@@ -215,6 +237,86 @@ def build_tiny_model(*, seed: int = 19) -> TinyDecoder:
         ),
         seed=seed,
     )
+
+
+def build_gpt2_model_package(
+    *,
+    source_directory: Path | str,
+    output_dir: Path,
+    model_version: str,
+    layers: int,
+    sequence: int,
+    candidate_size: int,
+    prompt: str | None = None,
+    error_bound: float = 2.0 ** -19,
+    license_path: Path | str | None = None,
+    share_epoch: int = 1,
+    share_seed: int = 20261011,
+    encrypt_with_local_seed: str | None = None,
+    storage_keys: Mapping[str, StorageKey] | None = None,
+) -> dict[str, Any]:
+    """Freeze, calibrate, quantize and share the real GPT-2 weight set.
+
+    The export step runs first and writes the freeze record, the bundle, the
+    graph, the calibrated precision plan and the model manifest; this function
+    then quantizes the exported bundle at the plan's own per-tensor widths,
+    splits the result into the three additive shares the nodes load, and — when
+    asked — seals each share with a throwaway key so the package also carries
+    the encrypted form. The claim boundary says exactly what ran here: a local
+    package over real weights, not yet an enclave acceptance.
+    """
+    from model.export import export_gpt2_run, load_model_bundle
+
+    output_dir = Path(output_dir)
+    exported = export_gpt2_run(
+        source_directory=source_directory,
+        output_directory=output_dir,
+        model_version=model_version,
+        layers=layers,
+        sequence=sequence,
+        candidate_size=candidate_size,
+        prompt=prompt,
+        error_bound=error_bound,
+        license_path=license_path,
+    )
+    plan = json.loads((output_dir / "precision_plan.json").read_text(encoding="utf-8"))
+    calibration = json.loads(
+        (output_dir / "calibration.json").read_text(encoding="utf-8")
+    )
+    bundle = load_model_bundle(output_dir / "model" / "model.json")
+    result = build_local_model_package(
+        bundle,
+        output_dir=output_dir,
+        share_epoch=share_epoch,
+        fractional_bits=int(plan["scales"][sorted(plan["scales"])[0]]),
+        share_seed=share_seed,
+        storage_keys=storage_keys,
+        encrypt_with_local_seed=encrypt_with_local_seed,
+        scales=plan["scales"],
+        plan_document=plan,
+        extra_manifest={
+            "source_freeze": "source-freeze.json",
+            "graph_digest": exported["graph_digest"],
+            "run": json.loads((output_dir / "run.json").read_text(encoding="utf-8")),
+            "calibration": {
+                "file": "calibration.json",
+                "worst_max_abs_error": calibration["worst_max_abs_error"],
+                "narrowest_fractional_bits": calibration["narrowest_fractional_bits"],
+            },
+            "claim_boundary": {
+                "local_model_package": True,
+                "production_model": False,
+                "production_keys": False,
+                "sgx_acceptance": False,
+                "real_gpt2_weights": True,
+                "full_50257_vocabulary": False,
+                "all_twelve_layers": layers == 12,
+            },
+        },
+    )
+    result["export"] = exported
+    result["plan_scales"] = plan["scales"]
+    return result
 
 
 def verify_local_model_package(output_dir: Path) -> dict[str, Any]:
@@ -281,6 +383,18 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--verify", action="store_true")
     parser.add_argument("--model-version", default="tiny-local-v1")
+    parser.add_argument(
+        "--source",
+        type=Path,
+        default=None,
+        help="frozen GPT-2 directory; switches the build to the real weights",
+    )
+    parser.add_argument("--layers", type=int, default=12)
+    parser.add_argument("--sequence", type=int, default=8)
+    parser.add_argument("--candidates", type=int, default=1024)
+    parser.add_argument("--prompt", default=None)
+    parser.add_argument("--error-bound", type=float, default=2.0 ** -19)
+    parser.add_argument("--license", type=Path, default=None)
     parser.add_argument("--share-epoch", type=int, default=1)
     parser.add_argument("--fractional-bits", type=int, default=12)
     parser.add_argument("--share-seed", type=int, default=20261011)
@@ -296,6 +410,29 @@ def main() -> int:
             result = verify_local_model_package(args.output)
         except (OSError, ValueError) as exc:
             print(f"model package verification failed: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(result, ensure_ascii=True, sort_keys=True, indent=2))
+        return 0
+    if args.source is not None:
+        try:
+            result = build_gpt2_model_package(
+                source_directory=args.source,
+                output_dir=args.output,
+                model_version=args.model_version,
+                layers=args.layers,
+                sequence=args.sequence,
+                candidate_size=args.candidates,
+                prompt=args.prompt,
+                error_bound=args.error_bound,
+                license_path=args.license,
+                share_epoch=args.share_epoch,
+                share_seed=args.share_seed,
+                encrypt_with_local_seed=(
+                    args.local_key_seed if args.encrypt_local else None
+                ),
+            )
+        except (OSError, ValueError) as exc:
+            print(f"model package build failed: {exc}", file=sys.stderr)
             return 1
         print(json.dumps(result, ensure_ascii=True, sort_keys=True, indent=2))
         return 0
@@ -324,7 +461,9 @@ if __name__ == "__main__":
 
 __all__ = [
     "ModelPackageError",
+    "build_gpt2_model_package",
     "build_local_model_package",
     "build_tiny_model",
+    "main",
     "verify_local_model_package",
 ]

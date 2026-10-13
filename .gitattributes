@@ -18,5 +18,10 @@ Makefile text eol=lf
 
 docs/evidence/** text eol=lf
 
+# The license text is pinned by digest in docs/d7-model-freeze.md and in the
+# model manifest, so its bytes must not depend on the platform that checked
+# the repository out.
+third_party/gpt2/LICENSE text eol=lf
+
 *.bin binary
 *.pcap binary
