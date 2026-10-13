@@ -356,7 +356,9 @@ staging 的做法（细节见证据目录的 `README.md`）：
    ABI 探测、抓包解析、明文探针）都带 `PYTHONDONTWRITEBYTECODE=1`，跑一次不会
    再把各台特有的 .pyc 写回受测树。
 4. **工作区**：`infra.d4_three_hosts` 本来就是 P0 provision 一次、打包发给另外
-   两台，所以本来就已经是同一份。
+   两台，所以本来就已经是同一份。要注意签名时的 `out/` 也在这棵树里，用上一轮
+   跑过的 workspace 直接再签一次会把各台不同的结果文件测进 manifest；`run`
+   每次先 `rm -rf` 再 provision，因此这条路径是安全的。
 
 staging 之后三棵树逐字节一致：仓库
 `82ce36a92bfd7263a7ab5a18c1ca1bd8664bbcb3f6d291ec078f04f13358116d`、venv
