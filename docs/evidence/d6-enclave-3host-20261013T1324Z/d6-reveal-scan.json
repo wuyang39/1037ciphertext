@@ -1,0 +1,751 @@
+{
+  "must_be_clean": [
+    "mpc/spu_backend/d6_program.py",
+    "mpc/spu_backend/d5_program.py",
+    "mpc/spu_backend/program_runtime.py",
+    "mpc/spu_backend/spu_link.py",
+    "tee/enclave/d6_node.py",
+    "tee/enclave/d5_node.py",
+    "tee/enclave/node_common.py",
+    "tee/enclave/spu_node.py",
+    "infra/d6_three_hosts.py",
+    "infra/d5_three_hosts.py"
+  ],
+  "patterns": [
+    "reveal(",
+    "reveal_allowed",
+    "simulated_reveal",
+    "SimulationRevealProvider"
+  ],
+  "roles": {
+    "P0": {
+      "allowlisted": [
+        {
+          "file": "mpc/secure_ops/__init__.py",
+          "line": 8,
+          "pattern": "SimulationRevealProvider",
+          "reason": "re-exports the opt-in simulation provider"
+        },
+        {
+          "file": "mpc/secure_ops/__init__.py",
+          "line": 26,
+          "pattern": "SimulationRevealProvider",
+          "reason": "re-exports the opt-in simulation provider"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 61,
+          "pattern": "SimulationRevealProvider",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 85,
+          "pattern": "reveal_allowed",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 97,
+          "pattern": "simulated_reveal",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 107,
+          "pattern": "SimulationRevealProvider",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 33,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 45,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 141,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 148,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 182,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 200,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 212,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 222,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 425,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 437,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 454,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 464,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 485,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 24,
+          "pattern": "SimulationRevealProvider",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 100,
+          "pattern": "SimulationRevealProvider",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 346,
+          "pattern": "reveal_allowed",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 467,
+          "pattern": "reveal_allowed",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "infra/collect_evidence.py",
+          "line": 24,
+          "pattern": "reveal(",
+          "reason": "the forbidden-pattern table used for release scans"
+        },
+        {
+          "file": "infra/local_three_node.py",
+          "line": 153,
+          "pattern": "reveal_allowed",
+          "reason": "negative assertion: reveal_allowed=False must refuse the operation"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 39,
+          "pattern": "SimulationRevealProvider",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 42,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 48,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 51,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 71,
+          "pattern": "reveal(",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 72,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 73,
+          "pattern": "simulated_reveal",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 74,
+          "pattern": "SimulationRevealProvider",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/security_negative.py",
+          "line": 43,
+          "pattern": "reveal_allowed",
+          "reason": "negative assertion: reveal_allowed=False must refuse the operation"
+        }
+      ],
+      "findings": [],
+      "missing_modules": [],
+      "must_be_clean": [
+        "mpc/spu_backend/d6_program.py",
+        "mpc/spu_backend/d5_program.py",
+        "mpc/spu_backend/program_runtime.py",
+        "mpc/spu_backend/spu_link.py",
+        "tee/enclave/d6_node.py",
+        "tee/enclave/d5_node.py",
+        "tee/enclave/node_common.py",
+        "tee/enclave/spu_node.py",
+        "infra/d6_three_hosts.py",
+        "infra/d5_three_hosts.py"
+      ],
+      "patterns": [
+        "reveal(",
+        "reveal_allowed",
+        "simulated_reveal",
+        "SimulationRevealProvider"
+      ],
+      "scanned_roots": [
+        "mpc",
+        "tee",
+        "kas",
+        "client",
+        "crypto",
+        "contracts",
+        "deploy",
+        "infra"
+      ],
+      "verdict": "clean"
+    },
+    "P1": {
+      "allowlisted": [
+        {
+          "file": "mpc/secure_ops/__init__.py",
+          "line": 8,
+          "pattern": "SimulationRevealProvider",
+          "reason": "re-exports the opt-in simulation provider"
+        },
+        {
+          "file": "mpc/secure_ops/__init__.py",
+          "line": 26,
+          "pattern": "SimulationRevealProvider",
+          "reason": "re-exports the opt-in simulation provider"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 61,
+          "pattern": "SimulationRevealProvider",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 85,
+          "pattern": "reveal_allowed",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 97,
+          "pattern": "simulated_reveal",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 107,
+          "pattern": "SimulationRevealProvider",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 33,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 45,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 141,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 148,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 182,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 200,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 212,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 222,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 425,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 437,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 454,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 464,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 485,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 24,
+          "pattern": "SimulationRevealProvider",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 100,
+          "pattern": "SimulationRevealProvider",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 346,
+          "pattern": "reveal_allowed",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 467,
+          "pattern": "reveal_allowed",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "infra/collect_evidence.py",
+          "line": 24,
+          "pattern": "reveal(",
+          "reason": "the forbidden-pattern table used for release scans"
+        },
+        {
+          "file": "infra/local_three_node.py",
+          "line": 153,
+          "pattern": "reveal_allowed",
+          "reason": "negative assertion: reveal_allowed=False must refuse the operation"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 39,
+          "pattern": "SimulationRevealProvider",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 42,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 48,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 51,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 71,
+          "pattern": "reveal(",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 72,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 73,
+          "pattern": "simulated_reveal",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 74,
+          "pattern": "SimulationRevealProvider",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/security_negative.py",
+          "line": 43,
+          "pattern": "reveal_allowed",
+          "reason": "negative assertion: reveal_allowed=False must refuse the operation"
+        }
+      ],
+      "findings": [],
+      "missing_modules": [],
+      "must_be_clean": [
+        "mpc/spu_backend/d6_program.py",
+        "mpc/spu_backend/d5_program.py",
+        "mpc/spu_backend/program_runtime.py",
+        "mpc/spu_backend/spu_link.py",
+        "tee/enclave/d6_node.py",
+        "tee/enclave/d5_node.py",
+        "tee/enclave/node_common.py",
+        "tee/enclave/spu_node.py",
+        "infra/d6_three_hosts.py",
+        "infra/d5_three_hosts.py"
+      ],
+      "patterns": [
+        "reveal(",
+        "reveal_allowed",
+        "simulated_reveal",
+        "SimulationRevealProvider"
+      ],
+      "scanned_roots": [
+        "mpc",
+        "tee",
+        "kas",
+        "client",
+        "crypto",
+        "contracts",
+        "deploy",
+        "infra"
+      ],
+      "verdict": "clean"
+    },
+    "P2": {
+      "allowlisted": [
+        {
+          "file": "mpc/secure_ops/__init__.py",
+          "line": 8,
+          "pattern": "SimulationRevealProvider",
+          "reason": "re-exports the opt-in simulation provider"
+        },
+        {
+          "file": "mpc/secure_ops/__init__.py",
+          "line": 26,
+          "pattern": "SimulationRevealProvider",
+          "reason": "re-exports the opt-in simulation provider"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 61,
+          "pattern": "SimulationRevealProvider",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 85,
+          "pattern": "reveal_allowed",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 97,
+          "pattern": "simulated_reveal",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/provider.py",
+          "line": 107,
+          "pattern": "SimulationRevealProvider",
+          "reason": "opt-in SimulationRevealProvider that refuses unless the context enables it"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 33,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 45,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 141,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 148,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 182,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 200,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 212,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 222,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 425,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 437,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 454,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 464,
+          "pattern": "reveal_allowed",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/rss.py",
+          "line": 485,
+          "pattern": "simulated_reveal",
+          "reason": "the reveal_allowed switch itself, defaulting to off in local_three_node"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 24,
+          "pattern": "SimulationRevealProvider",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 100,
+          "pattern": "SimulationRevealProvider",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 346,
+          "pattern": "reveal_allowed",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "mpc/secure_ops/transformer.py",
+          "line": 467,
+          "pattern": "reveal_allowed",
+          "reason": "local-only fixed-point reference; the enclave node runs d5_program instead"
+        },
+        {
+          "file": "infra/collect_evidence.py",
+          "line": 24,
+          "pattern": "reveal(",
+          "reason": "the forbidden-pattern table used for release scans"
+        },
+        {
+          "file": "infra/local_three_node.py",
+          "line": 153,
+          "pattern": "reveal_allowed",
+          "reason": "negative assertion: reveal_allowed=False must refuse the operation"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 39,
+          "pattern": "SimulationRevealProvider",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 42,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 48,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 51,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 71,
+          "pattern": "reveal(",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 72,
+          "pattern": "reveal_allowed",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 73,
+          "pattern": "simulated_reveal",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/reveal_scan.py",
+          "line": 74,
+          "pattern": "SimulationRevealProvider",
+          "reason": "this scanner's own pattern table"
+        },
+        {
+          "file": "infra/security_negative.py",
+          "line": 43,
+          "pattern": "reveal_allowed",
+          "reason": "negative assertion: reveal_allowed=False must refuse the operation"
+        }
+      ],
+      "findings": [],
+      "missing_modules": [],
+      "must_be_clean": [
+        "mpc/spu_backend/d6_program.py",
+        "mpc/spu_backend/d5_program.py",
+        "mpc/spu_backend/program_runtime.py",
+        "mpc/spu_backend/spu_link.py",
+        "tee/enclave/d6_node.py",
+        "tee/enclave/d5_node.py",
+        "tee/enclave/node_common.py",
+        "tee/enclave/spu_node.py",
+        "infra/d6_three_hosts.py",
+        "infra/d5_three_hosts.py"
+      ],
+      "patterns": [
+        "reveal(",
+        "reveal_allowed",
+        "simulated_reveal",
+        "SimulationRevealProvider"
+      ],
+      "scanned_roots": [
+        "mpc",
+        "tee",
+        "kas",
+        "client",
+        "crypto",
+        "contracts",
+        "deploy",
+        "infra"
+      ],
+      "verdict": "clean"
+    }
+  },
+  "run_id": "d6-enclave-3host-20261013T1324Z",
+  "scanned_roots": [
+    "mpc",
+    "tee",
+    "kas",
+    "client",
+    "crypto",
+    "contracts",
+    "deploy",
+    "infra"
+  ],
+  "verdict": "clean"
+}
