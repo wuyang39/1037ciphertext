@@ -75,6 +75,12 @@ DONE_MARKER = "A122-D5-NODE-DONE"
 D5_PORTS = (47100, 47101, 47102, 47200, 47201, 47202)
 REVEAL_SCAN = "d5-reveal-scan.json"
 README = "README.md"
+EXCLUSION_NOTE = (
+    "These raw captures stay on the instances that produced them; the bundle "
+    "ships their digests and the per-host TLS 1.3 summary. Every excluded file "
+    "still has to match the sealed index if it is present, so restoring the "
+    "original capture tightens the check instead of bypassing it."
+)
 
 
 def capture_filter() -> str:
@@ -120,6 +126,7 @@ def _bundle(
         "by_program": summary.get("by_program"),
         "seed": summary.get("seed"),
         "share_bytes": summary.get("share_bytes"),
+        **_interlock(out_dir),
     }
     write_json(out_dir / "d5-summary.json", document)
     return document
@@ -136,6 +143,35 @@ def _capture_reason(*, role: str, value: Mapping[str, Any]) -> str:
         f"instance that produced it ({role}) under {value['path']}; the bundle "
         "ships its digest and the TLS 1.3 summary that instance derived from it"
     )
+
+
+def _interlock(out_dir: Path) -> dict[str, Any]:
+    """Check that every role authenticated its peers as those peers' identities.
+
+    Each node writes the digest of the certificate it presented and the digests
+    of the certificates it accepted, so the three files together say whether
+    the mesh authenticated one identity per role or three unrelated ones.
+    """
+    statuses: dict[str, Any] = {}
+    for role in ROLES:
+        path = Path(out_dir) / f"d5-three-{role.lower()}-node-status.json"
+        try:
+            statuses[role] = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ThreeHostError(f"the {role} node status is unreadable: {exc}") from exc
+    mismatches: list[str] = []
+    for role in ROLES:
+        peers = statuses[role].get("peer_certificates") or {}
+        for peer, digest in peers.items():
+            if digest != statuses.get(peer, {}).get("identity_sha256"):
+                mismatches.append(f"{role}->{peer}")
+    return {
+        "peer_certificates_match": not mismatches,
+        "certificate_mismatches": sorted(mismatches),
+        "identity_sha256": {
+            role: statuses[role].get("identity_sha256") for role in ROLES
+        },
+    }
 
 
 def _reveal_scan(
@@ -224,7 +260,7 @@ def _finalise(
         for role in ROLES
     ]
     index = seal_directory(out_dir, external=external)
-    write_exclusions(out_dir, external, run_id=run_id)
+    write_exclusions(out_dir, external, run_id=run_id, note=EXCLUSION_NOTE)
     return {
         "index": index,
         "verify": verify_directory(out_dir, exclusions=external),
@@ -325,6 +361,10 @@ def _readme(
         f"| Link setup | {trace.get('link_seconds')} s, share bytes "
         f"{document.get('share_bytes')} |",
         f"| Cases traced | {len(trace.get('runs') or [])} |",
+        f"| Peer certificates match | "
+        f"`{document.get('peer_certificates_match')}` |",
+        f"| Certificate mismatches | "
+        f"{len(document.get('certificate_mismatches') or [])} |",
         "",
         "## Enclosure",
         "",

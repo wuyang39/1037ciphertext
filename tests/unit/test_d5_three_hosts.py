@@ -5,7 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from infra.d5_three_hosts import _capture_reason, _finalise, _readme
+from infra.d5_three_hosts import (
+    _capture_reason,
+    _finalise,
+    _interlock,
+    _readme,
+)
 from infra.evidence import load_exclusions, verify_directory
 
 
@@ -61,6 +66,8 @@ def _document() -> dict:
         },
         "seed": 20261013,
         "share_bytes": 1234,
+        "peer_certificates_match": True,
+        "certificate_mismatches": [],
     }
 
 
@@ -97,6 +104,7 @@ def test_readme_reports_the_numbers_the_run_recorded() -> None:
     assert "`distinct_measurements`: 3." in text
     assert "| P2 | `clean` | 0 | 1 |" in text
     assert document["captures"]["P0"]["sha256"] in text
+    assert "| Peer certificates match | `True` |" in text
 
 
 def test_capture_reason_reads_the_size_back_from_the_run() -> None:
@@ -106,6 +114,40 @@ def test_capture_reason_reads_the_size_back_from_the_run() -> None:
     assert "51409592 bytes" in reason
     assert "/tmp/run-P1.pcap" in reason
     assert "100 MB" not in reason
+
+
+def _write_statuses(out_dir: Path, *, peer_digest: dict[str, dict[str, str]]) -> None:
+    identities = {role: _bytes(40 + index) for index, role in enumerate(ROLES)}
+    for role in ROLES:
+        peers = {peer: peer_digest.get(role, {}).get(peer, identities[peer]) for peer in ROLES if peer != role}
+        (out_dir / f"d5-three-{role.lower()}-node-status.json").write_text(
+            json.dumps(
+                {
+                    "role": role,
+                    "identity_sha256": identities[role],
+                    "peer_certificates": peers,
+                }
+            ),
+            encoding="utf-8",
+            newline="\n",
+        )
+
+
+def test_interlock_accepts_one_identity_per_role(tmp_path: Path) -> None:
+    _write_statuses(tmp_path, peer_digest={})
+    result = _interlock(tmp_path)
+    assert result["peer_certificates_match"] is True
+    assert result["certificate_mismatches"] == []
+    assert set(result["identity_sha256"]) == set(ROLES)
+
+
+def test_interlock_reports_a_peer_that_authenticated_someone_else(
+    tmp_path: Path,
+) -> None:
+    _write_statuses(tmp_path, peer_digest={"P0": {"P2": _bytes(99)}})
+    result = _interlock(tmp_path)
+    assert result["peer_certificates_match"] is False
+    assert result["certificate_mismatches"] == ["P0->P2"]
 
 
 def test_finalise_seals_the_external_captures_and_writes_the_readme(
