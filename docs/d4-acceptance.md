@@ -468,8 +468,9 @@ sha256，把原件放回目录只会收紧校验，不会绕过校验。
    TLS 四个场景已在 enclave 内连跑三次（4.9），三次全部拒绝、拒绝理由一致，
    未出现偶发放行；但"偶尔放行"的反面——正向网格与抓包——仍只有单次 enclave
    记录（4.7、4.8），没有做同样的多次统计。
-4. **D5 之后**：Tiny Decoder Block、两 token 自回归、正式英文 GPT-2 和性能
-   对照均未执行。
+4. **D5 之后**：Tiny Decoder Block 已在三个 enclave 内跑通（运行
+   `d5-enclave-3host-20261013T1057Z`，见 [d5-acceptance.md](d5-acceptance.md)），
+   但两 token 自回归、正式英文 GPT-2 和性能对照均未执行。
 
 复跑入口：
 

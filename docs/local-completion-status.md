@@ -22,7 +22,11 @@
 > `d4-enclave-negs-3host-20261013T052407Z` 每台各自签名自己的 manifest，
 > 正向与四个负例同样全过；enclave 内四类负例又连跑三次（运行
 > `d4-enclave-negs-repeat-3host-20261013T0907Z`），三次全部拒绝、每台实例的
-> 测量值跨运行逐字节复现。D5 及之后仍待执行；D4 还差真实 attestation 放行，
+> 测量值跨运行逐字节复现。D5 的完整 Tiny Decoder Block 也已在三个 enclave 内
+> 跑通（运行 `d5-enclave-3host-20261013T1057Z`：Softmax/LayerNorm/GELU/Argmax
+> 与整个 Block 共 38 个用例全过、溢出 0、三棵树的 reveal 扫描干净、证书互校
+> 6/6），见 [d5-acceptance.md](d5-acceptance.md)。D6 及之后仍待执行；D4 还差
+> 真实 attestation 放行，
 > 以及把 staging 固化成一条命令（三台共享同一份受测树已经跑通，运行
 > `d4-enclave-shared-3host-20261013T1715Z` 给出单一 MRENCLAVE）。
 
@@ -32,7 +36,7 @@
 |---|---|---|
 | D3 | encrypted-FS mock、错误 key/epoch/篡改拒绝、Worker 固定入口、Lease + storage key 状态机、失败清理 | 真实 Gramine encrypted FS、宿主读取证明、KAS 驱动的 `K_disk_i` 放行、Worker startup/epoch/Lease 校验均已在同一实例通过；剩余镜像与 core dump 扫描（D9） |
 | D4 | 3PC RSS topology、add/mul/matmul/truncate/compare/reciprocal、固定点 adapter、1,000 组向量、MaterialLedger、mTLS policy mock | 真实 YACL/BRPC TLS 1.3、证书与 SAN/CA 校验、抓包、关闭 TLS 时 fail-closed 已在同一实例（三进程）通过；正向网格、抓包与四类 fail-closed 负例已在三台独立实例通过；三个节点也已在 `gramine-sgx` 内跑通单实例与三实例两种形态，enclave 内负例并连跑三次全部拒绝；三台在三实例 enclave 里跑同一份 staged 受测树、给出单一 MRENCLAVE；剩余真实 attestation 放行与 staging 的入口化 |
-| D5 | secure embedding、QKV、causal attention、稳定 Softmax、A*V、残差、LayerNorm、FFN、GELU、Argmax、脱敏 trace | 三个 enclave 内执行、secure nonlinear operator、真实通信 profile |
+| D5 | secure embedding、QKV、causal attention、稳定 Softmax、A*V、残差、LayerNorm、FFN、GELU、Argmax、脱敏 trace | 三个 `gramine-sgx` enclave 内执行完整 Block、真实 secure nonlinear operator、enclave 内通信 profile 均已通过（运行 `d5-enclave-3host-20261013T1057Z`，38/38、溢出 0、无生产 reveal）；剩余正式模型权重（D7）与端到端自回归（D6） |
 | D6 | Session runtime、ResultFrame、三帧一致性与篡改拒绝、KV cache、secure wipe | 真实两 token 自回归、enclave tmpfs 扫描、真实回执签名 |
 | D7 | Torch/HuggingFace 风格权重导出、模型 hash、dyadic 量化、precision plan、静态图、份额拆分/导入 | 正式英文 GPT-2（`gpt2`）权重、真实三节点模型加载和 token 生成 |
 | D8 | StagePlanner、softmax/GELU/rsqrt 近似边界、脱敏 benchmark collector、网络 profile、报告脚本 | EPC/CPU/RAM、真实延迟、通信量、开关对照和安全回归 |

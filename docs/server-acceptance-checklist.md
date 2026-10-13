@@ -85,7 +85,12 @@ Gramine 运行 `d1-20261012T1830`，证据在
 三台实例的基线已经就绪（正向运行在提交 `bcd8935`、负例运行在 `a2d8026`，
 `spu` 0.9.5、SGX 设备与 `aesmd` 正常、私网 `47100` 实测互通），见
 [d4-acceptance.md](d4-acceptance.md) 第 8 节。
-- [ ] Tiny Decoder Block 在三个 enclave 完成。
+- [x] Tiny Decoder Block 在三个 enclave 完成。（运行
+  `d5-enclave-3host-20261013T1057Z`：P0/P1/P2 各自在 `gramine-sgx` 内执行
+  完整 Block，38/38 用例通过，`overflow_count` 全 0，9 个 Block 用例的 secure
+  Argmax 结果与浮点参考逐个相等，三份抓包都是 `tls13_only`、非 TLS 字节 0，
+  证书互校 6/6，三棵树的 reveal 扫描无未解释命中。权重是合成权重，正式英文
+  GPT-2 属 D7。见 [d5-acceptance.md](d5-acceptance.md)）
 - [ ] 连续生成至少 2 token。
 - [ ] ResultFrame 重复、篡改 `decode_step`、模型混用、输入/Ticket 重放均被拒绝。
 - [ ] 会话结束后 `/run/session`、临时目录和进程扫描无 Prompt share、KV、会话密钥。

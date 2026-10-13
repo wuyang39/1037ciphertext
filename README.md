@@ -11,6 +11,13 @@
 服务器租用、镜像复用、比赛日部署与资源释放方案见
 [`docs/服务器资源准备.md`](docs/服务器资源准备.md)。
 
+真实 SGX 实例上的验收记录：
+[`docs/d1-server-acceptance.md`](docs/d1-server-acceptance.md)、
+[`docs/d3-encfs-acceptance.md`](docs/d3-encfs-acceptance.md)、
+[`docs/d3-kas-release-acceptance.md`](docs/d3-kas-release-acceptance.md)、
+[`docs/d4-acceptance.md`](docs/d4-acceptance.md)、
+[`docs/d5-acceptance.md`](docs/d5-acceptance.md)。
+
 当前已经冻结的 canonical JSON、REPORTDATA 和 KAS 接口见
 [`docs/protocol-baseline.md`](docs/protocol-baseline.md)。
 
