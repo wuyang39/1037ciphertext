@@ -18,6 +18,10 @@ loader.log_level = "warning"
 loader.env.LD_LIBRARY_PATH = "/lib:@ARCH_LIBDIR@:@USR_LIBDIR@"
 loader.env.PYTHONPATH = "@REPO@:@SITE@"
 loader.env.PYTHONDONTWRITEBYTECODE = "1"
+# The LibOS starts the app with cwd "/" rather than the host working
+# directory, so without this the `-m` import would probe "/tee/__init__.py"
+# before reaching the mounted repo.
+loader.env.PYTHONSAFEPATH = "1"
 # The node loads libspu.so through this path rather than importing the spu
 # package, which keeps JAX out of the enclave.
 loader.env.A122_LIBSPU_PATH = "@LIBSPU@"
