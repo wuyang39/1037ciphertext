@@ -118,6 +118,10 @@ def test_capture_and_node_commands_quote_their_paths() -> None:
     )
     assert "cd /home/u/repo" in node
     assert "-m tee.enclave.spu_node --config /home/u/ws/configs/P1.json" in node
+    # A bare-process node runs inside the tree a manifest may later measure, so
+    # it must not drop bytecode into it; ``env`` keeps the assignment a real
+    # prefix behind ``setsid nohup``.
+    assert "setsid nohup env PYTHONDONTWRITEBYTECODE=1 /home/u/venv/bin/python" in node
 
 
 def test_node_command_hands_a_wrapper_the_node_as_its_own_arguments() -> None:
@@ -151,6 +155,9 @@ def test_enclave_sign_command_renders_then_signs() -> None:
     assert 's|@WORKSPACE@|/home/jiahao/a122-d4/three/workspace|g' in command
     assert "[ -f sign.pem ] || gramine-sgx-gen-private-key sign.pem" in command
     assert "gramine-sgx-sign --manifest spu_node.manifest" in command
+    # The ABI probe runs the interpreter inside the tree the manifest hashes,
+    # so the signer must not leave bytecode there either.
+    assert "export PYTHONDONTWRITEBYTECODE=1" in command
     assert ENCLAVE_SIGNED_MARKER in command
 
 
@@ -361,7 +368,9 @@ def test_probe_command_runs_on_the_driver_against_a_private_address() -> None:
         host="172.27.172.202",
         port=47201,
     )
-    assert command.startswith("cd /home/u/repo && PYTHONPATH=.")
+    assert command.startswith(
+        "cd /home/u/repo && PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=."
+    )
     assert "_plaintext_probe" in command
     assert "172.27.172.202" in command and "47201" in command
 

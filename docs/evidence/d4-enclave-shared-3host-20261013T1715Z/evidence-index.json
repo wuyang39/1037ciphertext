@@ -1,0 +1,110 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "file_count": 20,
+  "files": [
+    {
+      "bytes": 9498,
+      "path": "d4-enclave-p0-sign.txt",
+      "sha256": "071375a36aaba9042057a99e29df46bed3291d9378945364b3ececb98069907d"
+    },
+    {
+      "bytes": 9459,
+      "path": "d4-enclave-p1-sign.txt",
+      "sha256": "97a6e0e79fdbbe77fd5fd9373f28461f6e7a4813ea79fc5e9c36b3d8a41867d2"
+    },
+    {
+      "bytes": 9459,
+      "path": "d4-enclave-p2-sign.txt",
+      "sha256": "97a6e0e79fdbbe77fd5fd9373f28461f6e7a4813ea79fc5e9c36b3d8a41867d2"
+    },
+    {
+      "bytes": 2964874,
+      "path": "d4-enclave.manifest",
+      "sha256": "f1745b0544859b1b205b7becb2f3e111a4cfa139ce8f07f236921ffcc4e7fa68"
+    },
+    {
+      "bytes": 8307,
+      "path": "d4-three-communication-trace.json",
+      "sha256": "37ae13a71a52652ac79a08e2a80274066460e0c8967e123f880975296fa43b28"
+    },
+    {
+      "bytes": 577,
+      "path": "d4-three-p0-node-status.json",
+      "sha256": "251faa4bee896999e2be1bbdb834ea7623f3324b2b374e31fe3cd954e8d87eae"
+    },
+    {
+      "bytes": 12614,
+      "path": "d4-three-p0-node.log",
+      "sha256": "36540560ce5d3f679f983ff4d329b0fc16cb835b42ea5b3ac4e86cf92a216167"
+    },
+    {
+      "bytes": 34232,
+      "path": "d4-three-P0-tls-summary.txt",
+      "sha256": "1dd7b94ddec9df844a3b254549170ddda7d8957877148fcc1774234b6586f9d0"
+    },
+    {
+      "bytes": 449,
+      "path": "d4-three-p1-node-status.json",
+      "sha256": "5c257f6c14a79f74923bd7805b44f99604992cbf9ca50e8b54496eae91ae21b1"
+    },
+    {
+      "bytes": 6535,
+      "path": "d4-three-p1-node.log",
+      "sha256": "8c62667464623aaf4c1ec7bccfa874976bf69603f7200af17814522f6dbd4872"
+    },
+    {
+      "bytes": 19139,
+      "path": "d4-three-P1-tls-summary.txt",
+      "sha256": "37488cdb0cd6d27af3681ec023b859ee90c78f71ae2c6036ec70e9842329cae1"
+    },
+    {
+      "bytes": 449,
+      "path": "d4-three-p2-node-status.json",
+      "sha256": "233358cc9ffc148acdadb347abd8685401c7648fd622f0376dc8bdd0ab87771b"
+    },
+    {
+      "bytes": 6473,
+      "path": "d4-three-p2-node.log",
+      "sha256": "6fc90174307b9a5d48d7f7fab6ab66a04f997ea00980243dd1d34910fdb43bcb"
+    },
+    {
+      "bytes": 19139,
+      "path": "d4-three-P2-tls-summary.txt",
+      "sha256": "f771c3fc8b62cffed86be9321f2b65d5d4319423022fc9a81e10d2dedcb2ef23"
+    },
+    {
+      "bytes": 311952,
+      "path": "d4-three-rss-vectors.json",
+      "sha256": "429ae59123522f3fea7a24e3250785238b1c67106eec086f6856b398f28f4cfc"
+    },
+    {
+      "bytes": 4854,
+      "path": "d4-three-summary.json",
+      "sha256": "0287b8769e277b434f7e3246907541a18e709d4c6369f585ec05adaa0025ceb7"
+    },
+    {
+      "bytes": 5745,
+      "path": "README.md",
+      "sha256": "ef978ec793a5c61dfdf806fbbaa995cb12bead691c02cf69b10e0d092e9f6e6f"
+    },
+    {
+      "bytes": 145109510,
+      "external": true,
+      "path": "d4-three-P0.pcap",
+      "sha256": "b1ffea250449a66d152503aab9bcb88d45d146abf86c2b537e55b0aad2c36080"
+    },
+    {
+      "bytes": 143560270,
+      "external": true,
+      "path": "d4-three-P1.pcap",
+      "sha256": "1cb561f7b01cc62e5ab3dda714b3354d3cc4cbdfeadb08f5fdaea16cc0d2c2eb"
+    },
+    {
+      "bytes": 143554642,
+      "external": true,
+      "path": "d4-three-P2.pcap",
+      "sha256": "ca8e6e35f6a6720b2f97124fd918ce5317cd6e466da32c674a924376aee2ba73"
+    }
+  ],
+  "root": "d4-enclave-shared-3host-20261013T1715Z"
+}

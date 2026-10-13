@@ -72,6 +72,13 @@ Gramine 运行 `d1-20261012T1830`，证据在
   拒绝理由逐句相同，`all_refused: true`、`unexpected_cases: []`，明文探针
   三次都连上监听端口且都没有业务应答；每台实例的 MRENCLAVE 在三次之间逐字节
   复现）
+- [x] 三台实例跑同一份 staged 受测树，给出单一测量值。（运行
+  `d4-enclave-shared-3host-20261013T1715Z`：仓库用 `git archive`、venv 从 P0
+  经私网分发同一份 tar、三台统一清掉 `__pycache__` 并让宿主侧调用带
+  `PYTHONDONTWRITEBYTECODE=1`，三份 manifest 渲染结果逐字节相同，MRENCLAVE
+  三台都是 `8749c1db...`，`distinct_measurements: 1`；1024 组全过、三份抓包
+  `tls13_only`、非 TLS 字节 0、证书互校 6/6。staging 目前是手工步骤，见
+  [d4-acceptance.md](d4-acceptance.md) 第 7 节）
 - [ ] 证书来自真实 attestation 放行：Quote → 验证 → 签发短期身份/Lease 的
   KAS 链路尚未实现。enclave 内执行已经跑通，缺的只是这一段。
 
@@ -94,7 +101,9 @@ D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
 与
 [docs/evidence/d4-enclave-negs-3host-20261013T052407Z](evidence/d4-enclave-negs-3host-20261013T052407Z)
 ，以及 enclave 内负例连跑三次的
-[docs/evidence/d4-enclave-negs-repeat-3host-20261013T0907Z](evidence/d4-enclave-negs-repeat-3host-20261013T0907Z)。
+[docs/evidence/d4-enclave-negs-repeat-3host-20261013T0907Z](evidence/d4-enclave-negs-repeat-3host-20261013T0907Z)
+，和三个节点跑在同一份 staged 树上的
+[docs/evidence/d4-enclave-shared-3host-20261013T1715Z](evidence/d4-enclave-shared-3host-20261013T1715Z)。
 链路、证书、抓包、拒绝路径和 `gramine-sgx` 内的执行都是实测；真实 attestation
 放行仍未验证。
 

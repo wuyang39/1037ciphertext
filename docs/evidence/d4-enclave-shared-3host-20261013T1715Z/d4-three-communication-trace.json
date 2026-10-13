@@ -1,0 +1,369 @@
+{
+  "attestation_available": true,
+  "batches": [
+    {
+      "batch_id": 0,
+      "elapsed_ms": 650.66,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 636.639,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 634.67,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 1,
+      "elapsed_ms": 836.802,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 823.797,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 823.425,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 2,
+      "elapsed_ms": 765.081,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 751.931,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 751.596,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 3,
+      "elapsed_ms": 712.013,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 699.094,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 698.521,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 4,
+      "elapsed_ms": 864.072,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 851.135,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 850.846,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 5,
+      "elapsed_ms": 652.102,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 639.156,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 638.47,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 6,
+      "elapsed_ms": 752.872,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 740.004,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 739.4,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 7,
+      "elapsed_ms": 747.374,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 734.213,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 733.534,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 8,
+      "elapsed_ms": 751.024,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 737.769,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 738.196,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 9,
+      "elapsed_ms": 664.998,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 651.973,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 651.067,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44140,
+      "vectors": 64
+    },
+    {
+      "batch_id": 10,
+      "elapsed_ms": 663.841,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 649.99,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 649.302,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44142,
+      "vectors": 64
+    },
+    {
+      "batch_id": 11,
+      "elapsed_ms": 690.84,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 677.985,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 677.326,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44142,
+      "vectors": 64
+    },
+    {
+      "batch_id": 12,
+      "elapsed_ms": 607.492,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 594.647,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 594.022,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44142,
+      "vectors": 64
+    },
+    {
+      "batch_id": 13,
+      "elapsed_ms": 686.402,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 673.739,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 672.921,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44142,
+      "vectors": 64
+    },
+    {
+      "batch_id": 14,
+      "elapsed_ms": 654.93,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 642.051,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 641.718,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44142,
+      "vectors": 64
+    },
+    {
+      "batch_id": 15,
+      "elapsed_ms": 700.927,
+      "peers": [
+        {
+          "peer_san": "spiffe://a122/P1",
+          "role": "P1",
+          "rtt_ms": 688.289,
+          "tls_version": "TLSv1.3"
+        },
+        {
+          "peer_san": "spiffe://a122/P2",
+          "role": "P2",
+          "rtt_ms": 687.947,
+          "tls_version": "TLSv1.3"
+        }
+      ],
+      "share_bytes": 44142,
+      "vectors": 64
+    }
+  ],
+  "inside_enclave": true,
+  "link": {
+    "allow_brpc_builtin_services": false,
+    "client_verify_depth": 4,
+    "connect_retry_interval_ms": 500,
+    "connect_retry_times": 120,
+    "enable_ssl": true,
+    "endpoints": [
+      {
+        "host": "172.27.172.201",
+        "port": 47100,
+        "role": "P0"
+      },
+      {
+        "host": "172.27.172.202",
+        "port": 47101,
+        "role": "P1"
+      },
+      {
+        "host": "172.27.172.203",
+        "port": 47102,
+        "role": "P2"
+      }
+    ],
+    "min_version": "TLS1.3",
+    "partition_id": "a122-d4-d4-enclave-shared-3host-20261013T1715Z",
+    "rank": 0,
+    "require_client_certificate": true,
+    "role": "P0",
+    "server_verify_depth": 4
+  },
+  "link_seconds": 5.749,
+  "note": "Only byte counts, roles, fingerprints, and timings are recorded; no share, key, or plaintext input reaches the trace.",
+  "partition_id": "a122-d4-d4-enclave-shared-3host-20261013T1715Z",
+  "role": "P0",
+  "run_id": "d4-enclave-shared-3host-20261013T1715Z",
+  "share_bytes": 706252,
+  "share_channel": {
+    "host": "172.27.172.201",
+    "min_version": "TLS1.3",
+    "port": 47200,
+    "tls_version": "TLSv1.3"
+  },
+  "transport": "SPU/YACL/BRPC over TLS 1.3 inside a Gramine-SGX enclave"
+}

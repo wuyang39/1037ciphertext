@@ -71,6 +71,11 @@ DEFAULT_USR_LIBDIR = "/usr/lib/x86_64-linux-gnu"
 DEFAULT_ENCLAVE_SIZE = "4G"
 DEFAULT_MAX_THREADS = 64
 DEFAULT_STACK_SIZE = "2M"
+# Every host-side helper runs the interpreter against the same tree a manifest
+# measures, so it must not drop ``__pycache__`` into that tree: one extra
+# bytecode file changes the trusted-file list, and the instances stop
+# measuring the same enclave.
+NO_BYTECODE = "PYTHONDONTWRITEBYTECODE=1"
 ENCLAVE_SIGNED_MARKER = "A122-D4-ENCLAVE-SIGNED"
 MEASUREMENT_PREFIX = "Measurement:"
 # ``plaintext`` is the probe of the live listeners, not a mutated config, so it
@@ -377,7 +382,7 @@ def node_command(
     launcher = (
         " ".join(remote_path(token) for token in wrapper)
         if wrapper
-        else remote_path(python)
+        else f"env {NO_BYTECODE} {remote_path(python)}"
     )
     return (
         f"cd {remote_path(repo)} && "
@@ -427,6 +432,10 @@ def enclave_sign_command(
             f"cd {remote_path(enclave_dir)}",
             f'PY="$(readlink -f {remote_path(python)})"',
             f'VENV="$(dirname "$(dirname {remote_path(python)})")"',
+            # The ABI probe runs the interpreter inside the tree the manifest
+            # is about to hash, and a bytecode file left behind would be
+            # measured: same flag as every other host-side helper.
+            f"export {NO_BYTECODE}",
             'ABI="$("$PY" -c "import sys; print(\'python%d.%d\' % sys.version_info[:2])")"',
             'SITE="$VENV/lib/$ABI/site-packages"',
             'UV_ROOT="$(dirname "$(dirname "$PY")")"',
@@ -780,7 +789,8 @@ def run_three_hosts(
             )
 
         provision = (
-            f"cd {remote_path(repo)} && PYTHONPATH=. {remote_path(python)} "
+            f"cd {remote_path(repo)} && {NO_BYTECODE} "
+            f"PYTHONPATH=. {remote_path(python)} "
             f"-m infra.d4_acceptance --mode provision "
             f"--workspace {remote_path(workspace)} --run-id {shlex.quote(run_id)} "
             f"--cluster-file {shlex.quote(cluster_file)} "
@@ -899,7 +909,8 @@ def run_three_hosts(
                     digest=digest,
                 )
                 analysis = (
-                    f"cd {remote_path(repo)} && PYTHONPATH=. {remote_path(python)} "
+                    f"cd {remote_path(repo)} && {NO_BYTECODE} "
+                    f"PYTHONPATH=. {remote_path(python)} "
                     f"-m infra.pcap_tls {shlex.quote(pcaps[role])} --d4-ports"
                 )
                 _status, body, _err = transport.run(
@@ -992,7 +1003,8 @@ def probe_command(*, python: str, repo: str, host: str, port: int) -> str:
         f"print(json.dumps(p({host!r}, {port})))"
     )
     return (
-        f"cd {remote_path(repo)} && PYTHONPATH=. {remote_path(python)} -c "
+        f"cd {remote_path(repo)} && {NO_BYTECODE} "
+        f"PYTHONPATH=. {remote_path(python)} -c "
         f"{shlex.quote(payload)}"
     )
 
@@ -1152,7 +1164,7 @@ def run_one_negative_case(
         driver_launcher = (
             " ".join(remote_path(token) for token in wrapper)
             if wrapper
-            else f"PYTHONPATH=. {remote_path(python)}"
+            else f"{NO_BYTECODE} PYTHONPATH=. {remote_path(python)}"
         )
         status, out, err = transport.run(
             role_routes[DRIVER],

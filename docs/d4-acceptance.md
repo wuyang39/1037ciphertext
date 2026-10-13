@@ -9,16 +9,20 @@
 > `d4-enclave-negs-3host-20261013T052407Z`（提交 `63937a0`）。
 > 四个 fail-closed 负例在 enclave 内连跑三次的复跑是
 > `d4-enclave-negs-repeat-3host-20261013T0907Z`（提交 `eacb7a6`）。
+> 三个节点跑在同一份 staged 受测树上的三实例复跑是
+> `d4-enclave-shared-3host-20261013T1715Z`（提交 `eacb7a6`），三份测量值相同。
 >
 > 结论：**D4 传输层与算子网格通过，已在三台独立实例上复跑，三个 SPU 参与方
 > 也已在 `gramine-sgx` enclave 内跑完整套流程**。1,024 组向量全部与固定点
 > 参考一致，协议端口上的抓包只出现 TLS 1.3 记录，明文/证书/关闭 TLS 四类
 > fail-closed 场景在 loopback、跨 VPC、enclave 三种形态下都拒绝；enclave 内
-> 又连跑三次，每次四个场景都拒绝。
+> 又连跑三次，每次四个场景都拒绝；把代码与运行环境做成同一份 staged 树之后，
+> 三台实例给出同一个测量值。
 >
 > 范围限定：证书来自本次运行的本地 PKI，不是真实 attestation 放行的短期
-> 身份；三实例 enclave 运行时每台实例各自签署自己的 manifest，因此三份
-> 测量值互不相同（见 4.8）。见第 7 节。
+> 身份；三实例 enclave 运行若不做 staging，每台各自签署自己那棵树的 manifest，
+> 三份测量值互不相同（见 4.8），做成本次 4.10 的同一份 staged 树才会收敛到
+> 一个值。见第 7 节。
 
 本记录对应 [后续开发总计划.md](后续开发总计划.md) 第 7 节。
 
@@ -320,6 +324,49 @@ checkout、venv 与解释器目录并不是逐字节相同的树：
 也就是说，只要受测的那棵树不变，同一台实例量出的 MRENCLAVE 是稳定的；三台
 之间的差异只来自各自那棵 checkout/解释器树（4.8），不是签名或运行的抖动。
 
+### 4.10 三台跑同一份 staged 树：三份测量值收敛为一个
+
+4.8 说明三实例的测量值互不相同，原因是 Gramine 会把每个受信目录的**全部内容**
+哈希进 manifest，而三台的 checkout、venv 与解释器目录不是同一棵树。把受测树
+做成一模一样的三份之后，三台给出同一个测量值
+（`d4-enclave-shared-3host-20261013T1715Z`，提交 `eacb7a6`）：
+
+| 项目 | 结果 |
+| --- | --- |
+| MRENCLAVE（P0 = P1 = P2） | `8749c1dbba7743fef93dde104a95ae023dbbd76b46631a4f79afc8326d603f77` |
+| `spu_node.manifest` sha256（P0 = P1 = P2） | `f1745b0544859b1b205b7becb2f3e111a4cfa139ce8f07f236921ffcc4e7fa68` |
+| `distinct_measurements` | 1 |
+| `rss_vectors` | 1024/1024，网格摘要 `96b6c835...` |
+| 角色判决 | P0 `passed`，P1/P2 各 `served` 16 批 |
+| 抓包 | 三份各自 `tls13_only`，非 TLS 字节 0；TLS 1.3 流 42 / 23 / 23 |
+| 证书互校 | 6/6 一致，`peer_certificates_match: true` |
+| teardown | 三个角色均 `teardown_finished: true` |
+| 链路建立 | 5.749 s，份额 706252 字节 |
+
+staging 的做法（细节见证据目录的 `README.md`）：
+
+1. **仓库**：三台各自 `git -C ~/1037ciphertext archive HEAD | tar -x`，同一提交
+   得到逐字节相同的树，同时去掉各台不同的 `.git` 抓取历史；再放一个只记录该
+   提交的极小 `.git`，runner 的提交校验因此仍然生效。
+2. **venv**：P0 打一次包，P1/P2 用 P0 私网地址上的临时 `http.server` 拉同一份
+   tar（236,679,933 字节），三台的 `~/a122-shared/a122-venv311` 是同一批字节。
+3. **字节码**：`__pycache__` 的内容带着源文件 mtime，而三台装解释器与 wheel 的
+   时间不同，所以 .pyc 天然互相不同。三台的 staged 仓库、staged venv 与 uv
+   解释器树统一清掉 `__pycache__`，并且所有宿主机侧调用（provision、签名前的
+   ABI 探测、抓包解析、明文探针）都带 `PYTHONDONTWRITEBYTECODE=1`，跑一次不会
+   再把各台特有的 .pyc 写回受测树。
+4. **工作区**：`infra.d4_three_hosts` 本来就是 P0 provision 一次、打包发给另外
+   两台，所以本来就已经是同一份。
+
+staging 之后三棵树逐字节一致：仓库
+`82ce36a92bfd7263a7ab5a18c1ca1bd8664bbcb3f6d291ec078f04f13358116d`、venv
+`64cdb67c95522a67c501491dbc8643387105dede862bd46ffe1529fcac6b13de`、uv 解释器树
+`374e148b5b736c61dc3d3099c5f55953aa9f6ebf7d80e658d4f51344172eff2c`；三台的
+manifest 在签名前渲染结果逐字节相同。
+
+这一步是**部署 staging**，不是改代码路径：节点仍读自己的配置、走跨 VPC 私网、
+在各自实例的 enclave 内执行，只是受测的那棵树被做成了同一份。
+
 ## 5. 关键值
 
 | 项目 | 值 |
@@ -350,6 +397,12 @@ checkout、venv 与解释器目录并不是逐字节相同的树：
 | 三实例 enclave evidence-index.json | sha256 `5f9bd7d5f747e608c2fa3ac08eaacbc1d4321ea7e80d6c0b5a557c13e69a78dd` |
 | 三实例 enclave 负例 evidence-index.json | sha256 `064e47454b1aabb0bf02bc667c2cdc09a7d6e6177050b1efb2148cd2a5cf951c` |
 | enclave 负例三次复跑 evidence-index.json | sha256 `eb9ff5b186ba68d1ece602f0e9e715476e973a66dc9264f0c65c298d23d50199` |
+| staged 树三实例 enclave MRENCLAVE | `8749c1dbba7743fef93dde104a95ae023dbbd76b46631a4f79afc8326d603f77` |
+| staged 树三实例 enclave manifest | 2964874 字节，sha256 `f1745b0544859b1b205b7becb2f3e111a4cfa139ce8f07f236921ffcc4e7fa68`（三台相同） |
+| staged 树三实例 enclave `d4-three-P0.pcap` | 145109510 字节，sha256 `b1ffea250449a66d152503aab9bcb88d45d146abf86c2b537e55b0aad2c36080` |
+| staged 树三实例 enclave `d4-three-P1.pcap` | 143560270 字节，sha256 `1cb561f7b01cc62e5ab3dda714b3354d3cc4cbdfeadb08f5fdaea16cc0d2c2eb` |
+| staged 树三实例 enclave `d4-three-P2.pcap` | 143554642 字节，sha256 `ca8e6e35f6a6720b2f97124fd918ce5317cd6e466da32c674a924376aee2ba73` |
+| staged 树三实例 enclave evidence-index.json | sha256 `83fd1f6604d903a799ca77f4f15b07295753a6de32b770d77dacc348fad80ee8` |
 
 ## 6. 证据位置
 
@@ -366,6 +419,8 @@ checkout、venv 与解释器目录并不是逐字节相同的树：
 [docs/evidence/d4-enclave-negs-3host-20261013T052407Z](evidence/d4-enclave-negs-3host-20261013T052407Z)；
 enclave 内负例的三次复跑在
 [docs/evidence/d4-enclave-negs-repeat-3host-20261013T0907Z](evidence/d4-enclave-negs-repeat-3host-20261013T0907Z)；
+三个节点跑在同一份 staged 树上的三实例复跑在
+[docs/evidence/d4-enclave-shared-3host-20261013T1715Z](evidence/d4-enclave-shared-3host-20261013T1715Z)；
 每个目录都有一份 `README.md` 说明每个文件的含义。
 
 四个封存目录里共八份原始抓包都超过 GitHub 单文件上限，未随仓库提交：入库
@@ -382,6 +437,9 @@ sha256，把原件放回目录只会收紧校验，不会绕过校验。
 - 2026-10-13 三实例 enclave `d4-three-P{0,1,2}.pcap`：三份都是 `tls13_only`
   （P0 42 条，P1/P2 各 23 条），非 TLS 字节 0，与 `d4-three-summary.json`
   记录的流数、包数和 application-data 记录数逐项吻合。
+- 2026-10-13 staged 树三实例 enclave `d4-three-P{0,1,2}.pcap`：同样取回复算，
+  sha256 与封存索引一致，三份都是 `tls13_only`（P0 42 条、P1/P2 各 23 条），
+  非 TLS 字节 0，包数 70885 / 70386 / 70280 与摘要逐项吻合。
 - 两份单实例抓包（`d4-20261012T143111Z`、`d4-enclave-20261013T0530Z`）：同样
   复算 sha256 并复跑判决，都是 `tls13_only`、非 TLS 字节 0。这两次运行把明文
   探针打在 127.0.0.1 的四个监听端口上，所以复跑时按 runner 的做法补上
@@ -398,11 +456,12 @@ sha256，把原件放回目录只会收紧校验，不会绕过校验。
 1. **KAS 证明链**：证书由 `kas.ca` 的签发路径产生，但 CA 与叶证书来自本次
    运行的本地 PKI，不是真实 attestation 放行出来的短期身份和 Lease。enclave
    内执行的代码路径已经跑通，缺的是"Quote → 验证 → 放行证书"这一段。
-2. **三个 enclave 的测量值不一致**：三实例运行时每台各自签署自己的 manifest，
-   测的是各自那棵树，因此 4.8 列出三个不同的 MRENCLAVE。4.9 的复跑证明同一
-   棵树上的测量值跨运行稳定（每台三次逐字节复现），但三台之间仍不一致；要给出
-   "三方运行同一份受测代码"的单一测量值，需要先把代码与运行环境做成同一份
-   staged 树，这一步还没做。
+2. **单一测量值来自手工 staging，且只覆盖正向运行**：4.10 已经把三台收敛到
+   一个 MRENCLAVE（`8749c1db...`），4.9 也证明同一棵树上测量值跨运行稳定；
+   但 staging 现在仍是一串手工步骤（`git archive`、一次私网 http 分发 venv、
+   清 `__pycache__`），没有固化成入口脚本，跑之前要人工确保三台都用 staged
+   路径；4.10 只跑了正向网格，负例那三次仍是在各自原来的树上跑的。要做成
+   "一条命令就能复现的一次性部署"，还需要把 staging 收进 runner 或 deploy 脚本。
 3. **负例只覆盖 fail-closed 这一半的重复**：错误 CA/SAN、无客户端证书、关闭
    TLS 四个场景已在 enclave 内连跑三次（4.9），三次全部拒绝、拒绝理由一致，
    未出现偶发放行；但"偶尔放行"的反面——正向网格与抓包——仍只有单次 enclave
@@ -487,3 +546,11 @@ python -m infra.d4_three_hosts negatives \
   被 seal 的目录，而 runner 在打印判决之前就封存，导致索引记录的是日志的前半
   段。现在日志写在 bundle 外，跑完再拷进来并重新封存（`run_d4_accept.sh` 一直
   是这么做的）。
+- **宿主机的 .pyc 会改测量值**（2026-10-13）：`sgx.trusted_files` 收目录时
+  Gramine 把目录下每个文件的 sha256 写进 manifest，而 `.pyc` 的头里带着源文件
+  mtime，所以三台各自导入过的模块会留下互不相同的字节码。第一次 staged 树
+  复跑（`d4-enclave-shared-3host-20261013T1645Z`）就是这样失败的：staged 仓库、
+  venv 与 uv 解释器树都逐字节相同，却因为 provision 步和签名前的 ABI 探测各在
+  P0 的树上留下几个 `.pyc`，出来三个测量值。现在 `infra/d4_three_hosts.py` 里
+  所有宿主机侧调用都带 `PYTHONDONTWRITEBYTECODE=1`，并在 staging 时统一清掉
+  `__pycache__`。
