@@ -615,6 +615,7 @@ def prepare_enclave(
         enclave_size=enclave_size,
         max_threads=max_threads,
         stack_size=stack_size,
+        session_root=session_root,
     )
     out_dir = Path(out_dir)
     measurements: dict[str, str] = {}

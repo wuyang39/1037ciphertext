@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from infra.d4_three_hosts import ROLES, enclave_sign_command
+from infra.d4_three_hosts import (
+    ENCLAVE_SIGNED_MARKER,
+    ROLES,
+    enclave_sign_command,
+    prepare_enclave,
+    routes,
+)
 from infra.d6_three_hosts import (
     D6_PORTS,
     DEFAULT_PROMPT,
@@ -14,6 +20,47 @@ from infra.d6_three_hosts import (
     _verdicts,
     session_root,
 )
+
+
+CLUSTER = {
+    "P0": {"host": "172.27.172.201", "brpc_port": 47100, "share_port": 47200},
+    "P1": {"host": "172.27.172.202", "brpc_port": 47101, "share_port": 47201},
+    "P2": {"host": "172.27.172.203", "brpc_port": 47102, "share_port": 47202},
+}
+
+
+class _SigningTransport:
+    """Stands in for the SSH transport so ``prepare_enclave`` can be read."""
+
+    def __init__(self) -> None:
+        self.commands: list[tuple[str, str]] = []
+        self.puts: list[tuple[str, str, str]] = []
+        self.gets: list[tuple[str, str, str]] = []
+
+    def run(self, route, command, *, timeout=None, check=True):
+        self.commands.append((route.role, command))
+        if 'echo "repo=' in command:
+            return 0, (
+                "repo=/repo\npython=/venv/bin/python\n"
+                "workspace=/ws\nenclave=/enclave\n"
+            ), ""
+        if "gramine-sgx-sign" in command:
+            return 0, (
+                "Measurement:\n"
+                f"     {'ab' * 32}\n\n"
+                f"{'cd' * 32}  d6_node.manifest\n"
+                f"{'ef' * 32}  d6_node.manifest.sgx\n"
+                f"{ENCLAVE_SIGNED_MARKER}\n"
+            ), ""
+        return 0, "", ""
+
+    def put(self, route, local, remote):
+        self.puts.append((route.role, str(local), remote))
+
+    def get(self, route, remote, local):
+        self.gets.append((route.role, remote, str(local)))
+        Path(local).parent.mkdir(parents=True, exist_ok=True)
+        Path(local).write_bytes(b"manifest\n")
 
 
 def _steps() -> list[dict[str, object]]:
@@ -229,3 +276,44 @@ def test_the_enclave_template_carries_the_session_root() -> None:
     )
     assert '-e "s|@SESSION_ROOT@|/dev/shm/a122-d6/d6-unit|g"' in command
     assert "gramine-sgx-sign --manifest d6_node.manifest" in command
+
+
+def test_prepare_enclave_hands_the_session_root_to_every_signer(
+    tmp_path: Path,
+) -> None:
+    """The template names @SESSION_ROOT@, so an unsubstituted token would leave
+    an empty mount path and Gramine would refuse to start the enclave."""
+    template = (
+        Path(__file__).resolve().parents[2]
+        / "tee"
+        / "gramine"
+        / "enclave"
+        / "d6_node.manifest.template"
+    )
+    transport = _SigningTransport()
+    result = prepare_enclave(
+        transport,
+        routes(CLUSTER, user="jiahao"),
+        template=template,
+        run_id="d6-unit",
+        out_dir=tmp_path,
+        node_name="d6_node",
+        bundle_prefix="d6-enclave",
+        session_root="/dev/shm/a122-d6/d6-unit",
+        prepare_session_root=True,
+    )
+    signers = [
+        command for _role, command in transport.commands if "gramine-sgx-sign" in command
+    ]
+    assert len(signers) == len(ROLES)
+    for command in signers:
+        assert '-e "s|@SESSION_ROOT@|/dev/shm/a122-d6/d6-unit|g"' in command
+    # The directory is staged before the manifest resolves it, on every rank.
+    prepared = [
+        command
+        for _role, command in transport.commands
+        if "mkdir -p /dev/shm/a122-d6/d6-unit" in command
+    ]
+    assert len(prepared) == len(ROLES)
+    assert result["wrapper"][0] == "gramine-sgx"
+    assert result["measurements"] == {role: "ab" * 32 for role in ROLES}
