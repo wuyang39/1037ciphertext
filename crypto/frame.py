@@ -228,6 +228,8 @@ class SecureSession:
             allow_out_of_order=allow_out_of_order,
         )
         self._closed = False
+        self._key_bytes_wiped = 0
+        self._session_hash: str | None = None
 
     @property
     def closed(self) -> bool:
@@ -235,12 +237,15 @@ class SecureSession:
 
     @property
     def session_hash(self) -> str:
-        material = (
-            b"A1-22:session-hash:v1\0"
-            + canonical_bytes(self.keys.bindings.to_dict())
-            + self.keys.transcript_hash
-        )
-        return sm3(material).hex()
+        """A stable name for the session, cached so ``wipe()`` cannot change it."""
+        if self._session_hash is None:
+            material = (
+                b"A1-22:session-hash:v1\0"
+                + canonical_bytes(self.keys.bindings.to_dict())
+                + self.keys.transcript_hash
+            )
+            self._session_hash = sm3(material).hex()
+        return self._session_hash
 
     def _nonce(self, key: DirectionalKey, counter: int) -> bytes:
         nonce = key.nonce_prefix + counter.to_bytes(4, "big")
@@ -344,3 +349,49 @@ class SecureSession:
         )
         self._closed = True
         return frame
+
+    @property
+    def keys_wiped(self) -> bool:
+        return self._key_bytes_wiped > 0
+
+    @property
+    def wiped_key_bytes(self) -> int:
+        return self._key_bytes_wiped
+
+    def wipe(self) -> int:
+        """Drop this session's key material and refuse every later frame.
+
+        The directional keys, their nonce prefixes and the transcript hash are
+        immutable ``bytes`` in CPython, so "zeroing" them means replacing them
+        with same-shaped blanks: neither this object nor anything reading its
+        attributes can reach a usable key afterwards, and the closed session
+        still refuses every frame. The session name computed before the wipe
+        stays readable, so a node can keep pointing at the session it just
+        retired. Anything the interpreter may have copied elsewhere is out of
+        reach of this method, which is why it reports the byte count it
+        replaced instead of claiming a memory audit.
+        """
+        if self._key_bytes_wiped:
+            return self._key_bytes_wiped
+        # Read the name first: its inputs are about to be replaced.
+        self.session_hash
+        keys = self.keys
+        c2p = DirectionalKey(key=bytes(len(keys.c2p.key)), nonce_prefix=bytes(8))
+        p2c = DirectionalKey(key=bytes(len(keys.p2c.key)), nonce_prefix=bytes(8))
+        replaced = (
+            2 * (len(keys.c2p.key) + len(keys.c2p.nonce_prefix))
+            + len(keys.transcript_hash)
+        )
+        self.keys = SessionKeys(
+            c2p=c2p,
+            p2c=p2c,
+            transcript_hash=bytes(len(keys.transcript_hash)),
+            bindings=keys.bindings,
+        )
+        if self.local_role == "C":
+            self._send_key, self._receive_key = c2p, p2c
+        else:
+            self._send_key, self._receive_key = p2c, c2p
+        self._closed = True
+        self._key_bytes_wiped = replaced
+        return replaced

@@ -106,13 +106,35 @@ class SM2CertificateAuthority:
         revoked_serial_numbers: set[str] | None = None,
     ) -> None:
         self._signing_key = signing_key
+        self._public_key = signing_key.public_key
         self._revoked = {
             serial.lower() for serial in (revoked_serial_numbers or set())
         }
 
+    @classmethod
+    def verifier(
+        cls,
+        public_key: str,
+        *,
+        revoked_serial_numbers: set[str] | None = None,
+    ) -> "SM2CertificateAuthority":
+        """A verify-only authority that holds no signing key.
+
+        An enclave node has to check the certificates the KAS issued without
+        ever holding the KAS signing key, so the public half of the authority
+        needs its own constructor.
+        """
+        instance = cls.__new__(cls)
+        instance._signing_key = None
+        instance._public_key = validate_sm2_public_key(public_key)
+        instance._revoked = {
+            serial.lower() for serial in (revoked_serial_numbers or set())
+        }
+        return instance
+
     @property
     def public_key(self) -> str:
-        return self._signing_key.public_key
+        return self._public_key
 
     def revoke(self, serial_number: str) -> None:
         self._revoked.add(serial_number.lower())
@@ -130,6 +152,8 @@ class SM2CertificateAuthority:
             raise CertificateError("invalid certificate role")
         if ttl <= dt.timedelta(0):
             raise CertificateError("certificate TTL must be positive")
+        if self._signing_key is None:
+            raise CertificateError("this authority can only verify certificates")
         now = _require_utc(now, name="now")
         public_key = validate_sm2_public_key(public_key)
         unsigned = {
@@ -194,7 +218,7 @@ class SM2CertificateAuthority:
             valid = verify_sm2(
                 bytes.fromhex(parsed.signature),
                 canonical_bytes(parsed.unsigned_dict()),
-                self._signing_key.public_key,
+                self._public_key,
             )
         except (SM2Error, ValueError) as exc:
             raise CertificateForgery("certificate signature is malformed") from exc

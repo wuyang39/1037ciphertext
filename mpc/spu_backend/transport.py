@@ -20,6 +20,11 @@ from cryptography import x509
 
 MAX_FRAME_BYTES = 16 * 1024 * 1024
 
+# The share channel carries one party's input share and its output share. The
+# three SPU parties are P0/P1/P2; D6 adds "C" so the client can present its own
+# identity instead of connecting under a node's certificate.
+FRAME_ROLES = frozenset({"C", "P0", "P1", "P2"})
+
 
 class TLSChannelError(RuntimeError):
     """A TLS channel could not be established or violated its policy."""
@@ -47,13 +52,13 @@ class TLSIdentity:
     min_version: str = "TLS1.3"
 
     def __post_init__(self) -> None:
-        if self.role not in {"P0", "P1", "P2"}:
-            raise TLSChannelError("SPU role must be P0, P1, or P2")
+        if self.role not in FRAME_ROLES:
+            raise TLSChannelError("the frame role must be C, P0, P1, or P2")
         if self.min_version != "TLS1.3":
             raise TLSChannelError("TLS versions below 1.3 are forbidden")
         if not self.allowed_peer_roles:
             raise TLSChannelError("at least one peer role must be allowed")
-        if any(role not in {"P0", "P1", "P2"} for role in self.allowed_peer_roles):
+        if any(role not in FRAME_ROLES for role in self.allowed_peer_roles):
             raise TLSChannelError("peer allowlist contains an invalid role")
         if self.role in self.allowed_peer_roles:
             raise TLSChannelError("an endpoint cannot allow itself as a peer")
@@ -210,7 +215,15 @@ class TLSFrameChannel:
 
 
 class TLSFrameServer:
-    """Single-connection-at-a-time TLS frame server for local integration."""
+    """TLS frame server for the enclave nodes' share channels.
+
+    The D4/D5 loops open one connection per request, so the default is a single
+    connection at a time. A D6 client holds its session open for the whole
+    conversation and still dials a second connection to probe a replayed
+    ticket, so ``threaded`` lets the listener keep accepting while a session is
+    in flight. The accept loop hands the socket to the worker and never touches
+    it again.
+    """
 
     def __init__(
         self,
@@ -219,9 +232,13 @@ class TLSFrameServer:
         handler: Callable[[TLSFrameChannel], None],
         host: str = "127.0.0.1",
         port: int = 0,
+        threaded: bool = False,
+        connection_timeout: float = 10.0,
     ) -> None:
         self.identity = identity
         self.handler = handler
+        self.threaded = bool(threaded)
+        self.connection_timeout = float(connection_timeout)
         self._context = _server_context(identity)
         self._listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -231,6 +248,7 @@ class TLSFrameServer:
         self.address = self._listener.getsockname()
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
+        self._workers: list[threading.Thread] = []
         self._errors: list[BaseException] = []
         self._error_lock = threading.Lock()
 
@@ -248,42 +266,56 @@ class TLSFrameServer:
                 if not self._stop.is_set():
                     self._record_error(TLSChannelError("TLS listener failed"))
                 return
-            try:
-                raw_socket.settimeout(10.0)
-                try:
-                    tls_socket = self._context.wrap_socket(
-                        raw_socket,
-                        server_side=True,
-                    )
-                except (ssl.SSLError, ConnectionError):
-                    # The peer never completed a TLS handshake: a bare port
-                    # probe, a plaintext request (the D4 acceptance sends one
-                    # on purpose), or a client that fails certificate
-                    # verification. Those connections are refused, which is
-                    # the wanted outcome; they are not handler failures, and
-                    # treating them as such used to kill the peer before the
-                    # collective link teardown. A peer that completes the
-                    # handshake and then misbehaves still raises below.
-                    continue
-                with tls_socket:
-                    peer_role = _peer_role(
-                        tls_socket,
-                        self.identity.allowed_peer_roles,
-                    )
-                    with TLSFrameChannel(
-                        tls_socket,
-                        peer_role=peer_role,
-                    ) as channel:
-                        self.handler(channel)
-            except TLSChannelClosed:
-                # The client hung up between frames: normal for this
-                # one-connection-per-request transport, not a handler failure.
+            if self.threaded:
+                worker = threading.Thread(
+                    target=self._serve_socket,
+                    args=(raw_socket,),
+                    name=f"a122-tls-conn-{self.identity.role}",
+                    daemon=True,
+                )
+                with self._error_lock:
+                    self._workers.append(worker)
+                worker.start()
                 continue
-            except BaseException as exc:
-                self._record_error(exc)
-            finally:
-                with suppress(OSError):
-                    raw_socket.close()
+            self._serve_socket(raw_socket)
+
+    def _serve_socket(self, raw_socket: socket.socket) -> None:
+        try:
+            raw_socket.settimeout(self.connection_timeout)
+            try:
+                tls_socket = self._context.wrap_socket(
+                    raw_socket,
+                    server_side=True,
+                )
+            except (ssl.SSLError, ConnectionError):
+                # The peer never completed a TLS handshake: a bare port probe,
+                # a plaintext request (the D4 acceptance sends one on purpose),
+                # or a client that fails certificate verification. Those
+                # connections are refused, which is the wanted outcome; they
+                # are not handler failures, and treating them as such used to
+                # kill the peer before the collective link teardown. A peer
+                # that completes the handshake and then misbehaves still raises
+                # below.
+                return
+            with tls_socket:
+                peer_role = _peer_role(
+                    tls_socket,
+                    self.identity.allowed_peer_roles,
+                )
+                with TLSFrameChannel(
+                    tls_socket,
+                    peer_role=peer_role,
+                ) as channel:
+                    self.handler(channel)
+        except TLSChannelClosed:
+            # The client hung up between frames: normal for this transport,
+            # not a handler failure.
+            return
+        except BaseException as exc:
+            self._record_error(exc)
+        finally:
+            with suppress(OSError):
+                raw_socket.close()
 
     def start(self) -> "TLSFrameServer":
         if self._thread is not None:

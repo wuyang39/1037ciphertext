@@ -342,3 +342,32 @@ def test_close_frame_transitions_both_sides_and_blocks_later_traffic() -> None:
         )
     with pytest.raises(SessionClosed):
         node.receive(close_frame)
+
+
+def test_wipe_replaces_the_directional_keys_and_refuses_everything_after() -> None:
+    _, client, node = establish("P1")
+    before_key = client._send_key.key
+    name_before = client.session_hash
+    assert client.wipe() == 2 * (16 + 8) + 32
+    assert client.keys_wiped is True
+    assert client.wiped_key_bytes == 80
+    assert client._send_key.key == bytes(16)
+    assert client._receive_key.key == bytes(16)
+    assert client._send_key.key != before_key
+    # Nothing on the session still carries the keys the handshake derived.
+    assert client.keys.c2p.key == bytes(16)
+    assert client.keys.p2c.key == bytes(16)
+    assert client.keys.transcript_hash == bytes(32)
+    # The session keeps its name so a node can point at what it retired.
+    assert client.session_hash == name_before
+    # Idempotent, and the session can no longer carry a frame in either
+    # direction even though the frames it already exchanged stay authentic.
+    assert client.wipe() == 80
+    with pytest.raises(SessionClosed):
+        client.send(
+            b"late",
+            message_type="Request",
+            request_hash=request_digest(b"late"),
+        )
+    with pytest.raises(SessionClosed):
+        client.receive(node.close(b"bye"))

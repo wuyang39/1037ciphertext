@@ -54,12 +54,15 @@ ALLOWLIST: dict[str, str] = {
 """Files whose hits are policy text or refused-operation tests, never a reveal."""
 
 MUST_BE_CLEAN: tuple[str, ...] = (
+    "mpc/spu_backend/d6_program.py",
     "mpc/spu_backend/d5_program.py",
     "mpc/spu_backend/program_runtime.py",
     "mpc/spu_backend/spu_link.py",
+    "tee/enclave/d6_node.py",
     "tee/enclave/d5_node.py",
     "tee/enclave/node_common.py",
     "tee/enclave/spu_node.py",
+    "infra/d6_three_hosts.py",
     "infra/d5_three_hosts.py",
 )
 """The modules the enclave node actually evaluates; none may reveal."""

@@ -1,0 +1,231 @@
+"""The D6 driver's own arithmetic: verdicts, probes and the sealed README."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+from infra.d4_three_hosts import ROLES, enclave_sign_command
+from infra.d6_three_hosts import (
+    D6_PORTS,
+    DEFAULT_PROMPT,
+    capture_filter,
+    _probes,
+    _readme,
+    _verdicts,
+    session_root,
+)
+
+
+def _steps() -> list[dict[str, object]]:
+    return [
+        {
+            "decode_step": 1,
+            "token_id": 11,
+            "token_word": "cipher",
+            "argmax_of_reconstructed_logits": 11,
+            "argmax_match": True,
+            "step_wall_ms": 812.5,
+            "shares": {
+                role: {"history_share_probe": f"probe-{role}"} for role in ROLES
+            },
+        },
+        {
+            "decode_step": 2,
+            "token_id": 80,
+            "token_word": "secret",
+            "argmax_of_reconstructed_logits": 80,
+            "argmax_match": True,
+            "step_wall_ms": 640.25,
+        },
+    ]
+
+
+def _document() -> dict[str, object]:
+    return {
+        "run_id": "d6-unit",
+        "phase": "D6",
+        "mode": "enclave",
+        "commit": "abc123",
+        "prompt": DEFAULT_PROMPT,
+        "prompt_tokens": [3, 70, 71, 11, 80],
+        "prompt_words": ["the", "cipher", "key", "is", "secret"],
+        "session_id": "00" * 32,
+        "generated_tokens": [11, 80],
+        "generated_words": ["cipher", "secret"],
+        "generated_text": "cipher secret",
+        "roles": {
+            role: {
+                "instance_id": f"i-{role.lower()}",
+                "private_address": f"172.27.172.20{index}",
+                "public_address": f"47.0.0.{index}",
+            }
+            for index, role in enumerate(ROLES)
+        },
+        "enclosure": {
+            "measurements": {role: "m" * 64 for role in ROLES},
+            "manifest_sha256": {role: "d" * 64 for role in ROLES},
+            "distinct_measurements": 1,
+            "enclave_size": "4G",
+            "max_threads": 64,
+            "stack_size": "2M",
+            "template": "d6_node.manifest.template",
+            "wrapper": ["gramine-sgx", "/w/d6_node"],
+        },
+        "captures": {
+            role: {"bytes": 1000 + index, "sha256": "e" * 64}
+            for index, role in enumerate(ROLES)
+        },
+        "steps": _steps(),
+        "reference_check": [
+            {
+                "decode_step": 1,
+                "max_abs_error": 1e-9,
+                "mean_abs_error": 1e-11,
+                "reference_token": 11,
+                "token_match": True,
+                "argmax_match": True,
+            }
+        ],
+        "negative_cases": [
+            {"case": "duplicate_result_frame", "refused": True, "reason": "rejected"},
+            {"case": "replayed_job_ticket", "refused": True, "reason": "rejected"},
+        ],
+        "node_status": {
+            role: {
+                "close_evidence": {
+                    "spilled_files": 2,
+                    "spilled_bytes_overwritten": 512,
+                    "session_dir_removed": True,
+                    "session_keys_wiped_bytes": 48,
+                    "kv": {"entries": 0, "all_zero": True},
+                }
+            }
+            for role in ROLES
+        },
+        "hygiene": {
+            "roles": {
+                role: {
+                    "verdict": "clean",
+                    "findings": [],
+                    "roots_that_exist": ["/dev/shm/a122-d6"],
+                    "journal": {"available": True},
+                }
+                for role in ROLES
+            }
+        },
+        "session_state_before_close": {"total_files": 6, "total_bytes": 1536},
+        "session_state_after_close": {"total_files": 0, "total_bytes": 0},
+        "verdicts": _verdicts(
+            result={
+                "negative_cases": [
+                    {"case": "a", "refused": True},
+                    {"case": "b", "refused": True},
+                ],
+                "reference_verdicts": "passed",
+                "shutdown_verdicts": "passed",
+            },
+            hygiene={"verdict": "clean"},
+            tokens=2,
+        ),
+    }
+
+
+def _reveal() -> dict[str, object]:
+    return {
+        "roles": {
+            role: {"verdict": "clean", "findings": [], "allowlisted": []}
+            for role in ROLES
+        }
+    }
+
+
+def test_capture_filter_names_every_d6_port() -> None:
+    text = capture_filter()
+    assert text == " or ".join(f"port {port}" for port in D6_PORTS)
+    assert "47200" in text
+
+
+def test_session_root_is_under_the_tmpfs() -> None:
+    assert session_root("d6-x") == "/dev/shm/a122-d6/d6-x"
+
+
+def test_every_gate_clause_has_to_hold() -> None:
+    good = {
+        "negative_cases": [{"case": name, "refused": True} for name in ("a", "b")],
+        "reference_verdicts": "passed",
+        "shutdown_verdicts": "passed",
+    }
+    passed = _verdicts(result=good, hygiene={"verdict": "clean"}, tokens=2)
+    assert passed["passed"] is True
+    assert passed["two_tokens_generated"] is True
+    assert passed["negatives_refused"] is True
+    one_token = _verdicts(result=good, hygiene={"verdict": "clean"}, tokens=1)
+    assert one_token["passed"] is False
+    accepted_negative = _verdicts(
+        result={
+            **good,
+            "negative_cases": [
+                {"case": "a", "refused": True},
+                {"case": "b", "refused": False},
+            ],
+        },
+        hygiene={"verdict": "clean"},
+        tokens=2,
+    )
+    assert accepted_negative["passed"] is False
+    assert accepted_negative["negatives_refused"] is False
+    dirty = _verdicts(
+        result=good, hygiene={"verdict": "session-state-found"}, tokens=2
+    )
+    assert dirty["passed"] is False
+    assert dirty["hygiene_clean"] is False
+    no_negatives = _verdicts(result={"negative_cases": []}, hygiene=None, tokens=2)
+    assert no_negatives["passed"] is False
+
+
+def test_probes_come_from_both_sides_of_the_session() -> None:
+    result = {"share_probes": ["aaa", "bbb"]}
+    statuses = {
+        "P0": {"close_evidence": {"spilled_probes": ["ccc", "aaa"]}},
+        "P1": {"close_evidence": {"spilled_probes": ["ddd"]}},
+        "P2": {"close_evidence": {}},
+    }
+    assert _probes(result, statuses) == ["aaa", "bbb", "ccc", "ddd"]
+    assert _probes({}, {}) == []
+
+
+def test_the_readme_is_written_from_the_run(tmp_path: Path) -> None:
+    document = _document()
+    text = _readme(document=document, reveal=_reveal())
+    assert "# D6 three-instance enclave run (d6-unit)" in text
+    for role in ROLES:
+        assert f"| {role} | `i-{role.lower()}` |" in text
+    assert "| 1 | 11 | `cipher` | 11 | `True` | 812.5 |" in text
+    assert "`duplicate_result_frame` | `True` | rejected |" in text
+    assert "| Files under the session root | 6 | 0 |" in text
+    assert "| Gate | `True` |" in text
+    assert "no undefined" not in text
+    assert text.endswith("\n")
+
+
+def test_the_enclave_template_carries_the_session_root() -> None:
+    template = (
+        Path(__file__).resolve().parents[2]
+        / "tee"
+        / "gramine"
+        / "enclave"
+        / "d6_node.manifest.template"
+    ).read_text(encoding="utf-8")
+    assert "@SESSION_ROOT@" in template
+    assert 'path = "@SESSION_ROOT@", uri = "file:@SESSION_ROOT@"' in template
+    assert '"file:@SESSION_ROOT@/"' in template
+    command = enclave_sign_command(
+        enclave_dir="/e",
+        python="~/venv/bin/python",
+        repo="/repo",
+        workspace="/ws",
+        node_name="d6_node",
+        session_root="/dev/shm/a122-d6/d6-unit",
+    )
+    assert '-e "s|@SESSION_ROOT@|/dev/shm/a122-d6/d6-unit|g"' in command
+    assert "gramine-sgx-sign --manifest d6_node.manifest" in command

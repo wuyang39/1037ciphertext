@@ -405,12 +405,18 @@ def enclave_sign_command(
     enclave_size: str = DEFAULT_ENCLAVE_SIZE,
     max_threads: int = DEFAULT_MAX_THREADS,
     stack_size: str = DEFAULT_STACK_SIZE,
+    session_root: str = "",
 ) -> str:
     """Render and sign the node manifest on the instance that will run it.
 
     Every value the template carries is a path the instance resolves itself, so
     the measurement describes the interpreter, the venv, the repo and the
     workspace that are really there rather than a laptop's guess at them.
+
+    ``session_root`` only matters for a template that names ``@SESSION_ROOT@``
+    -- the D6 node mounts and empties one session directory -- and the sed pass
+    is a no-op for the D4/D5 templates that do not carry the token, so the
+    three phases keep signing the same manifests they signed before.
     """
     substitutions = [
         ("@PYTHON@", "$PY"),
@@ -424,6 +430,7 @@ def enclave_sign_command(
         ("@ENCLAVE_SIZE@", enclave_size),
         ("@MAX_THREADS@", str(int(max_threads))),
         ("@STACK_SIZE@", stack_size),
+        ("@SESSION_ROOT@", session_root),
     ]
     sed_flags = " ".join(
         f'-e "s|{token}|{value}|g"' for token, value in substitutions
@@ -532,16 +539,32 @@ def prepare_enclave(
     enclave_size: str = DEFAULT_ENCLAVE_SIZE,
     max_threads: int = DEFAULT_MAX_THREADS,
     stack_size: str = DEFAULT_STACK_SIZE,
+    session_root: str = "",
+    prepare_session_root: bool = False,
 ) -> dict[str, Any]:
     """Sign the node enclave on every instance and return how to start it.
 
     One signing key is generated on the driver's host and copied to the peers,
     so all three ranks measure the same enclave: both the manifest contents and
     the key's hash end up inside the measurement.
+
+    A template that names ``@SESSION_ROOT@`` needs its directory to exist before
+    Gramine resolves the manifest, so ``prepare_session_root`` creates it on
+    every instance first. It is left empty, and the node fills and empties it.
     """
     template = Path(template)
     if not template.is_file():
         raise ThreeHostError(f"the enclave template is missing: {template}")
+    if prepare_session_root:
+        if not session_root:
+            raise ThreeHostError("a session root is required to prepare one")
+        for role in ROLES:
+            transport.run(
+                role_routes[role],
+                f"mkdir -p {shlex.quote(session_root)} && "
+                f"chmod 700 {shlex.quote(session_root)}",
+                check=False,
+            )
     resolved = _absolute_paths(
         transport,
         role_routes[DRIVER],

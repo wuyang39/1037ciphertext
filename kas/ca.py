@@ -15,6 +15,10 @@ from .errors import AttestationRejected
 
 
 RELEASE_EXTENSION_OID = ObjectIdentifier("1.3.6.1.4.1.55555.1.1")
+# The CA signs one identity per SPU party plus the client that drives them.
+# D6 introduces the client certificate so the share channel can authenticate
+# "C" as its own role instead of borrowing a node identity.
+SIGNED_IDENTITY_ROLES = frozenset({"C", "P0", "P1", "P2"})
 
 
 @dataclass(frozen=True)
@@ -74,8 +78,8 @@ class CertificateAuthority:
             public_key.curve, ec.SECP256R1
         ):
             raise AttestationRejected("node key must be P-256")
-        if role not in {"P0", "P1", "P2"}:
-            raise AttestationRejected("invalid node role")
+        if role not in SIGNED_IDENTITY_ROLES:
+            raise AttestationRejected("invalid certificate role")
 
         subject = x509.Name(
             [

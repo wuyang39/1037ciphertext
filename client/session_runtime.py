@@ -111,6 +111,25 @@ class NodeSessionRuntime:
         self._closed = True
         return self.session.close(payload)
 
+    def accept_close(self, frame: EncryptedFrame | Mapping[str, Any]) -> None:
+        """Consume the client's Close frame and refuse any later request.
+
+        The client ends the session; the node authenticates that frame with the
+        same session keys every request used, and only then does it stop
+        accepting work.
+        """
+        if self._closed:
+            raise SessionClosed("runtime session is closed")
+        parsed = (
+            frame
+            if isinstance(frame, EncryptedFrame)
+            else EncryptedFrame.from_dict(frame)
+        )
+        if parsed.aad.message_type != "Close":
+            raise ResultRejected("runtime accepts only a Close frame here")
+        self.session.receive(parsed)
+        self._closed = True
+
 
 def parse_request_payload(payload: bytes) -> dict[str, Any]:
     """Parse the narrow JSON request shape accepted by the fixed graph."""

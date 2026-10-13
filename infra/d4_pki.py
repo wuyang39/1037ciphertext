@@ -27,6 +27,9 @@ DEFAULT_RELEASE_ID = "a122-d4"
 DEFAULT_TTL_HOURS = 24
 CA_COMMON_NAME = "A1-22 D4 KAS CA"
 FOREIGN_CA_COMMON_NAME = "A1-22 D4 Foreign CA"
+# D4 issues the three SPU parties. D6 adds the client identity, so the CA that
+# signs the mesh also signs the role the share channel authenticates "C" with.
+ISSUABLE_ROLES = frozenset({"C", "P0", "P1", "P2"})
 
 
 class D4PKIError(ValueError):
@@ -114,11 +117,11 @@ def issue_node_credentials(
     ttl_hours: int = DEFAULT_TTL_HOURS,
 ) -> NodeCredentials:
     """Issue one node certificate through the KAS CA."""
-    if role not in {"P0", "P1", "P2"}:
-        raise D4PKIError("the node role must be P0, P1, or P2")
+    if role not in ISSUABLE_ROLES:
+        raise D4PKIError("the certificate role must be C, P0, P1, or P2")
     effective_san = san_role or role
-    if effective_san not in {"P0", "P1", "P2"}:
-        raise D4PKIError("the SAN role must be P0, P1, or P2")
+    if effective_san not in ISSUABLE_ROLES:
+        raise D4PKIError("the SAN role must be C, P0, P1, or P2")
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     now = dt.datetime.now(dt.timezone.utc)

@@ -105,8 +105,17 @@ def serve_share_channel(
     host: str,
     port: int,
     handler: Callable[[TLSFrameChannel], None],
+    threaded: bool = False,
+    connection_timeout: float = 10.0,
 ) -> TLSFrameServer:
-    server = TLSFrameServer(identity=identity, handler=handler, host=host, port=port)
+    server = TLSFrameServer(
+        identity=identity,
+        handler=handler,
+        host=host,
+        port=port,
+        threaded=threaded,
+        connection_timeout=connection_timeout,
+    )
     server.start()
     return server
 

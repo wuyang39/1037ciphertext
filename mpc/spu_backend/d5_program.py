@@ -517,7 +517,13 @@ def _block_shape(kind: str, config: D5Config) -> tuple[int, ...]:
         raise D5ProgramError(f"unknown block input kind {kind!r}") from exc
 
 
-def build_block_program(config: D5Config) -> SpuProgram:
+def build_block_program(
+    config: D5Config,
+    *,
+    extra_inputs: Sequence[TensorSpec] = (),
+    prelude: Sequence[str] = (),
+    h_operand: str = "%h",
+) -> SpuProgram:
     """One pre-norm Tiny Decoder block followed by a final norm, LM head and
     secure Argmax, expressed with no plaintext reveal.
 
@@ -525,6 +531,11 @@ def build_block_program(config: D5Config) -> SpuProgram:
     pattern before the sum, which is exactly the shifted Softmax with the
     future positions removed and avoids ever feeding a huge negative exponent
     to the SPU exponential protocol.
+
+    ``prelude``/``extra_inputs``/``h_operand`` let D6 fuse the token-embedding
+    lookup in front of the same block without a second program: the prelude
+    emits the IR that produces the hidden states, and the block then reads them
+    from ``h_operand`` instead of from the ``%h`` argument.
     """
     seq, d, heads, head, inter, vocab = (
         config.sequence,
@@ -552,11 +563,18 @@ def build_block_program(config: D5Config) -> SpuProgram:
     one = "tensor<1xf64>"
 
     emitter = _Emitter()
-    inputs = tuple(
+    for line in prelude:
+        emitter.raw(line)
+    specs = [
         TensorSpec(name, _block_shape(kind, config)) for name, kind in BLOCK_INPUT_SPECS
-    )
+    ]
+    if h_operand != "%h":
+        # The prelude produced the hidden states, so the block no longer takes
+        # them as an argument and ``%h`` appears nowhere in the body.
+        specs = [spec for spec in specs if spec.name != "h"]
+    inputs = tuple(specs) + tuple(extra_inputs)
     normalized_1 = _emit_layernorm(
-        emitter, "%h", matrix, seq, d, "%ln1_weight", "%ln1_bias"
+        emitter, h_operand, matrix, seq, d, "%ln1_weight", "%ln1_bias"
     )
     query = _emit_linear(
         emitter, normalized_1, matrix, "%wq", square, "%bq", hidden, matrix, [1]
@@ -633,7 +651,7 @@ def build_block_program(config: D5Config) -> SpuProgram:
         matrix,
         [1],
     )
-    residual = emitter.assign("rz", f"mhlo.add %h, {projected} : {matrix}")
+    residual = emitter.assign("rz", f"mhlo.add {h_operand}, {projected} : {matrix}")
     normalized_2 = _emit_layernorm(
         emitter, residual, matrix, seq, d, "%ln2_weight", "%ln2_bias"
     )
