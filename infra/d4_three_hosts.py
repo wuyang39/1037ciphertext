@@ -199,8 +199,11 @@ class Transport:
         self._clients: dict[str, Any] = {}
 
     def _connect(self, route: SSHRoute) -> Any:
-        if route.ssh_target in self._clients:
-            return self._clients[route.ssh_target]
+        return self._client(route.ssh_target, route)
+
+    def _client(self, key: str, route: SSHRoute) -> Any:
+        if key in self._clients:
+            return self._clients[key]
         try:
             import paramiko
         except ImportError as exc:  # pragma: no cover - operator environment
@@ -223,8 +226,19 @@ class Transport:
             kwargs["look_for_keys"] = False
             kwargs["allow_agent"] = False
         client.connect(route.ssh_target.split("@")[-1], **kwargs)
-        self._clients[route.ssh_target] = client
+        self._clients[key] = client
         return client
+
+    def _sftp_client(self, route: SSHRoute) -> Any:
+        """A connection of the ssh session family reserved for file transfer.
+
+        The exec connection sometimes wedges -- paramiko has been seen to block
+        opening a channel on a connection whose session the peer has not
+        finished with -- and a transfer that shared it would hang with it.
+        Keeping the transfers on their own connection means a stuck exec
+        channel can no longer take the evidence with it.
+        """
+        return self._client(f"{route.ssh_target}#sftp", route)
 
     def run(
         self,
@@ -263,9 +277,17 @@ class Transport:
                     f"{route.role}: command did not finish within {seconds:.0f}s: "
                     f"{command}"
                 )
-            # Exit status can be ready before the last bytes are readable.
-            if channel.exit_status_ready() and time.monotonic() - quiet_since > 0.3:
-                break
+            # Exit status can be ready before the last bytes are readable, and
+            # closing the channel while the server still has output queued
+            # wedges it: the peer blocks writing to a window nobody drains and
+            # then cannot answer the channel opens that follow, so the next
+            # sftp get on the same connection never returns. Wait for the
+            # server's EOF, and fall back to a drained quiet window for a
+            # server that does not send one.
+            if channel.exit_status_ready() and not channel.recv_ready():
+                if not channel.recv_stderr_ready():
+                    if channel.eof_received or time.monotonic() - quiet_since > 2.0:
+                        break
             time.sleep(0.05)
         status = channel.recv_exit_status()
         channel.close()
@@ -308,7 +330,7 @@ class Transport:
         return collected.decode("utf-8", "replace")
 
     def get(self, route: SSHRoute, remote: str, local: Path) -> None:
-        sftp = self._connect(route).open_sftp()
+        sftp = self._open_sftp(route)
         try:
             Path(local).parent.mkdir(parents=True, exist_ok=True)
             sftp.get(self._expand(sftp, remote), str(local))
@@ -316,11 +338,19 @@ class Transport:
             sftp.close()
 
     def put(self, route: SSHRoute, local: Path, remote: str) -> None:
-        sftp = self._connect(route).open_sftp()
+        sftp = self._open_sftp(route)
         try:
             sftp.put(str(local), self._expand(sftp, remote))
         finally:
             sftp.close()
+
+    def _open_sftp(self, route: SSHRoute) -> Any:
+        """Open an sftp session on the transfer connection, retrying once."""
+        try:
+            return self._sftp_client(route).open_sftp()
+        except Exception:  # noqa: BLE001 - retried on a new connection
+            self._clients.pop(f"{route.ssh_target}#sftp", None)
+            return self._sftp_client(route).open_sftp()
 
     @staticmethod
     def _expand(sftp: Any, remote: str) -> str:
