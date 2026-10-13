@@ -67,6 +67,11 @@ Gramine 运行 `d1-20261012T1830`，证据在
   `d4-enclave-negs-3host-20261013T052407Z`：三台各自签名自己的 manifest，
   正向与四个负例同样全过。三份测量值互不相同，原因见
   [d4-acceptance.md](d4-acceptance.md) 4.8 节）
+- [x] enclave 内把四类 fail-closed 负例连跑三次。（运行
+  `d4-enclave-negs-repeat-3host-20261013T0907Z`：三次的四个场景全部退出码 3、
+  拒绝理由逐句相同，`all_refused: true`、`unexpected_cases: []`，明文探针
+  三次都连上监听端口且都没有业务应答；每台实例的 MRENCLAVE 在三次之间逐字节
+  复现）
 - [ ] 证书来自真实 attestation 放行：Quote → 验证 → 签发短期身份/Lease 的
   KAS 链路尚未实现。enclave 内执行已经跑通，缺的只是这一段。
 
@@ -87,7 +92,9 @@ D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
 [docs/evidence/d4-enclave-20261013T0530Z](evidence/d4-enclave-20261013T0530Z)
 、[docs/evidence/d4-enclave-3host-20261013T052121Z](evidence/d4-enclave-3host-20261013T052121Z)
 与
-[docs/evidence/d4-enclave-negs-3host-20261013T052407Z](evidence/d4-enclave-negs-3host-20261013T052407Z)。
+[docs/evidence/d4-enclave-negs-3host-20261013T052407Z](evidence/d4-enclave-negs-3host-20261013T052407Z)
+，以及 enclave 内负例连跑三次的
+[docs/evidence/d4-enclave-negs-repeat-3host-20261013T0907Z](evidence/d4-enclave-negs-repeat-3host-20261013T0907Z)。
 链路、证书、抓包、拒绝路径和 `gramine-sgx` 内的执行都是实测；真实 attestation
 放行仍未验证。
 

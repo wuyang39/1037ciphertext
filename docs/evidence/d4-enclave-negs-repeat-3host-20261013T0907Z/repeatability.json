@@ -1,0 +1,143 @@
+{
+  "all_runs_refused": true,
+  "case_verdicts_across_runs": {
+    "no-client-cert": [
+      "refused"
+    ],
+    "tls-disabled": [
+      "refused"
+    ],
+    "wrong-ca": [
+      "refused"
+    ],
+    "wrong-san": [
+      "refused"
+    ]
+  },
+  "enclosure": "gramine-sgx",
+  "mode": "three-instances",
+  "phase": "D4",
+  "runs": [
+    {
+      "all_listeners_connected": true,
+      "all_refused": true,
+      "any_plaintext_service": false,
+      "cases": {
+        "no-client-cert": {
+          "elapsed_seconds": 76.578,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: ",
+          "verdict": "refused"
+        },
+        "tls-disabled": {
+          "elapsed_seconds": 8.188,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS",
+          "verdict": "refused"
+        },
+        "wrong-ca": {
+          "elapsed_seconds": 8.203,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA",
+          "verdict": "refused"
+        },
+        "wrong-san": {
+          "elapsed_seconds": 8.14,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate SAN does not match its role",
+          "verdict": "refused"
+        }
+      },
+      "commit": "eacb7a690000af060a6127d620c8c1d692a13700",
+      "label": "run-1",
+      "measurements": {
+        "P0": "eecd9c8e19832fa4669db81327d51ea9f403885a1de02481d829cd3600034de4",
+        "P1": "83219c425fed157d228973ebcdf18926f07b2797a51744f9092f62fe8efab0fc",
+        "P2": "32880b8a59bbeb61873f991f105bf14a4f1726c0f3657b0a9653c191b5cc49eb"
+      },
+      "run_id": "d4-enclave-negs-r1-3host-20261013T080442Z",
+      "unexpected_cases": []
+    },
+    {
+      "all_listeners_connected": true,
+      "all_refused": true,
+      "any_plaintext_service": false,
+      "cases": {
+        "no-client-cert": {
+          "elapsed_seconds": 78.328,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: ",
+          "verdict": "refused"
+        },
+        "tls-disabled": {
+          "elapsed_seconds": 8.438,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS",
+          "verdict": "refused"
+        },
+        "wrong-ca": {
+          "elapsed_seconds": 8.25,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA",
+          "verdict": "refused"
+        },
+        "wrong-san": {
+          "elapsed_seconds": 8.156,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate SAN does not match its role",
+          "verdict": "refused"
+        }
+      },
+      "commit": "eacb7a690000af060a6127d620c8c1d692a13700",
+      "label": "run-2",
+      "measurements": {
+        "P0": "eecd9c8e19832fa4669db81327d51ea9f403885a1de02481d829cd3600034de4",
+        "P1": "83219c425fed157d228973ebcdf18926f07b2797a51744f9092f62fe8efab0fc",
+        "P2": "32880b8a59bbeb61873f991f105bf14a4f1726c0f3657b0a9653c191b5cc49eb"
+      },
+      "run_id": "d4-enclave-negs-rp2-3host-20261013T0845Z",
+      "unexpected_cases": []
+    },
+    {
+      "all_listeners_connected": true,
+      "all_refused": true,
+      "any_plaintext_service": false,
+      "cases": {
+        "no-client-cert": {
+          "elapsed_seconds": 76.25,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the BRPC link could not be established: what: ",
+          "verdict": "refused"
+        },
+        "tls-disabled": {
+          "elapsed_seconds": 8.312,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: the SPU link must not run without TLS",
+          "verdict": "refused"
+        },
+        "wrong-ca": {
+          "elapsed_seconds": 8.156,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate was not signed by the KAS CA",
+          "verdict": "refused"
+        },
+        "wrong-san": {
+          "elapsed_seconds": 8.25,
+          "exit_status": 3,
+          "refusal_line": "A122-D4-NODE-REFUSED SpuBackendError: peer P2 certificate SAN does not match its role",
+          "verdict": "refused"
+        }
+      },
+      "commit": "eacb7a690000af060a6127d620c8c1d692a13700",
+      "label": "run-3",
+      "measurements": {
+        "P0": "eecd9c8e19832fa4669db81327d51ea9f403885a1de02481d829cd3600034de4",
+        "P1": "83219c425fed157d228973ebcdf18926f07b2797a51744f9092f62fe8efab0fc",
+        "P2": "32880b8a59bbeb61873f991f105bf14a4f1726c0f3657b0a9653c191b5cc49eb"
+      },
+      "run_id": "d4-enclave-negs-rp3-3host-20261013T0855Z",
+      "unexpected_cases": []
+    }
+  ],
+  "scope": "three independent repeats of the four fail-closed negative cases with P0/P1/P2 as separate instances and every node inside a Gramine-SGX enclave"
+}

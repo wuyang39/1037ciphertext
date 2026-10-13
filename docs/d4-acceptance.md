@@ -7,11 +7,14 @@
 > 单实例 `d4-enclave-20261013T0530Z`（提交 `560deff`）、三实例正向
 > `d4-enclave-3host-20261013T052121Z` 与三实例负例
 > `d4-enclave-negs-3host-20261013T052407Z`（提交 `63937a0`）。
+> 四个 fail-closed 负例在 enclave 内连跑三次的复跑是
+> `d4-enclave-negs-repeat-3host-20261013T0907Z`（提交 `eacb7a6`）。
 >
 > 结论：**D4 传输层与算子网格通过，已在三台独立实例上复跑，三个 SPU 参与方
 > 也已在 `gramine-sgx` enclave 内跑完整套流程**。1,024 组向量全部与固定点
 > 参考一致，协议端口上的抓包只出现 TLS 1.3 记录，明文/证书/关闭 TLS 四类
-> fail-closed 场景在 loopback、跨 VPC、enclave 三种形态下都拒绝。
+> fail-closed 场景在 loopback、跨 VPC、enclave 三种形态下都拒绝；enclave 内
+> 又连跑三次，每次四个场景都拒绝。
 >
 > 范围限定：证书来自本次运行的本地 PKI，不是真实 attestation 放行的短期
 > 身份；三实例 enclave 运行时每台实例各自签署自己的 manifest，因此三份
@@ -289,6 +292,34 @@ checkout、venv 与解释器目录并不是逐字节相同的树：
 仍只打到 P1/P2 的监听端口：四个端口全部 `connected: true`，没有一处给出明文
 业务应答（`any_plaintext_service: false`）。
 
+### 4.9 enclave 内 fail-closed 负例连跑三次
+
+为了排除"单次通过只是偶然"，四个负例在 enclave 内又独立跑了三次
+（`d4-enclave-negs-repeat-3host-20261013T0907Z`，提交 `eacb7a6`）：每次都
+从干净的端口状态起一个完整的三实例 enclave 网格，跑完同一个四场景序列。
+
+| 场景 | run-1 | run-2 | run-3 |
+| --- | --- | --- | --- |
+| `wrong-ca` | refused，退出 3（8.20 s） | refused，退出 3（8.25 s） | refused，退出 3（8.16 s） |
+| `wrong-san` | refused，退出 3（8.14 s） | refused，退出 3（8.16 s） | refused，退出 3（8.25 s） |
+| `no-client-cert` | refused，退出 3（76.58 s） | refused，退出 3（78.33 s） | refused，退出 3（76.25 s） |
+| `tls-disabled` | refused，退出 3（8.19 s） | refused，退出 3（8.44 s） | refused，退出 3（8.31 s） |
+
+三次的 `all_refused` 均为 true，`unexpected_cases` 均为空，拒绝理由逐句相同；
+明文探针三次都连上了 P1/P2 的四个监听端口（`all_listeners_connected: true`）
+且都没有业务应答（`any_plaintext_service: false`）。
+
+**同一次运行内三台实例的测量值互不相同，但每台在三次之间逐字节复现**：
+
+| 角色 | MRENCLAVE（run-1/2/3 相同） |
+| --- | --- |
+| P0 | `eecd9c8e19832fa4669db81327d51ea9f403885a1de02481d829cd3600034de4` |
+| P1 | `83219c425fed157d228973ebcdf18926f07b2797a51744f9092f62fe8efab0fc` |
+| P2 | `32880b8a59bbeb61873f991f105bf14a4f1726c0f3657b0a9653c191b5cc49eb` |
+
+也就是说，只要受测的那棵树不变，同一台实例量出的 MRENCLAVE 是稳定的；三台
+之间的差异只来自各自那棵 checkout/解释器树（4.8），不是签名或运行的抖动。
+
 ## 5. 关键值
 
 | 项目 | 值 |
@@ -318,6 +349,7 @@ checkout、venv 与解释器目录并不是逐字节相同的树：
 | 三实例 enclave `d4-three-P2.pcap` | 143478805 字节，sha256 `34a4a61e101c93bc9215a15a9c7854923c23937648a36b24156d3307a7ca9126` |
 | 三实例 enclave evidence-index.json | sha256 `5f9bd7d5f747e608c2fa3ac08eaacbc1d4321ea7e80d6c0b5a557c13e69a78dd` |
 | 三实例 enclave 负例 evidence-index.json | sha256 `064e47454b1aabb0bf02bc667c2cdc09a7d6e6177050b1efb2148cd2a5cf951c` |
+| enclave 负例三次复跑 evidence-index.json | sha256 `eb9ff5b186ba68d1ece602f0e9e715476e973a66dc9264f0c65c298d23d50199` |
 
 ## 6. 证据位置
 
@@ -332,6 +364,8 @@ checkout、venv 与解释器目录并不是逐字节相同的树：
 [docs/evidence/d4-enclave-3host-20261013T052121Z](evidence/d4-enclave-3host-20261013T052121Z)
 和
 [docs/evidence/d4-enclave-negs-3host-20261013T052407Z](evidence/d4-enclave-negs-3host-20261013T052407Z)；
+enclave 内负例的三次复跑在
+[docs/evidence/d4-enclave-negs-repeat-3host-20261013T0907Z](evidence/d4-enclave-negs-repeat-3host-20261013T0907Z)；
 每个目录都有一份 `README.md` 说明每个文件的含义。
 
 四个封存目录里共八份原始抓包都超过 GitHub 单文件上限，未随仓库提交：入库
@@ -365,10 +399,14 @@ sha256，把原件放回目录只会收紧校验，不会绕过校验。
    运行的本地 PKI，不是真实 attestation 放行出来的短期身份和 Lease。enclave
    内执行的代码路径已经跑通，缺的是"Quote → 验证 → 放行证书"这一段。
 2. **三个 enclave 的测量值不一致**：三实例运行时每台各自签署自己的 manifest，
-   测的是各自那棵树，因此 4.8 列出三个不同的 MRENCLAVE。要给出"三方运行同一
-   份受测代码"的单一测量值，需要先把代码与运行环境做成同一份 staged 树。
-3. **负例的次数**：错误 CA/SAN、无客户端证书、关闭 TLS 各跑过一次（4.6 与
-   4.8），单次通过不足以排除"偶尔放行"，也没有做重复运行统计。
+   测的是各自那棵树，因此 4.8 列出三个不同的 MRENCLAVE。4.9 的复跑证明同一
+   棵树上的测量值跨运行稳定（每台三次逐字节复现），但三台之间仍不一致；要给出
+   "三方运行同一份受测代码"的单一测量值，需要先把代码与运行环境做成同一份
+   staged 树，这一步还没做。
+3. **负例只覆盖 fail-closed 这一半的重复**：错误 CA/SAN、无客户端证书、关闭
+   TLS 四个场景已在 enclave 内连跑三次（4.9），三次全部拒绝、拒绝理由一致，
+   未出现偶发放行；但"偶尔放行"的反面——正向网格与抓包——仍只有单次 enclave
+   记录（4.7、4.8），没有做同样的多次统计。
 4. **D5 之后**：Tiny Decoder Block、两 token 自回归、正式英文 GPT-2 和性能
    对照均未执行。
 

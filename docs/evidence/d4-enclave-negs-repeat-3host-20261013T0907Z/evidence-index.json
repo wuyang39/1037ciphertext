@@ -1,0 +1,92 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "file_count": 17,
+  "files": [
+    {
+      "bytes": 4738,
+      "path": "README.md",
+      "sha256": "d623fd2979fafbdca857209c3863d2b5dc73172be796725b4d3e5ab934878f19"
+    },
+    {
+      "bytes": 5192,
+      "path": "repeatability.json",
+      "sha256": "e655dde818c0e19c8c68635dc5cd57093db2dcddae75cf34540023cc0f411f78"
+    },
+    {
+      "bytes": 9498,
+      "path": "run-1/d4-enclave-p0-sign.txt",
+      "sha256": "506dad0d10aa5c008ce29ab8b1e5539e57fe85327d78ae375779d0a9fbe0c45d"
+    },
+    {
+      "bytes": 9459,
+      "path": "run-1/d4-enclave-p1-sign.txt",
+      "sha256": "868b4e85e69323f158ec23f5d9a6034df7b58dd3a41a0dd07ef2693b46179853"
+    },
+    {
+      "bytes": 9459,
+      "path": "run-1/d4-enclave-p2-sign.txt",
+      "sha256": "4d88d784f9c38ff620f7f430e5749c384ed922125d045a4f9aa346ce47e46cfd"
+    },
+    {
+      "bytes": 939,
+      "path": "run-1/d4-negatives-plaintext-probes.json",
+      "sha256": "12b5685175d7e808169a53921a07f86a6493987b64efc172edfcf8e62e8da350"
+    },
+    {
+      "bytes": 7390,
+      "path": "run-1/d4-negatives-summary.json",
+      "sha256": "d63b960c580f3e3928763064631f8604e036db83fda249535095e4ca975ab48f"
+    },
+    {
+      "bytes": 9498,
+      "path": "run-2/d4-enclave-p0-sign.txt",
+      "sha256": "506dad0d10aa5c008ce29ab8b1e5539e57fe85327d78ae375779d0a9fbe0c45d"
+    },
+    {
+      "bytes": 9459,
+      "path": "run-2/d4-enclave-p1-sign.txt",
+      "sha256": "868b4e85e69323f158ec23f5d9a6034df7b58dd3a41a0dd07ef2693b46179853"
+    },
+    {
+      "bytes": 9459,
+      "path": "run-2/d4-enclave-p2-sign.txt",
+      "sha256": "4d88d784f9c38ff620f7f430e5749c384ed922125d045a4f9aa346ce47e46cfd"
+    },
+    {
+      "bytes": 939,
+      "path": "run-2/d4-negatives-plaintext-probes.json",
+      "sha256": "12b5685175d7e808169a53921a07f86a6493987b64efc172edfcf8e62e8da350"
+    },
+    {
+      "bytes": 7387,
+      "path": "run-2/d4-negatives-summary.json",
+      "sha256": "25cdbb4049d4dfbefa9f7a04daf1adbf54eb6ac233a8d39f86fd257f09748c58"
+    },
+    {
+      "bytes": 9498,
+      "path": "run-3/d4-enclave-p0-sign.txt",
+      "sha256": "506dad0d10aa5c008ce29ab8b1e5539e57fe85327d78ae375779d0a9fbe0c45d"
+    },
+    {
+      "bytes": 9459,
+      "path": "run-3/d4-enclave-p1-sign.txt",
+      "sha256": "868b4e85e69323f158ec23f5d9a6034df7b58dd3a41a0dd07ef2693b46179853"
+    },
+    {
+      "bytes": 9459,
+      "path": "run-3/d4-enclave-p2-sign.txt",
+      "sha256": "4d88d784f9c38ff620f7f430e5749c384ed922125d045a4f9aa346ce47e46cfd"
+    },
+    {
+      "bytes": 939,
+      "path": "run-3/d4-negatives-plaintext-probes.json",
+      "sha256": "12b5685175d7e808169a53921a07f86a6493987b64efc172edfcf8e62e8da350"
+    },
+    {
+      "bytes": 7386,
+      "path": "run-3/d4-negatives-summary.json",
+      "sha256": "40c83f2e51acc4d78cbf2c2a20f8befff14032ea73846b6b3422dfaf1e6e5bbf"
+    }
+  ],
+  "root": "d4-enclave-negs-repeat-3host-20261013T0907Z"
+}
