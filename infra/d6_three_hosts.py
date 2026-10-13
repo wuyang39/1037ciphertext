@@ -47,6 +47,7 @@ from infra.d4_three_hosts import (
     Transport,
     capture_command,
     endpoints,
+    kill_nodes,
     load_cluster,
     node_command,
     prepare_enclave,
@@ -69,6 +70,7 @@ DESTINATION = "P0"
 DEFAULT_WORKSPACE = "~/a122-d6/three/workspace"
 MODULE = "tee.enclave.d6_node"
 NODE_NAME = "d6_node"
+NODE_PATTERN = r"tee\.enclave\.d6_node"
 ENCLAVE_TEMPLATE = "tee/gramine/enclave/d6_node.manifest.template"
 READY_MARKER = "A122-D6-NODE-READY"
 DONE_MARKER = "A122-D6-NODE-DONE"
@@ -870,6 +872,11 @@ def run_three_hosts(
             )
         time.sleep(2.0)
 
+        # A node left over from an earlier attempt still holds its share port,
+        # and the failure it causes ("Address already in use") looks like a
+        # defect in this run rather than a ghost of the last one.
+        kill_nodes(transport, role_routes, pattern=NODE_PATTERN)
+        time.sleep(1.0)
         for role in ("P1", "P2", "P0"):
             transport.start_background(
                 role_routes[role],
@@ -1115,26 +1122,45 @@ def main(argv: Sequence[str] | None = None) -> int:
         key_path=args.ssh_key,
         key_password=args.ssh_key_password,
     )
-    result = run_three_hosts(
-        cluster=cluster,
-        out_dir=args.out_dir,
-        run_id=args.run_id,
-        transport=transport,
-        ssh_user=args.ssh_user,
-        mode=args.mode,
-        ssh_host=args.ssh_host,
-        repo=args.repo,
-        python=args.python,
-        workspace=args.workspace,
-        iface=args.iface,
-        seed=args.seed,
-        prompt=args.prompt,
-        max_new_tokens=args.max_new_tokens,
-        node_timeout=args.timeout,
-        expect_commit=args.expect_commit,
-        seal=args.seal,
-        dry_run=args.dry_run,
-    )
+    try:
+        result = run_three_hosts(
+            cluster=cluster,
+            out_dir=args.out_dir,
+            run_id=args.run_id,
+            transport=transport,
+            ssh_user=args.ssh_user,
+            mode=args.mode,
+            ssh_host=args.ssh_host,
+            repo=args.repo,
+            python=args.python,
+            workspace=args.workspace,
+            iface=args.iface,
+            seed=args.seed,
+            prompt=args.prompt,
+            max_new_tokens=args.max_new_tokens,
+            node_timeout=args.timeout,
+            expect_commit=args.expect_commit,
+            seal=args.seal,
+            dry_run=args.dry_run,
+        )
+    except BaseException:
+        # A run that died half way through must not leave a node holding its
+        # port or a tcpdump holding the interface: the next attempt would fail
+        # on someone else's leftovers and the instance would burn CPU until a
+        # person noticed.
+        if not args.dry_run:
+            try:
+                stray = routes(cluster, user=args.ssh_user, ssh_host=args.ssh_host)
+                kill_nodes(transport, stray, pattern=NODE_PATTERN)
+                for role in ROLES:
+                    transport.run(
+                        stray[role],
+                        f"pkill -9 -f {shlex.quote('tcpdump -i ' + args.iface)} || true",
+                        check=False,
+                    )
+            except Exception:  # noqa: BLE001 - the original failure matters more
+                pass
+        raise
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     if result.get("dry_run"):
         return 0

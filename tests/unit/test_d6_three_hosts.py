@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from infra.d4_three_hosts import (
@@ -14,6 +15,8 @@ from infra.d4_three_hosts import (
 from infra.d6_three_hosts import (
     D6_PORTS,
     DEFAULT_PROMPT,
+    MODULE,
+    NODE_PATTERN,
     capture_filter,
     _probes,
     _readme,
@@ -194,6 +197,13 @@ def test_capture_filter_names_every_d6_port() -> None:
 
 def test_session_root_is_under_the_tmpfs() -> None:
     assert session_root("d6-x") == "/dev/shm/a122-d6/d6-x"
+
+
+def test_the_leftover_node_pattern_matches_the_node_the_driver_starts() -> None:
+    """The sweep before a run has to match this driver's own node module."""
+    assert re.search(NODE_PATTERN, f"{MODULE} --config /w/configs/P0.json")
+    # And it must not be so loose that it also matches an unrelated process.
+    assert re.search(NODE_PATTERN, "tee.enclave.spu_node") is None
 
 
 def test_every_gate_clause_has_to_hold() -> None:

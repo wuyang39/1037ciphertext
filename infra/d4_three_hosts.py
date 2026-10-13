@@ -1109,12 +1109,23 @@ def probe_command(*, python: str, repo: str, host: str, port: int) -> str:
     )
 
 
-def kill_nodes(transport: Transport, role_routes: Mapping[str, SSHRoute]) -> None:
-    """Stop every node process on every instance."""
+def kill_nodes(
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    *,
+    pattern: str = NODE_PATTERN,
+) -> None:
+    """Stop every node process on every instance.
+
+    The signal is SIGKILL on purpose. A node running under ``gramine-sgx``
+    executes inside the enclave and does not act on the SIGTERM the loader
+    forwards, so a plain ``pkill`` reports success and leaves the listener
+    bound -- which then makes the next run fail on ``Address already in use``.
+    """
     for role in ROLES:
         transport.run(
             role_routes[role],
-            f"pkill -f {shlex.quote(NODE_PATTERN)} || true",
+            f"pkill -9 -f {shlex.quote(pattern)} || true",
             check=False,
         )
 
