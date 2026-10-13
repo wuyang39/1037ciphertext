@@ -74,6 +74,8 @@ NODE_PATTERN = r"tee\.enclave\.d6_node"
 ENCLAVE_TEMPLATE = "tee/gramine/enclave/d6_node.manifest.template"
 READY_MARKER = "A122-D6-NODE-READY"
 DONE_MARKER = "A122-D6-NODE-DONE"
+NODE_DIED_MARKER = "A122-D6-NODE-DIED"
+PYTHON_TRACEBACK = "Traceback (most recent call last)"
 CLIENT_MODULE = "client.d6_runner"
 CLIENT_MARKER = "A122-D6-CLIENT-DONE"
 CLIENT_FAILED_MARKER = "A122-D6-CLIENT-FAILED"
@@ -177,6 +179,62 @@ def _directory_exists(
         check=False,
     )
     return out.strip() == "yes"
+
+
+def wait_for_node_ready(
+    transport: Transport,
+    role_routes: Mapping[str, Any],
+    *,
+    logs: Mapping[str, str],
+    marker: str = READY_MARKER,
+    timeout: float,
+    poll: float = 2.0,
+) -> dict[str, str]:
+    """Wait for every node's ready line, and report one that died instead.
+
+    A node that fails on startup writes a traceback and stays dead, so its
+    marker never arrives; waiting out the whole node timeout for that leaves
+    the operator watching a run that already ended, and leaves the other two
+    nodes bound to their ports meanwhile. The failure is read off the log in
+    the same round trip, so the traceback is in hand when the error is raised.
+    """
+    deadline = time.monotonic() + timeout
+    ready: dict[str, str] = {}
+    pending = list(ROLES)
+    last = ""
+    while pending and time.monotonic() < deadline:
+        for role in list(pending):
+            log = logs[role]
+            command = (
+                f"if grep -q {shlex.quote(marker)} {shlex.quote(log)} 2>/dev/null;"
+                f" then grep -m1 {shlex.quote(marker)} {shlex.quote(log)};"
+                f" elif grep -q {shlex.quote(PYTHON_TRACEBACK)}"
+                f" {shlex.quote(log)} 2>/dev/null; then"
+                f" echo {shlex.quote(NODE_DIED_MARKER)};"
+                f" tail -c 2000 {shlex.quote(log)}; fi"
+            )
+            _status, out, _err = transport.run(
+                role_routes[role], command, check=False
+            )
+            text = out.strip()
+            if not text:
+                continue
+            if text.startswith(NODE_DIED_MARKER):
+                raise ThreeHostError(
+                    f"{role} died before it was ready:\n"
+                    f"{text[len(NODE_DIED_MARKER):].strip()}"
+                )
+            ready[role] = text
+            pending.remove(role)
+            last = f"{role} is ready"
+        if pending:
+            time.sleep(poll)
+    if pending:
+        raise ThreeHostError(
+            f"{', '.join(pending)} never reported {marker} within "
+            f"{timeout:.0f}s ({last})"
+        )
+    return ready
 
 
 def _watch_client(
@@ -862,7 +920,7 @@ def run_three_hosts(
         for role in ROLES:
             transport.run(
                 role_routes[role],
-                f"getcap $(command -v tcpdump) 2>/dev/null | grep -q cap_net_raw || "
+                "getcap $(command -v tcpdump) 2>/dev/null | grep -q cap_net_raw || "
                 f"sudo -n setcap cap_net_raw,cap_net_admin+eip $(command -v tcpdump)",
                 check=False,
             )
@@ -890,14 +948,12 @@ def run_three_hosts(
                 ),
             )
             time.sleep(1.0)
-        for role in ROLES:
-            wait_for_marker(
-                transport,
-                role_routes[role],
-                log=node_logs[role],
-                marker=READY_MARKER,
-                timeout=node_timeout,
-            )
+        wait_for_node_ready(
+            transport,
+            role_routes,
+            logs=node_logs,
+            timeout=node_timeout,
+        )
 
         transport.start_background(
             role_routes[DESTINATION],
@@ -1176,6 +1232,7 @@ __all__ = [
     "capture_filter",
     "run_three_hosts",
     "session_root",
+    "wait_for_node_ready",
 ]
 
 

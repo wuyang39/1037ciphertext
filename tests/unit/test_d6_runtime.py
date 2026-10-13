@@ -61,6 +61,19 @@ def test_the_decoder_is_resolved_on_first_use() -> None:
         model.not_a_real_attribute
 
 
+def test_the_node_module_binds_every_frame_type_it_uses() -> None:
+    """The node's step and close branches decode an ``EncryptedFrame``.
+
+    Those branches only run against a live client, so a missing import there
+    stays invisible to the in-process flow test -- which builds its own
+    channel -- and shows up as ``NameError`` on a real run instead.
+    """
+    import tee.enclave.d6_node as node
+    from crypto.frame import EncryptedFrame
+
+    assert node.EncryptedFrame is EncryptedFrame
+
+
 def test_three_node_runtime_results_bind_and_reconstruct() -> None:
     authority = __import__(
         "crypto.certificates", fromlist=["SM2CertificateAuthority"]

@@ -5,9 +5,12 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
 from infra.d4_three_hosts import (
     ENCLAVE_SIGNED_MARKER,
     ROLES,
+    ThreeHostError,
     enclave_sign_command,
     prepare_enclave,
     routes,
@@ -16,12 +19,14 @@ from infra.d6_three_hosts import (
     D6_PORTS,
     DEFAULT_PROMPT,
     MODULE,
+    NODE_DIED_MARKER,
     NODE_PATTERN,
     capture_filter,
     _probes,
     _readme,
     _verdicts,
     session_root,
+    wait_for_node_ready,
 )
 
 
@@ -204,6 +209,52 @@ def test_the_leftover_node_pattern_matches_the_node_the_driver_starts() -> None:
     assert re.search(NODE_PATTERN, f"{MODULE} --config /w/configs/P0.json")
     # And it must not be so loose that it also matches an unrelated process.
     assert re.search(NODE_PATTERN, "tee.enclave.spu_node") is None
+
+
+class _ReadyTransport:
+    """Answers the ready probe with whatever the instance's log would say."""
+
+    def __init__(self, answers: dict[str, str]) -> None:
+        self.answers = answers
+        self.commands: list[str] = []
+
+    def run(self, route, command, **kwargs):
+        self.commands.append(command)
+        return 0, self.answers.get(route.role, ""), ""
+
+
+def test_wait_for_node_ready_collects_all_three() -> None:
+    transport = _ReadyTransport(
+        {role: f"A122-D6-NODE-READY {{'role': '{role}'}}" for role in ROLES}
+    )
+    ready = wait_for_node_ready(
+        transport,                    # type: ignore[arg-type]
+        routes(CLUSTER, user="jiahao"),
+        logs={role: f"/tmp/{role}.log" for role in ROLES},
+        timeout=5.0,
+    )
+    assert set(ready) == set(ROLES)
+    assert "P2" in ready["P2"]
+
+
+def test_wait_for_node_ready_gives_up_as_soon_as_a_node_dies() -> None:
+    """A dead node writes a traceback, so the wait must stop there rather than
+    sit out the whole node timeout with the other two bound to their ports."""
+    transport = _ReadyTransport(
+        {
+            "P0": "A122-D6-NODE-READY {}",
+            "P1": f"{NODE_DIED_MARKER}\nTraceback (most recent call last):\n"
+            "NameError: name 'EncryptedFrame' is not defined",
+            "P2": "",
+        }
+    )
+    with pytest.raises(ThreeHostError, match="P1 died before it was ready"):
+        wait_for_node_ready(
+            transport,                # type: ignore[arg-type]
+            routes(CLUSTER, user="jiahao"),
+            logs={role: f"/tmp/{role}.log" for role in ROLES},
+            timeout=5.0,
+        )
 
 
 def test_every_gate_clause_has_to_hold() -> None:

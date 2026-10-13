@@ -44,7 +44,7 @@ from contracts.d6_session import (
     result_payload,
 )
 from crypto.certificates import SM2Certificate, SM2CertificateAuthority
-from crypto.frame import SecureSession
+from crypto.frame import EncryptedFrame, SecureSession
 from crypto.handshake import HandshakeBindings, NodeHandshake
 from crypto.sm2 import SM2KeyPair
 from infra.evidence import write_json
