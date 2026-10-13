@@ -649,3 +649,99 @@ def test_run_three_hosts_refuses_a_host_on_the_wrong_commit(tmp_path: Path) -> N
             ssh_user="jiahao",
             expect_commit="deadbeef",
         )
+
+
+class _FakeChannel:
+    """A channel that hands out one scripted block of output and then EOF."""
+
+    def __init__(self, text: str) -> None:
+        self._pending = text.encode()
+        self.closed = False
+
+    @property
+    def eof_received(self) -> bool:
+        return not self._pending
+
+    def recv_ready(self) -> bool:
+        return bool(self._pending)
+
+    def recv(self, count: int) -> bytes:
+        chunk, self._pending = self._pending[:count], self._pending[count:]
+        return chunk
+
+    def recv_stderr_ready(self) -> bool:
+        return False
+
+    def recv_stderr(self, count: int) -> bytes:  # pragma: no cover - unused
+        return b""
+
+    def exit_status_ready(self) -> bool:
+        return not self._pending
+
+    def recv_exit_status(self) -> int:
+        return 0
+
+    def close(self) -> None:
+        self.closed = True
+
+
+class _FakeStdout:
+    def __init__(self, channel: _FakeChannel) -> None:
+        self.channel = channel
+
+
+class _FakeClient:
+    """Wedge on the first channel open, then behave like a healthy session."""
+
+    def __init__(self, *, wedge: bool, text: str = "hello\n") -> None:
+        self._wedge = wedge
+        self._text = text
+        self.closed = False
+        self.channels: list[_FakeChannel] = []
+
+    def exec_command(self, command: str, timeout: float | None = None):
+        if self._wedge:
+            self._wedge = False
+            raise RuntimeError("Timeout opening channel.")
+        channel = _FakeChannel(self._text)
+        self.channels.append(channel)
+        return None, _FakeStdout(channel), None
+
+    def close(self) -> None:
+        self.closed = True
+
+
+class _WedgingTransport(Transport):
+    """A transport whose first connection cannot open a channel at all."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.built = 0
+
+    def _client(self, key: str, route: SSHRoute) -> _FakeClient:
+        if key not in self._clients:
+            self.built += 1
+            self._clients[key] = _FakeClient(wedge=self.built == 1)
+        return self._clients[key]
+
+
+def _route() -> SSHRoute:
+    return SSHRoute.from_document("P0", {"host": "10.0.0.1"}, user="ops")
+
+
+def test_a_wedged_exec_session_reconnects_and_runs_the_command() -> None:
+    transport = _WedgingTransport()
+    status, out, err = transport.run(_route(), "echo hello")
+    assert (status, out, err) == (0, "hello\n", "")
+    # The bad session was dropped, not reused, and the data got drained.
+    assert transport.built == 2
+    assert transport._clients["ops@10.0.0.1"].channels[0].closed is True
+
+
+def test_start_background_drains_the_channel_before_closing_it() -> None:
+    transport = _WedgingTransport()
+    assert transport.start_background(_route(), "setsid nohup true & echo started") == (
+        "hello\n"
+    )
+    assert transport.built == 2
+    assert transport._clients["ops@10.0.0.1"].channels[0].closed is True

@@ -240,6 +240,35 @@ class Transport:
         """
         return self._client(f"{route.ssh_target}#sftp", route)
 
+    def _drop(self, key: str) -> None:
+        """Forget a cached connection so the next use reconnects."""
+        client = self._clients.pop(key, None)
+        if client is not None:
+            try:
+                client.close()
+            except Exception:  # noqa: BLE001 - the socket is already bad
+                pass
+
+    def _exec(self, route: SSHRoute, command: str, *, timeout: float) -> Any:
+        """Open an exec channel, reconnecting once if the session has gone bad.
+
+        sshd stops answering channel opens on a connection whose peer is no
+        longer draining one of its channels, which surfaces here as
+        ``Timeout opening channel``. Reconnecting turns that from a failed run
+        into a hiccup.
+        """
+        last: Exception | None = None
+        for attempt in (0, 1):
+            client = self._connect(route)
+            try:
+                return client.exec_command(command, timeout=timeout)
+            except Exception as exc:  # noqa: BLE001 - retried on a new session
+                last = exc
+                self._drop(route.ssh_target)
+        raise ThreeHostError(
+            f"{route.role}: could not open a session for {command!r}: {last}"
+        )
+
     def run(
         self,
         route: SSHRoute,
@@ -254,9 +283,8 @@ class Transport:
         command that leaves a detached process behind keeps the channel open
         long after it has returned, so waiting for EOF would hang here.
         """
-        client = self._connect(route)
         seconds = timeout or self.timeout
-        _stdin, stdout, _stderr = client.exec_command(command, timeout=seconds)
+        _stdin, stdout, _stderr = self._exec(route, command, timeout=seconds)
         channel = stdout.channel
         out = bytearray()
         err = bytearray()
@@ -313,19 +341,32 @@ class Transport:
         ends this shell session without touching it. Whether the shell itself
         exits immediately is not worth waiting for; the caller confirms the
         process came up by watching its log.
+
+        The channel still has to be drained the same way ``run`` drains one:
+        closing it while the server has output queued wedges the session, and
+        the next channel open on that connection never arrives.
         """
-        client = self._connect(route)
-        _stdin, stdout, _stderr = client.exec_command(command, timeout=settle)
+        _stdin, stdout, _stderr = self._exec(route, command, timeout=settle)
         channel = stdout.channel
         collected = bytearray()
         deadline = time.monotonic() + settle
-        while time.monotonic() < deadline:
+        quiet_since = time.monotonic()
+        while True:
             if channel.recv_ready():
                 collected += channel.recv(65536)
-            elif channel.exit_status_ready():
+                quiet_since = time.monotonic()
+                continue
+            if channel.recv_stderr_ready():
+                channel.recv_stderr(65536)
+                quiet_since = time.monotonic()
+                continue
+            if channel.exit_status_ready() and (
+                channel.eof_received or time.monotonic() - quiet_since > 0.5
+            ):
                 break
-            else:
-                time.sleep(0.05)
+            if time.monotonic() > deadline:
+                break
+            time.sleep(0.05)
         channel.close()
         return collected.decode("utf-8", "replace")
 
@@ -349,7 +390,7 @@ class Transport:
         try:
             return self._sftp_client(route).open_sftp()
         except Exception:  # noqa: BLE001 - retried on a new connection
-            self._clients.pop(f"{route.ssh_target}#sftp", None)
+            self._drop(f"{route.ssh_target}#sftp")
             return self._sftp_client(route).open_sftp()
 
     @staticmethod
