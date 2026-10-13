@@ -169,6 +169,22 @@ def reference_check(
     return checks
 
 
+def write_result(out_path: Path | str, result: Mapping[str, Any]) -> None:
+    """Write the session result, creating the directory it lands in.
+
+    The node creates its own out directory when it starts; the client's is
+    only ever written here, at the end of a session that has already run, so a
+    missing directory must not be what loses the result.
+    """
+    destination = Path(out_path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text(
+        json.dumps(dict(result), ensure_ascii=True, sort_keys=True, indent=2),
+        encoding="utf-8",
+        newline="\n",
+    )
+
+
 def run(
     *,
     client_document: Mapping[str, Any],
@@ -222,11 +238,7 @@ def run(
         else "failed"
     )
     if out_path is not None:
-        Path(out_path).write_text(
-            json.dumps(result, ensure_ascii=True, sort_keys=True, indent=2),
-            encoding="utf-8",
-            newline="\n",
-        )
+        write_result(out_path, result)
     return result
 
 
@@ -334,6 +346,7 @@ __all__ = [
     "reference_check",
     "release_nodes",
     "run",
+    "write_result",
 ]
 
 

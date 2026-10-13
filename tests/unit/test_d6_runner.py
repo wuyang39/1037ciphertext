@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
+from pathlib import Path
 
-from client.d6_runner import build_ledger
+from client.d6_runner import build_ledger, write_result
 from crypto.sm2 import SM2KeyPair
 from kas.models import IssueJobTicketRequest
 from kas.tickets import verify_job_ticket
@@ -37,3 +39,20 @@ def test_the_runner_ledger_issues_a_ticket_that_verifies() -> None:
     assert verified.ticket_id == ticket.ticket_id
     expiry = dt.datetime.fromisoformat(ticket.expiry.replace("Z", "+00:00"))
     assert expiry > dt.datetime.now(dt.timezone.utc) - dt.timedelta(seconds=1)
+
+
+def test_the_result_lands_even_when_its_directory_does_not_exist(
+    tmp_path: Path,
+) -> None:
+    """The client writes this file after a session that has already run.
+
+    The workspace names an out directory the node creates for itself, and the
+    client's is only ever written here -- so a missing directory used to throw
+    away a completed session on the last line of the run.
+    """
+    out = tmp_path / "out" / "C" / "client-result.json"
+    write_result(out, {"generated_tokens": [11, 80], "prompt": "the cipher key"})
+    assert json.loads(out.read_text(encoding="utf-8")) == {
+        "generated_tokens": [11, 80],
+        "prompt": "the cipher key",
+    }
