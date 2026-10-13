@@ -58,7 +58,12 @@ from infra.d4_three_hosts import (
     wait_for_remote_file,
 )
 from infra.d5_vectors import D5_SEED
-from infra.evidence import seal_directory, verify_directory, write_json
+from infra.evidence import (
+    seal_directory,
+    verify_directory,
+    write_exclusions,
+    write_json,
+)
 
 
 DESTINATION = "P0"
@@ -68,6 +73,8 @@ NODE_NAME = "d5_node"
 READY_MARKER = "A122-D5-NODE-READY"
 DONE_MARKER = "A122-D5-NODE-DONE"
 D5_PORTS = (47100, 47101, 47102, 47200, 47201, 47202)
+REVEAL_SCAN = "d5-reveal-scan.json"
+README = "README.md"
 
 
 def capture_filter() -> str:
@@ -111,9 +118,266 @@ def _bundle(
         "failed": summary.get("failed"),
         "grid_digest": summary.get("grid_digest"),
         "by_program": summary.get("by_program"),
+        "seed": summary.get("seed"),
+        "share_bytes": summary.get("share_bytes"),
     }
     write_json(out_dir / "d5-summary.json", document)
     return document
+
+
+def _capture_reason(*, role: str, value: Mapping[str, Any]) -> str:
+    """Say why a raw capture is recorded rather than committed.
+
+    The size is read back from the run so the note cannot claim a limit the
+    file does not exceed.
+    """
+    return (
+        f"the raw capture is {int(value['bytes'])} bytes and stays on the "
+        f"instance that produced it ({role}) under {value['path']}; the bundle "
+        "ships its digest and the TLS 1.3 summary that instance derived from it"
+    )
+
+
+def _reveal_scan(
+    transport: Transport,
+    role_routes: Mapping[str, Any],
+    *,
+    repo: str,
+    python: str,
+    run_id: str,
+) -> dict[str, Any]:
+    """Scan each instance's tree for a production reveal and return the verdicts.
+
+    The D5 gate is about the tree the enclave evaluated, so the scan runs on
+    every instance instead of on the driver's checkout, and a hit on any of
+    them fails the run rather than being sealed as a footnote.
+    """
+    reports: dict[str, Any] = {}
+    for role in ROLES:
+        remote = f"/tmp/{run_id}-{role}-reveal-scan.json"
+        command = (
+            f"cd {remote_path(repo)} && {NO_BYTECODE} PYTHONPATH=. "
+            f"{remote_path(python)} -m infra.reveal_scan --root . "
+            f"--output {shlex.quote(remote)}"
+        )
+        status, out, err = transport.run(
+            role_routes[role], command, timeout=600, check=False
+        )
+        text = out + (f"\n{err}" if err.strip() else "")
+        try:
+            document = json.loads(
+                transport.run(
+                    role_routes[role],
+                    f"cat {shlex.quote(remote)}",
+                    timeout=300,
+                )[1]
+            )
+        except (json.JSONDecodeError, IndexError) as exc:
+            raise ThreeHostError(
+                f"{role} produced no readable reveal scan (exit {status}):\n"
+                f"{text.strip()[-400:]}"
+            ) from exc
+        reports[role] = document
+        if document.get("verdict") != "clean":
+            raise ThreeHostError(
+                f"{role} still reveals in production: "
+                f"{json.dumps(document.get('findings'), sort_keys=True)[:400]}"
+            )
+    return {
+        "run_id": run_id,
+        "scanned_roots": reports[ROLES[0]].get("scanned_roots"),
+        "patterns": reports[ROLES[0]].get("patterns"),
+        "must_be_clean": reports[ROLES[0]].get("must_be_clean"),
+        "roles": reports,
+        "verdict": "clean",
+    }
+
+
+def _finalise(
+    *,
+    out_dir: Path,
+    run_id: str,
+    document: Mapping[str, Any],
+    captures: Mapping[str, Any],
+    reveal: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Add the last two artifacts, then seal and verify the bundle.
+
+    The raw captures are recorded as external so a restorer who puts them back
+    is checked against their digests instead of being let off, and the README
+    is written from the sealed summary so it cannot drift from it.
+    """
+    trace_path = out_dir / "d5-communication-trace.json"
+    trace = json.loads(trace_path.read_text(encoding="utf-8"))
+    (out_dir / README).write_text(
+        _readme(run_id=run_id, document=document, reveal=reveal, trace=trace),
+        encoding="utf-8",
+        newline="\n",
+    )
+    external = [
+        {
+            "path": str(captures[role]["path"]),
+            "bytes": int(captures[role]["bytes"]),
+            "sha256": str(captures[role]["sha256"]),
+            "reason": str(captures[role].get("reason", "")),
+        }
+        for role in ROLES
+    ]
+    index = seal_directory(out_dir, external=external)
+    write_exclusions(out_dir, external, run_id=run_id)
+    return {
+        "index": index,
+        "verify": verify_directory(out_dir, exclusions=external),
+    }
+
+
+def _readme(
+    *,
+    run_id: str,
+    document: Mapping[str, Any],
+    reveal: Mapping[str, Any],
+    trace: Mapping[str, Any],
+) -> str:
+    """Describe the bundle from the numbers the run actually produced."""
+    roles = document["roles"]
+    enclosure = document.get("enclosure") or {}
+    captures = document.get("captures") or {}
+    by_program = document.get("by_program") or {}
+    measurements = enclosure.get("measurements") or {}
+    manifests = enclosure.get("manifest_sha256") or {}
+    lines = [
+        f"# D5 three-instance enclave run ({run_id})",
+        "",
+        "Sealed evidence for the D5 gate: the private Tiny Decoder Transformer",
+        "Block, its non-linear operators and their secure Argmax evaluated by",
+        "P0/P1/P2 on three separate instances with every node inside its own",
+        "`gramine-sgx` enclave.",
+        "",
+        "| Role | Instance | Private | Public |",
+        "| --- | --- | --- | --- |",
+    ]
+    for role in ROLES:
+        entry = roles[role]
+        lines.append(
+            f"| {role} | `{entry['instance_id']}` | `{entry['private_address']}` "
+            f"| `{entry['public_address']}` |"
+        )
+    lines += [
+        "",
+        f"The run is at commit `{document.get('commit')}`.",
+        "",
+        "## What each file says",
+        "",
+        "| File | Content |",
+        "| --- | --- |",
+        "| `d5-summary.json` | Machine-readable summary: roles, block geometry, "
+        "per-program errors, the enclosure block and the capture digests |",
+        "| `d5-operator-errors.json` | The per-program and per-run error table "
+        "the operator machine read back from P0 |",
+        "| `d5-case-results.json` | One record per case: max/mean/relative "
+        "error, overflow count, tolerance, verdict, peer RTTs and TLS version |",
+        "| `d5-communication-trace.json` | Per-case elapsed milliseconds and "
+        "share bytes, the link settings, and the attestation facts |",
+        "| `d5-reveal-scan.json` | The production-reveal scan each of the three "
+        "trees was checked against |",
+        "| `d5-enclave-p{0,1,2}-sign.txt`, `d5-enclave.manifest` | What each "
+        "instance's `gramine-sgx-sign` printed and the manifest it signed |",
+        "| `d5-three-<role>-tls-summary.txt` | Each instance's own TLS analysis "
+        "of its own capture |",
+        "| `d5-three-p{0,1,2}-node.log`, `d5-three-p{0,1,2}-node-status.json` | "
+        "The node log and status of each role |",
+        "| `evidence-index.json`, `evidence.sha256` | The seal over the "
+        "directory |",
+        "",
+        "The raw captures stay on their instances under `/tmp/`; the three",
+        "`d5-three-P{0,1,2}.pcap` entries in `<bundle>.exclusions.json` record",
+        "their size and digest, and the per-instance TLS summaries are",
+        "committed.",
+        "",
+        "## Results",
+        "",
+        "| Item | Result |",
+        "| --- | --- |",
+        f"| Cases | {document.get('cases')} total, {document.get('passed')} "
+        f"passed, {document.get('failed')} failed |",
+        f"| Verdict | `{document.get('verdicts')}` |",
+        f"| Grid digest | `{document.get('grid_digest')}` |",
+    ]
+    for program in sorted(by_program):
+        stats = by_program[program]
+        lines.append(
+            f"| `{program}` | {stats['passed']}/{stats['cases']} passed, "
+            f"max_abs_error {stats['max_abs_error']:.6g}, overflow_count "
+            f"{stats['overflow_count']} |"
+        )
+    lines += [
+        "",
+        "Every tolerance the cases were judged against is carried in",
+        "`d5-case-results.json`; the two-sided budget of the GELU tail is in its",
+        "`tail_error_per_input` and `approximation_error` fields.",
+        "",
+        "## Runtime",
+        "",
+        "| Item | Value |",
+        "| --- | --- |",
+        f"| `inside_enclave` | `{trace.get('inside_enclave')}` |",
+        f"| `attestation_available` | `{trace.get('attestation_available')}` |",
+        f"| Link setup | {trace.get('link_seconds')} s, share bytes "
+        f"{document.get('share_bytes')} |",
+        f"| Cases traced | {len(trace.get('runs') or [])} |",
+        "",
+        "## Enclosure",
+        "",
+        "| Role | MRENCLAVE | `d5_node.manifest` sha256 |",
+        "| --- | --- | --- |",
+    ]
+    for role in ROLES:
+        lines.append(
+            f"| {role} | `{measurements.get(role)}` | `{manifests.get(role)}` |"
+        )
+    lines += [
+        "",
+        f"`distinct_measurements`: {enclosure.get('distinct_measurements')}.",
+        "Each instance signed the tree it really loaded, so the driver's",
+        "default run measures three trees rather than pretending they are one;",
+        "`infra/d4_three_hosts.py` is what stages a byte-identical tree across",
+        "the three instances when a single shared measurement is the point.",
+        "",
+        "| Item | Value |",
+        "| --- | --- |",
+        f"| `sgx.enclave_size` | {enclosure.get('enclave_size')} |",
+        f"| `sgx.max_threads` | {enclosure.get('max_threads')} |",
+        f"| `sys.stack.size` | {enclosure.get('stack_size')} |",
+        f"| Template | `{enclosure.get('template')}` |",
+        f"| Launcher | `{' '.join(enclosure.get('wrapper') or [])}` |",
+        "",
+        "## Reveal scan",
+        "",
+        "| Role | Verdict | Findings | Allowlisted hits |",
+        "| --- | --- | --- | --- |",
+    ]
+    for role in ROLES:
+        entry = (reveal.get("roles") or {}).get(role) or {}
+        lines.append(
+            f"| {role} | `{entry.get('verdict')}` | "
+            f"{len(entry.get('findings') or [])} | "
+            f"{len(entry.get('allowlisted') or [])} |"
+        )
+    lines += [
+        "",
+        "The scan runs on every instance against the tree that instance signed,",
+        "so a plaintext reveal left in the production path on any one of them",
+        "fails the run instead of being sealed as a footnote.",
+        "",
+        "## Captures",
+        "",
+        "| Role | Bytes | SHA-256 |",
+        "| --- | --- | --- |",
+    ]
+    for role in ROLES:
+        value = captures.get(role) or {}
+        lines.append(f"| {role} | {value.get('bytes')} | `{value.get('sha256')}` |")
+    return "\n".join(lines) + "\n"
 
 
 def run_three_hosts(
@@ -132,6 +396,7 @@ def run_three_hosts(
     seed: int = D5_SEED,
     node_timeout: float = 1800.0,
     expect_commit: str | None = None,
+    seal: bool = False,
     enclave_dir: str = DEFAULT_ENCLAVE_DIR,
     enclave_size: str = DEFAULT_ENCLAVE_SIZE,
     max_threads: int = DEFAULT_MAX_THREADS,
@@ -343,15 +608,11 @@ def run_three_hosts(
             "path": f"d5-three-{role}.pcap",
             "bytes": value["bytes"],
             "sha256": value["sha256"],
-            "reason": (
-                "GitHub rejects blobs above 100 MB; the raw capture stays on "
-                f"{role_routes[role].instance_id} under {value['path']} and only "
-                "its digest and the derived summary are committed"
-            ),
+            "reason": _capture_reason(role=role, value=value),
         }
         for role, value in captured.items()
     }
-    _bundle(
+    document = _bundle(
         out_dir=out_dir,
         run_id=run_id,
         cluster=cluster,
@@ -362,6 +623,23 @@ def run_three_hosts(
         enclosure=enclosure,
         expect_commit=expect_commit,
     )
+    sealed: dict[str, Any] = {}
+    if seal:
+        reveal = _reveal_scan(
+            transport,
+            role_routes,
+            repo=repo,
+            python=python,
+            run_id=run_id,
+        )
+        write_json(out_dir / REVEAL_SCAN, reveal)
+        sealed = _finalise(
+            out_dir=out_dir,
+            run_id=run_id,
+            document=document,
+            captures=captures,
+            reveal=reveal,
+        )
     public = sorted(
         path.name for path in out_dir.iterdir() if path.is_file()
     )
@@ -373,6 +651,7 @@ def run_three_hosts(
         "failed": summary.get("failed"),
         "bundle": str(out_dir),
         "files": public,
+        **sealed,
     }
 
 
@@ -421,11 +700,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         seed=args.seed,
         node_timeout=args.timeout,
         expect_commit=args.expect_commit,
+        seal=args.seal,
         dry_run=args.dry_run,
     )
-    if args.seal and not args.dry_run:
-        result["seal"] = seal_directory(args.out_dir)
-        result["verify"] = verify_directory(args.out_dir)
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
     return 0 if result.get("verdicts") in (None, "passed") else 1
 
