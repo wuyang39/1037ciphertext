@@ -371,6 +371,7 @@ def node_command(
     config: str,
     log: str,
     wrapper: Sequence[str] | None = None,
+    module: str = "tee.enclave.spu_node",
 ) -> str:
     """Start one node, optionally under ``gramine-sgx``.
 
@@ -386,7 +387,7 @@ def node_command(
     )
     return (
         f"cd {remote_path(repo)} && "
-        f"setsid nohup {launcher} -m tee.enclave.spu_node "
+        f"setsid nohup {launcher} -m {module} "
         f"--config {remote_path(config)} > {shlex.quote(log)} 2>&1 < /dev/null & "
         f"echo started"
     )
@@ -398,6 +399,7 @@ def enclave_sign_command(
     python: str,
     repo: str,
     workspace: str,
+    node_name: str = ENCLAVE_NODE,
     arch_libdir: str = DEFAULT_ARCH_LIBDIR,
     usr_libdir: str = DEFAULT_USR_LIBDIR,
     enclave_size: str = DEFAULT_ENCLAVE_SIZE,
@@ -441,17 +443,17 @@ def enclave_sign_command(
             'UV_ROOT="$(dirname "$(dirname "$PY")")"',
             'LIBSPU="$SITE/spu/libspu.so"',
             'test -f "$LIBSPU"',
-            f"sed {sed_flags} {ENCLAVE_NODE}.manifest.template "
-            f"> {ENCLAVE_NODE}.manifest.rendered",
-            f"gramine-manifest {ENCLAVE_NODE}.manifest.rendered "
-            f"> {ENCLAVE_NODE}.manifest",
+            f"sed {sed_flags} {node_name}.manifest.template "
+            f"> {node_name}.manifest.rendered",
+            f"gramine-manifest {node_name}.manifest.rendered "
+            f"> {node_name}.manifest",
             "[ -f sign.pem ] || gramine-sgx-gen-private-key sign.pem",
-            f"gramine-sgx-sign --manifest {ENCLAVE_NODE}.manifest "
-            f"--output {ENCLAVE_NODE}.manifest.sgx --key sign.pem",
-            f"test -f {ENCLAVE_NODE}.manifest.sgx",
+            f"gramine-sgx-sign --manifest {node_name}.manifest "
+            f"--output {node_name}.manifest.sgx --key sign.pem",
+            f"test -f {node_name}.manifest.sgx",
             # The digest lets a reader check the peers signed the same manifest
             # as the one the bundle ships.
-            f"sha256sum {ENCLAVE_NODE}.manifest {ENCLAVE_NODE}.manifest.sgx",
+            f"sha256sum {node_name}.manifest {node_name}.manifest.sgx",
             f"echo {ENCLAVE_SIGNED_MARKER}",
         ]
     )
@@ -491,7 +493,7 @@ def _absolute_paths(
     return resolved
 
 
-def parse_sign_output(text: str) -> dict[str, str]:
+def parse_sign_output(text: str, *, node_name: str = ENCLAVE_NODE) -> dict[str, str]:
     """Read the measurement and manifest digest out of ``gramine-sgx-sign``.
 
     The signer prints ``Measurement:`` on its own line with the value indented
@@ -506,7 +508,7 @@ def parse_sign_output(text: str) -> dict[str, str]:
     manifest_sha256 = ""
     for line in lines:
         parts = line.split()
-        if len(parts) == 2 and parts[1] == f"{ENCLAVE_NODE}.manifest":
+        if len(parts) == 2 and parts[1] == f"{node_name}.manifest":
             manifest_sha256 = parts[0]
             break
     return {"measurement": measurement, "manifest_sha256": manifest_sha256}
@@ -519,6 +521,8 @@ def prepare_enclave(
     template: Path,
     run_id: str,
     out_dir: Path,
+    node_name: str = ENCLAVE_NODE,
+    bundle_prefix: str = "d4-enclave",
     repo: str = DEFAULT_REPO,
     python: str = DEFAULT_PYTHON,
     workspace: str = DEFAULT_WORKSPACE,
@@ -552,6 +556,7 @@ def prepare_enclave(
         python=python,
         repo=resolved["repo"],
         workspace=resolved["workspace"],
+        node_name=node_name,
         arch_libdir=arch_libdir,
         usr_libdir=usr_libdir,
         enclave_size=enclave_size,
@@ -568,7 +573,7 @@ def prepare_enclave(
             route = role_routes[role]
             transport.run(route, f"mkdir -p {shlex.quote(enclave)}")
             transport.put(
-                route, template, f"{enclave}/{ENCLAVE_NODE}.manifest.template"
+                route, template, f"{enclave}/{node_name}.manifest.template"
             )
             if role != DRIVER:
                 # The peers sign with the driver's key so the measurement is
@@ -580,12 +585,12 @@ def prepare_enclave(
                 raise ThreeHostError(
                     f"{role} could not sign the node enclave:\n{text.strip()}"
                 )
-            (out_dir / f"d4-enclave-{role.lower()}-sign.txt").write_text(
+            (out_dir / f"{bundle_prefix}-{role.lower()}-sign.txt").write_text(
                 text if text.endswith("\n") else text + "\n",
                 encoding="utf-8",
                 newline="\n",
             )
-            parsed = parse_sign_output(text)
+            parsed = parse_sign_output(text, node_name=node_name)
             measurements[role] = parsed["measurement"]
             digests[role] = parsed["manifest_sha256"]
             if not parsed["measurement"] or not parsed["manifest_sha256"]:
@@ -600,8 +605,8 @@ def prepare_enclave(
                 # already show, so the bundle ships one copy rather than three.
                 transport.get(
                     route,
-                    f"{enclave}/{ENCLAVE_NODE}.manifest",
-                    out_dir / "d4-enclave.manifest",
+                    f"{enclave}/{node_name}.manifest",
+                    out_dir / f"{bundle_prefix}.manifest",
                 )
     # Each instance signs the manifest it will load, and Gramine hashes whole
     # trusted directories, so the measurements agree only when the trees agree.
@@ -611,7 +616,7 @@ def prepare_enclave(
     distinct = sorted(set(measurements.values()))
     return {
         "directory": enclave,
-        "wrapper": ["gramine-sgx", f"{enclave}/{ENCLAVE_NODE}"],
+        "wrapper": ["gramine-sgx", f"{enclave}/{node_name}"],
         "measurements": dict(measurements),
         "manifest_sha256": dict(digests),
         "shared_measurement": len(distinct) == 1,
