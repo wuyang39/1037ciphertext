@@ -2,6 +2,18 @@
 
 本文件记录当前本地仓库的软件组件；服务器阶段应以实际镜像 digest 重新生成并冻结。
 
+机器可读版本由 `infra/build_sbom.py` 生成（CycloneDX 1.5 JSON），它从
+`pyproject.toml` 的实际依赖、本地包树摘要和冻结模型文件生成，不手工维护：
+
+```powershell
+python -m infra.build_sbom --root . --version <release-tag> --output artifacts/d10-sbom.json
+```
+
+输出为确定性的：不写墙钟时间，除非显式传 `--timestamp`。冻结 GPT-2 以
+`machine-learning-model` 组件出现，带六个文件的 SHA-256 与 Modified MIT
+许可，见 [model-card-gpt2.md](model-card-gpt2.md)。D10 证据包内的 `sbom.json`
+就是该命令的产物。
+
 ## Python 直接依赖
 
 | 组件 | 约束 | 用途 |

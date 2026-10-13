@@ -5,8 +5,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import zipfile
 from pathlib import Path
+from typing import Iterable, Iterator
 
 
 EXCLUDED_DIRS = {
@@ -42,6 +44,33 @@ def _iter_source_files(root: Path):
         yield path, relative
 
 
+def _iter_tracked_files(root: Path) -> Iterator[tuple[Path, Path]]:
+    """Yield only the files Git tracks under ``root``.
+
+    The submission archive must be exactly what is in the repository: a
+    filesystem walk would sweep in untracked research notes and local scratch
+    files that were never meant to ship.
+    """
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z"],
+            capture_output=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError(
+            "tracked-only packaging needs a Git work tree with a readable index"
+        ) from exc
+    for raw in completed.stdout.split(b"\0"):
+        if not raw:
+            continue
+        relative = Path(raw.decode("utf-8"))
+        path = root / relative
+        if not path.is_file():
+            continue
+        yield path, relative
+
+
 def _zip_info(name: str) -> zipfile.ZipInfo:
     info = zipfile.ZipInfo(name, FIXED_TIMESTAMP)
     info.compress_type = zipfile.ZIP_DEFLATED
@@ -49,13 +78,26 @@ def _zip_info(name: str) -> zipfile.ZipInfo:
     return info
 
 
-def build(root: Path, output: Path, version: str) -> dict[str, object]:
+def _iter_files(root: Path, *, tracked_only: bool) -> Iterable[tuple[Path, Path]]:
+    if tracked_only:
+        yield from _iter_tracked_files(root)
+    else:
+        yield from _iter_source_files(root)
+
+
+def build(
+    root: Path,
+    output: Path,
+    version: str,
+    *,
+    tracked_only: bool = False,
+) -> dict[str, object]:
     root = Path(root).resolve()
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     entries: list[dict[str, str]] = []
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        for path, relative in _iter_source_files(root):
+        for path, relative in _iter_files(root, tracked_only=tracked_only):
             raw = path.read_bytes()
             name = relative.as_posix()
             digest = hashlib.sha256(raw).hexdigest()
@@ -64,6 +106,7 @@ def build(root: Path, output: Path, version: str) -> dict[str, object]:
         manifest = {
             "release_version": version,
             "format": "deterministic-source-zip-v1",
+            "tracked_only": tracked_only,
             "files": entries,
             "file_count": len(entries),
         }
@@ -86,8 +129,13 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--version", default="local-checkpoint")
+    parser.add_argument(
+        "--tracked-only",
+        action="store_true",
+        help="package only the files Git tracks, so untracked scratch cannot ship",
+    )
     args = parser.parse_args()
-    build(args.root, args.output, args.version)
+    build(args.root, args.output, args.version, tracked_only=args.tracked_only)
     return 0
 
 

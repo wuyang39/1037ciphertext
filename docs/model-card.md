@@ -1,5 +1,8 @@
 # A1-22 模型卡
 
+> 正式对外模型卡是 [model-card-gpt2.md](model-card-gpt2.md)（英文 GPT-2）。
+> 本文件只描述接口、数值和缓存验证用的内置 TinyDecoder，不用于任何对外结论。
+
 ## 当前模型
 
 仓库内置模型是用于接口、数值和缓存验证的 `TinyDecoder`，默认参数：

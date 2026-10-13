@@ -47,3 +47,18 @@ Ubuntu/WSL 使用：
 5. 运行 `tests/tee`、`tests/security`、`tests/e2e`，把 Quote、拒绝日志、pcap、trace 和宿主机扫描结果写入证据目录。
 
 服务器阶段未通过 D1-D9 的真实硬件验收前，不得把 mock 结果写成 SGX 结论。
+
+## 空目录复现（D10 验收）
+
+交付包（`artifacts/a122-release-<tag>.zip`）必须能在干净目录里解压并运行，
+不允许任何手工补丁。本机用一条命令完成这次演练：
+
+```powershell
+python -m infra.d10_rehearsal --archive artifacts/a122-release-<tag>.zip `
+  --out artifacts/d10-rehearsal.json --log artifacts/d10-rehearsal.log
+```
+
+它会校验包内 manifest、扫描敏感标记、把包解压到一个空目录，再从解压副本里
+编译所有包并运行测试集，过程中把解压副本而不是开发机仓库放在 import path
+上。冻结的 GPT-2 权重按设计不进包，因此 D7 模型测试会 skip；skip 会被记录，
+不会被当成通过。判定成立时 `verdict` 为 `runs-without-patching`。

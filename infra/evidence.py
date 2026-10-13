@@ -21,6 +21,14 @@ SENSITIVE_PATTERNS = {
     "session_key_field": re.compile(r'"(?:session_key|storage_key|disk_key)"\s*:'),
     "raw_ticket_signature": re.compile(r'"ticket_signature"\s*:\s*"[0-9a-f]{64,}"'),
 }
+# Source files that match a scanner pattern for an honest reason, keyed by the
+# pattern names that were reviewed. Anything else in the file still fails, so a
+# real key pasted into one of these files would not slip through.
+SOURCE_MARKER_REVIEW: dict[str, frozenset[str]] = {
+    "crypto/enclave_key.py": frozenset({"session_key_field"}),
+    "infra/security_negative.py": frozenset({"private_key"}),
+    "tests/unit/test_d4_workspace.py": frozenset({"private_key"}),
+}
 
 
 class EvidenceError(ValueError):
@@ -110,6 +118,26 @@ def assert_no_sensitive_text(text: str) -> None:
         raise EvidenceError(
             "evidence contains forbidden sensitive markers: " + ", ".join(findings)
         )
+
+
+def scan_sensitive_markers(text: str, *, path: str = "") -> tuple[list[str], list[str]]:
+    """Return the (unreviewed, reviewed) marker names found in one file.
+
+    ``assert_redacted`` stays strict for evidence records. A release archive or
+    a repository sweep needs to read source too, where a dict field name or a
+    scanner self-test is not key material; those exact pattern names are listed
+    in :data:`SOURCE_MARKER_REVIEW` and returned separately so the caller can
+    show what it excused instead of hiding it.
+    """
+    found = [
+        name for name, pattern in SENSITIVE_PATTERNS.items() if pattern.search(text)
+    ]
+    if not path.endswith(".py"):
+        return found, []
+    reviewed_names = SOURCE_MARKER_REVIEW.get(path, frozenset())
+    unreviewed = [name for name in found if name not in reviewed_names]
+    reviewed = [name for name in found if name in reviewed_names]
+    return unreviewed, reviewed
 
 
 def assert_redacted(value: Any) -> None:
@@ -350,6 +378,7 @@ __all__ = [
     "EXCLUSIONS_SUFFIX",
     "INDEX_NAME",
     "SEAL_NAME",
+    "SOURCE_MARKER_REVIEW",
     "EvidenceError",
     "assert_no_sensitive_text",
     "assert_redacted",
@@ -357,6 +386,7 @@ __all__ = [
     "exclusions_path",
     "iter_evidence_files",
     "load_exclusions",
+    "scan_sensitive_markers",
     "seal_directory",
     "sha256_bytes",
     "sha256_file",

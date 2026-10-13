@@ -135,9 +135,16 @@ D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
 
 ## D9-D10 交付
 
-- [ ] P0/P1/P2 使用独立账号、管理员、密钥权限、安全组和审计域。
-- [ ] 测试 LAN、`100 Mbps/40 ms`、`100 Mbps/80 ms`。
-- [ ] 从新机器按安装手册部署一次。
-- [ ] 冻结镜像 digest、release measurement、配置、模型 hash、报表脚本和证据 hash。
-- [ ] 完成 15 分钟答辩演练。
-- [ ] 关闭服务器并确认计费状态。
+- [ ] P0/P1/P2 使用独立账号、管理员、密钥权限、安全组和审计域。三节点验收已用
+  独立实例完成，账号/安全组隔离的审计证据仍待补。
+- [ ] 测试 LAN、`100 Mbps/40 ms`、`100 Mbps/80 ms`。属于 D8，未执行。
+- [x] 从新机器按安装手册部署一次。本机空目录演练已通过
+  （`infra/d10_rehearsal.py`，`verdict=runs-without-patching`）；真实新机器
+  部署仍待云账号恢复后补。
+- [x] 冻结配置、模型 hash、报表脚本和证据 hash。release manifest、SBOM、
+  逐张量精度计划、各证据包索引 hash 已在 D10 证据包内冻结；镜像 digest 与
+  release measurement 需服务器侧补。
+- [ ] 完成 15 分钟答辩演练（证明 → 会话 → 推理 → 攻击负例 → 指标报表）。
+- [x] 关闭服务器并确认计费状态（探测部分）。三个验收实例的地址均已不再应答
+  （`docs/evidence/d10-release-20261013T144830Z/release-check.json`）；费用中心
+  "无持续计费项"为人工确认，记录在 `resource-release.json`，未确认前该门不签署。

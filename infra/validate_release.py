@@ -10,7 +10,7 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-from infra.evidence import assert_redacted, write_json
+from infra.evidence import scan_sensitive_markers, write_json
 
 
 class ReleaseValidationError(ValueError):
@@ -78,13 +78,16 @@ def validate_archive(
                 raise ReleaseValidationError(f"release hash mismatch: {name}")
             if scan_sensitive:
                 try:
-                    assert_redacted(payload.decode("utf-8"))
+                    unreviewed, _reviewed = scan_sensitive_markers(
+                        payload.decode("utf-8"), path=name
+                    )
                 except UnicodeDecodeError:
-                    pass
-                except ValueError as exc:
+                    unreviewed = []
+                if unreviewed:
                     raise ReleaseValidationError(
-                        f"release-sensitive marker in {name}: {exc}"
-                    ) from exc
+                        f"release-sensitive marker in {name}: "
+                        + ", ".join(unreviewed)
+                    )
             expected_paths.add(name)
             total_bytes += len(payload)
         actual_paths = set(names)

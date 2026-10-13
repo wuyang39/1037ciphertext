@@ -39,3 +39,33 @@ python infra.seal_evidence.py verify artifacts/evidence
 ## 论文/答辩口径
 
 只报告由 trace、日志、hash 或测试输出直接支持的结论。任何仍依赖服务器阶段的指标必须标为 `pending_server`，不能使用模拟值代替实测值。
+
+## D10 交付复现
+
+```powershell
+# 1. 只打包 Git 跟踪的文件，避免未跟踪的临时材料混入交付包
+python -m infra.build_release --root . --tracked-only `
+  --output artifacts/a122-release-<tag>.zip --version <tag>
+python -m infra.validate_release artifacts/a122-release-<tag>.zip `
+  --manifest artifacts/a122-release-<tag>.manifest.json --scan-sensitive
+
+# 2. 空目录演练：解压、编译、跑测试，无需任何手工补丁
+python -m infra.d10_rehearsal --archive artifacts/a122-release-<tag>.zip `
+  --out artifacts/d10-rehearsal.json --log artifacts/d10-rehearsal.log
+
+# 3. SBOM 与资源释放探测
+python -m infra.build_sbom --root . --version <tag> --output artifacts/d10-sbom.json
+python -m infra.d10_release_check --targets artifacts/d10-targets.json `
+  --out artifacts/d10-release-check.json
+
+# 4. 汇总成封存的 D10 证据包
+python -m infra.d10_evidence --root . --out docs/evidence/d10-release-<run-id> `
+  --run-id <run-id> --archive artifacts/a122-release-<tag>.zip `
+  --release-manifest artifacts/a122-release-<tag>.manifest.json `
+  --release-check artifacts/d10-release-check.json --sbom artifacts/d10-sbom.json `
+  --rehearsal artifacts/d10-rehearsal.json --rehearsal-log artifacts/d10-rehearsal.log `
+  --model-card docs/model-card-gpt2.md --conclusion-map docs/conclusion-map.md
+```
+
+`d10_release_check` 只能观测实例地址是否仍应答；费用中心无持续计费项属于人工
+确认，作为 operator 输入写入 `resource-release.json`，未确认前计费门不签署。

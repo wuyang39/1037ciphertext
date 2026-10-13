@@ -45,7 +45,7 @@
 | D7 | 正式英文 GPT-2（`gpt2` @ `607a30d7…`）冻结复核、safetensors 读取、候选词表规则、逐张量标定、静态图、纯 Python BPE、模型份额与加密份额包均已本地跑通；程序的浮点参考在候选列上与发布版最大差 5.8e-5、3 步贪心 token 完全一致，见 [d7-model-freeze.md](d7-model-freeze.md) 与 `docs/evidence/d7-local-model-20261013T1425Z` | 三个 enclave 内加载正式模型份额并生成 token；EPC/时延决定的层数与窗口需先做 1 层探针再定 |
 | D8 | StagePlanner、softmax/GELU/rsqrt 近似边界、脱敏 benchmark collector、网络 profile、报告脚本 | EPC/CPU/RAM、真实延迟、通信量、开关对照和安全回归 |
 | D9 | 本地负例脚本、证据采集脚本、拓扑模板、验收清单 | 三域部署、独立账号/安全组、pcap、宿主机材料演示、离线复现 |
-| D10 | 安装手册、模型卡、SBOM、复现文档、攻击演示、确定性 release 构建 | 干净账号答辩演练、最终实测结论和证据冻结 |
+| D10 | 安装手册、[正式模型卡](model-card-gpt2.md)、CycloneDX SBOM 生成器、[结论映射表](conclusion-map.md)、确定性 release 构建（`--tracked-only`）、空目录演练脚本、仓库密钥扫描与实例释放探测均已本地跑通，见 [d10-release-acceptance.md](d10-release-acceptance.md) 与 `docs/evidence/d10-release-20261013T144830Z` | 真实云账号的 15 分钟答辩演练、费用中心无持续计费确认（人工输入）；D7 的 enclave 解码因验收实例已释放而无法在本轮执行 |
 
 ## 本机 Linux/WSL 增量完成
 
@@ -83,6 +83,12 @@ python -m model.export --source artifacts/gpt2-frozen --out artifacts/d7-export 
 python -m infra.build_model_package --source artifacts/gpt2-frozen --output artifacts/d7-package --layers 12 --sequence 8 --candidates 1024 --prompt "the cipher key is secret" --license third_party/gpt2/LICENSE --encrypt-local
 python -m infra.build_model_package --output artifacts/d7-package --verify
 python -m infra.d7_local_evidence --source artifacts/gpt2-frozen --out docs/evidence/d7-local-model-<stamp> --license third_party/gpt2/LICENSE
+python -m infra.build_release --root . --tracked-only --output artifacts/a122-release-<tag>.zip --version <tag>
+python -m infra.validate_release artifacts/a122-release-<tag>.zip --manifest artifacts/a122-release-<tag>.manifest.json --scan-sensitive
+python -m infra.d10_rehearsal --archive artifacts/a122-release-<tag>.zip --out artifacts/d10-rehearsal.json --log artifacts/d10-rehearsal.log
+python -m infra.build_sbom --root . --version <tag> --output artifacts/d10-sbom.json
+python -m infra.d10_release_check --targets artifacts/d10-targets.json --out artifacts/d10-release-check.json
+python -m infra.d10_evidence --root . --out docs/evidence/d10-release-<run-id> --run-id <run-id> --archive artifacts/a122-release-<tag>.zip --release-manifest artifacts/a122-release-<tag>.manifest.json --release-check artifacts/d10-release-check.json --sbom artifacts/d10-sbom.json --rehearsal artifacts/d10-rehearsal.json --rehearsal-log artifacts/d10-rehearsal.log --model-card docs/model-card-gpt2.md --conclusion-map docs/conclusion-map.md
 python infra.validate_gramine_manifest.py --values deploy/gramine-values.example.json
 ```
 
