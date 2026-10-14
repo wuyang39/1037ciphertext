@@ -34,6 +34,7 @@ import datetime as dt
 import hashlib
 import json
 import posixpath
+import re
 import shlex
 import subprocess
 import sys
@@ -469,6 +470,53 @@ def remote_path(value: str) -> str:
         rest = value[1:].replace("\\", "\\\\").replace('"', '\\"')
         return f'"$HOME{rest}"'
     return shlex.quote(value)
+
+
+def reject_local_path(flag: str, value: str) -> None:
+    """Refuse a remote path that the driving shell already rewrote.
+
+    PowerShell expands a bare ``~/x`` argument into ``C:\\Users\\<me>/x``
+    before the runner's process ever sees it, so the value names nothing on the
+    instance and ``git rev-parse`` there prints nothing. A drive letter or a
+    backslash cannot appear in a POSIX path, so the shape is worth catching up
+    front rather than after the first SSH round trip.
+    """
+    if re.match(r"^[A-Za-z]:[\\/]", value) or "\\" in value:
+        raise ThreeHostError(
+            f"{flag} looks like a local path ({value!r}); pass the path as the "
+            "instance sees it, for example /home/<user>/a122-shared/repo"
+        )
+
+
+def require_commit(
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    *,
+    expect_commit: str,
+    repo: str = DEFAULT_REPO,
+) -> None:
+    """Refuse to run unless every instance reports the same commit.
+
+    A checkout that cannot be read at all -- a repo path that does not exist on
+    the instance, say -- prints nothing, so the failure carries the command's
+    own stderr instead of leaving a bare ``unknown`` behind.
+    """
+    for role in ROLES:
+        _status, out, err = transport.run(
+            role_routes[role],
+            f"cd {remote_path(repo)} && git rev-parse HEAD",
+            check=False,
+        )
+        seen = out.strip()
+        if seen == expect_commit:
+            continue
+        lines = err.strip().splitlines()
+        because = f" ({lines[-1]})" if lines else ""
+        raise ThreeHostError(
+            f"{role} is at {seen or f'unreadable{because}'}, expected "
+            f"{expect_commit}; fetch and check out that commit on every "
+            "instance first"
+        )
 
 
 def capture_command(
@@ -1524,17 +1572,12 @@ def run_three_hosts(
     )
 
     if expect_commit:
-        for role in ROLES:
-            _status, out, _err = transport.run(
-                role_routes[role],
-                f"cd {remote_path(repo)} && git rev-parse HEAD",
-                check=False,
-            )
-            if out.strip() != expect_commit:
-                raise ThreeHostError(
-                    f"{role} is at {out.strip() or 'unknown'}, expected {expect_commit}; "
-                    "fetch and check out that commit on every instance first"
-                )
+        require_commit(
+            transport,
+            role_routes,
+            expect_commit=expect_commit,
+            repo=repo,
+        )
 
     cluster_document = {
         role: {
@@ -2150,17 +2193,12 @@ def run_negative_cases(
     role_routes = routes(cluster, user=ssh_user, ssh_host=ssh_host)
     private = endpoints(cluster)
     if expect_commit:
-        for role in ROLES:
-            _status, out, _err = transport.run(
-                role_routes[role],
-                f"cd {remote_path(repo)} && git rev-parse HEAD",
-                check=False,
-            )
-            if out.strip() != expect_commit:
-                raise ThreeHostError(
-                    f"{role} is at {out.strip() or 'unknown'}, expected "
-                    f"{expect_commit}; fetch and check out that commit first"
-                )
+        require_commit(
+            transport,
+            role_routes,
+            expect_commit=expect_commit,
+            repo=repo,
+        )
     require_workspace(
         transport, role_routes, workspace=workspace, cases=tuple(cases)
     )
@@ -2434,12 +2472,25 @@ def main(argv: Sequence[str] | None = None) -> int:
     expect_commit = args.expect_commit
     if expect_commit == "HEAD":
         expect_commit = _local_head(Path(__file__).resolve().parents[1])
-    cluster = load_cluster(args.cluster, user=args.ssh_user, ssh_host=args.ssh_host)
-    transport = Transport(
-        key_path=args.ssh_key,
-        key_password=args.ssh_key_password,
-    )
+    transport: Transport | None = None
     try:
+        # The instance-side paths travel through an SSH command, so a value the
+        # driving shell already rewrote would only surface far from the
+        # mistake. Reject that shape before opening a connection.
+        for flag in ("repo", "python", "workspace", "enclave-dir"):
+            reject_local_path(
+                f"--{flag}", getattr(args, flag.replace("-", "_"), "")
+            )
+        if args.command == "attested":
+            reject_local_path("--kas-python", args.kas_python)
+            reject_local_path("--dcap-verify-bin", args.dcap_verify_bin)
+        cluster = load_cluster(
+            args.cluster, user=args.ssh_user, ssh_host=args.ssh_host
+        )
+        transport = Transport(
+            key_path=args.ssh_key,
+            key_password=args.ssh_key_password,
+        )
         if args.command == "negatives":
             result = run_negative_cases(
                 cluster=cluster,
@@ -2485,7 +2536,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"[d4-three] FAILED: {exc}", file=sys.stderr)
         return 1
     finally:
-        transport.close()
+        if transport is not None:
+            transport.close()
     print(json.dumps(result.get("summary", result), ensure_ascii=True, sort_keys=True, indent=2))
     return 0
 
@@ -2532,9 +2584,11 @@ __all__ = [
     "prepare_enclave",
     "publish_peer_map",
     "read_workspace_manifest",
+    "reject_local_path",
     "remote_path",
-    "resolve_remote_path",
+    "require_commit",
     "require_workspace",
+    "resolve_remote_path",
     "routes",
     "run_negative_cases",
     "run_one_negative_case",

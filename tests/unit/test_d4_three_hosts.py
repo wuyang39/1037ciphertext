@@ -19,10 +19,13 @@ from infra.d4_three_hosts import (
     endpoints,
     kill_nodes,
     load_cluster,
+    main,
     node_command,
     parse_sign_output,
     probe_command,
+    reject_local_path,
     remote_path,
+    require_commit,
     require_workspace,
     routes,
     run_negative_cases,
@@ -794,6 +797,71 @@ def test_run_and_attested_arms_ask_for_the_same_grid() -> None:
     # --dry-run stays a property of the plain run; the attested arm is never
     # a preview, so getattr is what keeps main() honest about it.
     assert getattr(attested, "dry_run", False) is False
+
+
+class _SilentTransport(FakeTransport):
+    """A host that answers the commit check with nothing but a complaint."""
+
+    def run(self, route, command, *, timeout=None, check=True):  # type: ignore[no-untyped-def]
+        self.commands.append((route.role, command))
+        return 1, "", "bash: cd: /nowhere/repo: No such file or directory\n"
+
+
+def test_require_commit_reports_why_the_checkout_could_not_be_read() -> None:
+    transport = _SilentTransport()
+    with pytest.raises(ThreeHostError, match="No such file or directory"):
+        require_commit(
+            transport,  # type: ignore[arg-type]
+            {role: _route() for role in ("P0", "P1", "P2")},
+            expect_commit="deadbeef",
+            repo="/nowhere/repo",
+        )
+
+
+def test_require_commit_accepts_matching_instances() -> None:
+    transport = FakeTransport(commit="deadbeef")
+    require_commit(
+        transport,  # type: ignore[arg-type]
+        {role: _route() for role in ("P0", "P1", "P2")},
+        expect_commit="deadbeef",
+    )
+    assert len(transport.commands) == 3
+
+
+@pytest.mark.parametrize(
+    "value",
+    [r"C:\Users\Alienware/repo", "C:/Users/Alienware/repo", r"~\a122-shared\repo"],
+)
+def test_reject_local_path_refuses_a_shell_rewritten_argument(value: str) -> None:
+    """PowerShell rewrites a bare ``~/x`` before the runner sees it."""
+    with pytest.raises(ThreeHostError, match="looks like a local path"):
+        reject_local_path("--repo", value)
+
+
+@pytest.mark.parametrize(
+    "value", ["~/a122-shared/repo", "/home/jiahao/a122-shared/repo", "/nowhere"]
+)
+def test_reject_local_path_allows_remote_shapes(value: str) -> None:
+    reject_local_path("--repo", value)
+
+
+def test_main_refuses_a_rewritten_path_before_it_dials_out(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The guard runs before the cluster file is read, let alone contacted."""
+    status = main(
+        [
+            "attested",
+            "--cluster",
+            str(tmp_path / "missing.json"),
+            "--out-dir",
+            str(tmp_path / "out"),
+            "--repo",
+            r"C:\Users\Alienware/a122-shared/repo",
+        ]
+    )
+    assert status == 1
+    assert "looks like a local path" in capsys.readouterr().err
 
 
 def test_a_wedged_exec_session_reconnects_and_runs_the_command() -> None:
