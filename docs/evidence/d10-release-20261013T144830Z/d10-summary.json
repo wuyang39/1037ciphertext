@@ -1,0 +1,10 @@
+{
+  "archive_sha256": "5968dbff16e645658ba53cd7093c639c7582337b04c7bacc7700d0824437077c",
+  "billing_status": "awaiting-operator",
+  "file_count": 605,
+  "probe_verdict": "released",
+  "rehearsal_verdict": "runs-without-patching",
+  "release_version": "a122-d10-20261013T144830Z",
+  "run_id": "d10-release-20261013T144830Z",
+  "secrets_sweep": "clean"
+}

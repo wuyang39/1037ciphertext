@@ -1,0 +1,100 @@
+{
+  "bundles": [
+    {
+      "bundle": "d1-20261012T1810",
+      "file_count": 17,
+      "index_sha256": "caec3d562012d4129bbfb65e58cb5ecdda92bb4457889ca90e7b58f188cfbdf9",
+      "seal": "caec3d562012d4129bbfb65e58cb5ecdda92bb4457889ca90e7b58f188cfbdf9"
+    },
+    {
+      "bundle": "d1-20261012T1830",
+      "file_count": 9,
+      "index_sha256": "27eb77bc8c92e051143437fa6a2d4eabef5dd8251606ec14615e3bafe307bfab",
+      "seal": "27eb77bc8c92e051143437fa6a2d4eabef5dd8251606ec14615e3bafe307bfab"
+    },
+    {
+      "bundle": "d10-release-20261013T144830Z",
+      "file_count": 13,
+      "index_sha256": "37bb65a4521d9ba1020c3aa2f51317a9a2898d40913e4ec4c6c6d089690b962c",
+      "seal": "37bb65a4521d9ba1020c3aa2f51317a9a2898d40913e4ec4c6c6d089690b962c"
+    },
+    {
+      "bundle": "d3-20261012T1930",
+      "file_count": 22,
+      "index_sha256": "dcd69eeedbf9c873e071fae3bef307ffb455f58c0543a89756fb652f1a733dad",
+      "seal": "dcd69eeedbf9c873e071fae3bef307ffb455f58c0543a89756fb652f1a733dad"
+    },
+    {
+      "bundle": "d3-kas-20261012T115025Z",
+      "file_count": 34,
+      "index_sha256": "343f81683e289aef97c3fd3c8f6d5e791ea9052de28d24f37f5836cea746b994",
+      "seal": "343f81683e289aef97c3fd3c8f6d5e791ea9052de28d24f37f5836cea746b994"
+    },
+    {
+      "bundle": "d4-20261012T143111Z",
+      "file_count": 34,
+      "index_sha256": "e01ecec23b29c735ee1873cb9d1e3aeabebdd7f21c86cdafc01ec46e9f353c7e",
+      "seal": "e01ecec23b29c735ee1873cb9d1e3aeabebdd7f21c86cdafc01ec46e9f353c7e"
+    },
+    {
+      "bundle": "d4-3host-20261012T152216Z",
+      "file_count": 16,
+      "index_sha256": "f793c120dfd1ccb646eff2f9e0ee35deabdc90f3ac42ef37422a4d567268f2c5",
+      "seal": "f793c120dfd1ccb646eff2f9e0ee35deabdc90f3ac42ef37422a4d567268f2c5"
+    },
+    {
+      "bundle": "d4-enclave-20261013T0530Z",
+      "file_count": 39,
+      "index_sha256": "276cc7f7e27cbe1dadf6a9b4a9cce728c1ec19e911ca2527d6d7e07b23f806b9",
+      "seal": "276cc7f7e27cbe1dadf6a9b4a9cce728c1ec19e911ca2527d6d7e07b23f806b9"
+    },
+    {
+      "bundle": "d4-enclave-3host-20261013T052121Z",
+      "file_count": 20,
+      "index_sha256": "5f9bd7d5f747e608c2fa3ac08eaacbc1d4321ea7e80d6c0b5a557c13e69a78dd",
+      "seal": "5f9bd7d5f747e608c2fa3ac08eaacbc1d4321ea7e80d6c0b5a557c13e69a78dd"
+    },
+    {
+      "bundle": "d4-enclave-negs-3host-20261013T052407Z",
+      "file_count": 19,
+      "index_sha256": "064e47454b1aabb0bf02bc667c2cdc09a7d6e6177050b1efb2148cd2a5cf951c",
+      "seal": "064e47454b1aabb0bf02bc667c2cdc09a7d6e6177050b1efb2148cd2a5cf951c"
+    },
+    {
+      "bundle": "d4-enclave-negs-repeat-3host-20261013T0907Z",
+      "file_count": 17,
+      "index_sha256": "eb9ff5b186ba68d1ece602f0e9e715476e973a66dc9264f0c65c298d23d50199",
+      "seal": "eb9ff5b186ba68d1ece602f0e9e715476e973a66dc9264f0c65c298d23d50199"
+    },
+    {
+      "bundle": "d4-enclave-shared-3host-20261013T1715Z",
+      "file_count": 20,
+      "index_sha256": "83fd1f6604d903a799ca77f4f15b07295753a6de32b770d77dacc348fad80ee8",
+      "seal": "83fd1f6604d903a799ca77f4f15b07295753a6de32b770d77dacc348fad80ee8"
+    },
+    {
+      "bundle": "d4-negs-3host-20261012T154315Z",
+      "file_count": 15,
+      "index_sha256": "32b0d1c569aabe9044571e45d70afc1ed77625d3bc55bcf22b048a2692b0cc61",
+      "seal": "32b0d1c569aabe9044571e45d70afc1ed77625d3bc55bcf22b048a2692b0cc61"
+    },
+    {
+      "bundle": "d5-enclave-3host-20261013T1057Z",
+      "file_count": 22,
+      "index_sha256": "6a92a9e406db653dee54c1c5a5f6f071ceb361b94d2991a4643bf51ecdc64271",
+      "seal": "6a92a9e406db653dee54c1c5a5f6f071ceb361b94d2991a4643bf51ecdc64271"
+    },
+    {
+      "bundle": "d6-enclave-3host-20261013T1324Z",
+      "file_count": 24,
+      "index_sha256": "03ff5cc6f01d9b00cbe2050985193874889fc67279795c85cf0a5ef7053cf538",
+      "seal": "03ff5cc6f01d9b00cbe2050985193874889fc67279795c85cf0a5ef7053cf538"
+    },
+    {
+      "bundle": "d7-local-model-20261013T1425Z",
+      "file_count": 8,
+      "index_sha256": "2de57b34e94d1c2ea64bb9b1624e155c6f429378181c4b28298a0a4a3035304c",
+      "seal": "2de57b34e94d1c2ea64bb9b1624e155c6f429378181c4b28298a0a4a3035304c"
+    }
+  ]
+}

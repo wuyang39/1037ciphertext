@@ -1,0 +1,609 @@
+{
+  "bomFormat": "CycloneDX",
+  "components": [
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::benchmark",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "benchmark"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "0141287f0b00892575023ecd4a8b94ca36b32d6a245e1f7ce08e4136d2f20451"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 4
+        },
+        {
+          "name": "a122:bytes",
+          "value": 5590
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::client",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "client"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "09352a0ae4d2679fee3de1b7389a8e8b55138b724b893f0248e722aea8a7dfa5"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 8
+        },
+        {
+          "name": "a122:bytes",
+          "value": 67047
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::contracts",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "contracts"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "e35ceb01d3ab60ffb1cdb850bdfb8980158fcd3b5866b0d33ae317632607eec5"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 15
+        },
+        {
+          "name": "a122:bytes",
+          "value": 30663
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::crypto",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "crypto"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "16ceaa797dd523632e56b1c40ab624921fb7949f4345c39a4c37fe98b396deea"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 8
+        },
+        {
+          "name": "a122:bytes",
+          "value": 76394
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::infra",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "infra"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "1aa057defa04501161a4ffc86df977635db6dfac69fcdb136ae4a706941abd7d"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 47
+        },
+        {
+          "name": "a122:bytes",
+          "value": 492876
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::kas",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "kas"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "eeb68641104521dad64132c93f39bc5dcf4db11be8d63ed58302a05c50608bf4"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 14
+        },
+        {
+          "name": "a122:bytes",
+          "value": 51173
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::model",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "model"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "412eacdbcdaf3011cda0fe70c75457eceaddfdd7cfbf8a6f9156ece616a3ba53"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 12
+        },
+        {
+          "name": "a122:bytes",
+          "value": 79271
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::mpc",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "mpc"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "d8833e16a3a4cbf33367b94dd15a304dae070b64959578529c7d66c79e07f9f0"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 27
+        },
+        {
+          "name": "a122:bytes",
+          "value": 167715
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "local",
+      "name": "a122-privacy-llm::tee",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "local-package"
+        },
+        {
+          "name": "a122:path",
+          "value": "tee"
+        },
+        {
+          "name": "a122:tree-sha256",
+          "value": "e9998f67e7dcbaf593094341d21abe1a42ce02da0da7e8ce6c4ece999f821c24"
+        },
+        {
+          "name": "a122:file-count",
+          "value": 27
+        },
+        {
+          "name": "a122:bytes",
+          "value": 155884
+        }
+      ],
+      "type": "library",
+      "version": "local-checkpoint"
+    },
+    {
+      "group": "pypi",
+      "name": "cryptography",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "cryptography>=48,<49"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "runtime",
+      "type": "library",
+      "version": "48.0.0"
+    },
+    {
+      "group": "pypi",
+      "name": "fastapi",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "fastapi>=0.109,<0.110"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "runtime",
+      "type": "library",
+      "version": "0.109.0"
+    },
+    {
+      "group": "pypi",
+      "name": "gmssl",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "gmssl>=3.2.2,<4"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "runtime",
+      "type": "library",
+      "version": "3.2.2"
+    },
+    {
+      "group": "pypi",
+      "name": "jsonschema",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "jsonschema>=4.26,<5"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "runtime",
+      "type": "library",
+      "version": "4.26.0"
+    },
+    {
+      "group": "pypi",
+      "name": "numpy",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "numpy>=2.4,<3"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "runtime",
+      "type": "library",
+      "version": "2.4.2"
+    },
+    {
+      "group": "pypi",
+      "name": "pydantic",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "pydantic>=2.5,<3"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "runtime",
+      "type": "library",
+      "version": "2.5.3"
+    },
+    {
+      "group": "pypi",
+      "name": "torch",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "torch>=2.12,<3"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "runtime",
+      "type": "library",
+      "version": "2.12.0"
+    },
+    {
+      "group": "pypi",
+      "name": "uvicorn",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "uvicorn>=0.27,<0.28"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "runtime",
+      "type": "library",
+      "version": "0.27.0"
+    },
+    {
+      "group": "pypi",
+      "name": "httpx",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "httpx>=0.27,<0.28"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "optional:dev",
+      "type": "library",
+      "version": "0.27.2"
+    },
+    {
+      "group": "pypi",
+      "name": "pytest",
+      "properties": [
+        {
+          "name": "a122:requirement",
+          "value": "pytest>=9.1,<10"
+        },
+        {
+          "name": "a122:resolved-locally",
+          "value": true
+        }
+      ],
+      "scope": "optional:dev",
+      "type": "library",
+      "version": "9.1.1"
+    },
+    {
+      "group": "server-runtime",
+      "name": "gramine",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "server-runtime"
+        },
+        {
+          "name": "a122:note",
+          "value": "Gramine-SGX runtime; pinned by the image and manifest measurement"
+        }
+      ],
+      "type": "platform",
+      "version": "1.9"
+    },
+    {
+      "group": "server-runtime",
+      "name": "intel-sgx-sdk",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "server-runtime"
+        },
+        {
+          "name": "a122:note",
+          "value": "enclave build toolchain; pinned by the image digest"
+        }
+      ],
+      "type": "platform",
+      "version": "2.x"
+    },
+    {
+      "group": "server-runtime",
+      "name": "dcap-qvl",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "server-runtime"
+        },
+        {
+          "name": "a122:note",
+          "value": "Quote verification library and PCCS configuration"
+        }
+      ],
+      "type": "platform",
+      "version": "server-pinned"
+    },
+    {
+      "group": "server-runtime",
+      "name": "yacl-brpc",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "server-runtime"
+        },
+        {
+          "name": "a122:note",
+          "value": "mTLS/BRPC transport shipped with SecretFlow-SPU"
+        }
+      ],
+      "type": "platform",
+      "version": "spu-bundled"
+    },
+    {
+      "group": "server-runtime",
+      "name": "secretflow-spu",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "server-runtime"
+        },
+        {
+          "name": "a122:note",
+          "value": "3PC RSS runtime used by the D4-D6 acceptance runs"
+        }
+      ],
+      "type": "platform",
+      "version": "0.9.5"
+    },
+    {
+      "externalReferences": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/openai/gpt-2"
+        }
+      ],
+      "group": "huggingface",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0daed7749b4f02b8f76240d5444551d7b08712dab4d0adb8239c56ba823bb7b4"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "0fcd631078093c2aa1d93438b898320b8a1167784e2a1ab37b8016e9de8b3c2e"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6"
+        },
+        {
+          "alg": "SHA-256",
+          "content": "196139668be63f3b5d6574427317ae82f612a97c5d1cdaf36ed2256dbf636783"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "name": "Modified MIT License (OpenAI, 2019)"
+          }
+        }
+      ],
+      "name": "gpt2",
+      "properties": [
+        {
+          "name": "a122:kind",
+          "value": "frozen-model"
+        },
+        {
+          "name": "a122:revision",
+          "value": "607a30d783dfa663caf39e06633721c8d4cfcd7e"
+        },
+        {
+          "name": "a122:file:config.json",
+          "value": "665:0daed7749b4f02b8f76240d5444551d7b08712dab4d0adb8239c56ba823bb7b4"
+        },
+        {
+          "name": "a122:file:merges.txt",
+          "value": "456318:1ce1664773c50f3e0cc8842619a93edc4624525b728b188a9e0be33b7726adc5"
+        },
+        {
+          "name": "a122:file:model.safetensors",
+          "value": "548105171:248dfc3911869ec493c76e65bf2fcf7f615828b0254c12b473182f0f81d3a707"
+        },
+        {
+          "name": "a122:file:README.md",
+          "value": "8092:0fcd631078093c2aa1d93438b898320b8a1167784e2a1ab37b8016e9de8b3c2e"
+        },
+        {
+          "name": "a122:file:tokenizer.json",
+          "value": "1355256:8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6"
+        },
+        {
+          "name": "a122:file:vocab.json",
+          "value": "1042301:196139668be63f3b5d6574427317ae82f612a97c5d1cdaf36ed2256dbf636783"
+        }
+      ],
+      "type": "machine-learning-model",
+      "version": "607a30d783dfa663caf39e06633721c8d4cfcd7e"
+    }
+  ],
+  "metadata": {
+    "component": {
+      "licenses": [
+        {
+          "license": {
+            "name": "proprietary-submission"
+          }
+        }
+      ],
+      "name": "a122-privacy-llm",
+      "type": "application",
+      "version": "local-checkpoint"
+    },
+    "tools": [
+      {
+        "name": "infra.build_sbom",
+        "vendor": "A1-22",
+        "version": "1"
+      }
+    ]
+  },
+  "specVersion": "1.5",
+  "version": 1
+}

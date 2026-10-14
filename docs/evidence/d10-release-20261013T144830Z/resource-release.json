@@ -1,0 +1,10 @@
+{
+  "billing_status": "awaiting-operator",
+  "boundary": "Aliyun billing is not visible from this repository. The console confirmation is an operator input; until it is recorded the D10 resource gate is not signed off.",
+  "instances_still_ours": 0,
+  "instances_unverified": 0,
+  "operator_confirmation": null,
+  "probe_boundary": "A silent address is recorded as released. An SSH banner whose key cannot be tested is recorded as unverified; a banner that refuses our key is another tenant behind a recycled address.",
+  "probe_verdict": "released",
+  "run_id": "d10-release-20261013T144830Z"
+}

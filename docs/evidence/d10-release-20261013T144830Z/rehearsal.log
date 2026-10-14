@@ -1,0 +1,20 @@
+archive: a122-release-20261013T144830Z.zip
+sha256: 5968dbff16e645658ba53cd7093c639c7582337b04c7bacc7700d0824437077c
+manifest: valid, 605 files
+$ C:\Users\Alienware\AppData\Local\Programs\Python\Python312\python.exe -m compileall -q benchmark client contracts crypto infra kas model mpc tee
+
+$ C:\Users\Alienware\AppData\Local\Programs\Python\Python312\python.exe -m pytest tests -p no:cacheprovider --tb=short
+........................................................................ [ 24%]
+...................................................................s.... [ 49%]
+.........................................................ss............. [ 74%]
+........................................................................ [ 98%]
+...                                                                      [100%]
+============================== warnings summary ===============================
+tests/unit/test_d3_kas_release.py::test_sealed_release_is_exposed_over_http
+tests/unit/test_kas.py::test_fastapi_challenge_endpoint
+tests/unit/test_tickets.py::test_ticket_fastapi_surface
+  C:\Users\Alienware\AppData\Local\Programs\Python\Python312\Lib\site-packages\httpx\_client.py:690: DeprecationWarning: The 'app' shortcut is now deprecated. Use the explicit style 'transport=WSGITransport(app=...)' instead.
+    warnings.warn(message, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+288 passed, 3 skipped, 3 warnings in 69.45s (0:01:09)

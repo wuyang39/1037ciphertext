@@ -1,0 +1,51 @@
+{
+  "instances_still_ours": 0,
+  "instances_unverified": 0,
+  "note": "A silent address is recorded as released. An SSH banner whose key cannot be tested is recorded as unverified; a banner that refuses our key is another tenant behind a recycled address.",
+  "targets": [
+    {
+      "connected": false,
+      "elapsed_ms": 6000.0,
+      "host": "47.117.34.67",
+      "port": 22,
+      "reason": "connect timed out",
+      "role": "SGX2 / P0 (historical)",
+      "timeout_seconds": 6.0,
+      "verdict": "no_listener"
+    },
+    {
+      "connected": false,
+      "elapsed_ms": 6015.0,
+      "host": "106.15.54.240",
+      "port": 22,
+      "reason": "connect timed out",
+      "role": "SGX3 / P2 (historical)",
+      "timeout_seconds": 6.0,
+      "verdict": "no_listener"
+    },
+    {
+      "connected": false,
+      "elapsed_ms": 6000.0,
+      "host": "47.116.200.143",
+      "port": 22,
+      "reason": "connect timed out",
+      "role": "P1 (historical)",
+      "timeout_seconds": 6.0,
+      "verdict": "no_listener"
+    },
+    {
+      "connected": false,
+      "elapsed_ms": 6000.0,
+      "host": "106.14.207.224",
+      "port": 22,
+      "reason": "connect timed out",
+      "role": "address observed after release (not ours)",
+      "timeout_seconds": 6.0,
+      "verdict": "no_listener"
+    }
+  ],
+  "verdict": "released",
+  "verdict_counts": {
+    "no_listener": 4
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "file_count": 13,
+  "files": [
+    {
+      "bytes": 4658,
+      "path": "conclusion-map.md",
+      "sha256": "7b6b0b56ad792e5b351328e0a866305f204a0bdc739ae742b48137419f479852"
+    },
+    {
+      "bytes": 6118,
+      "path": "d10-release-acceptance.md",
+      "sha256": "efc6f6768cebff808ca40869690c212334cf39f570c19af97653c8f19a7f1691"
+    },
+    {
+      "bytes": 354,
+      "path": "d10-summary.json",
+      "sha256": "b83ea34e96d480424e57538b7f2d69b3d7ac0abc3b7c27a2e0b2db5cfba0694d"
+    },
+    {
+      "bytes": 4109,
+      "path": "evidence-hashes.json",
+      "sha256": "9f801845d2331a349333bc5408a43f5bbaeb65f4c043c8ed4b4243e4448b4b3e"
+    },
+    {
+      "bytes": 5107,
+      "path": "model-card-gpt2.md",
+      "sha256": "f848d2bef39683392fb1fbceebaeabf989bbb4339ad88ab08c4cdc4ab267b401"
+    },
+    {
+      "bytes": 552,
+      "path": "README.md",
+      "sha256": "26905d9d29de31ddd0dda98ab341a0691d99b1ca72b1c2086d4750adda0f3716"
+    },
+    {
+      "bytes": 840,
+      "path": "rehearsal.json",
+      "sha256": "3757fb9f9158027817c8d4d6b169c74aff14e68bf2408331491236b264093135"
+    },
+    {
+      "bytes": 1478,
+      "path": "rehearsal.log",
+      "sha256": "f6269181cee21dfcafe8d214ac658de7b02b81515741d3c24d4fcc3cb5acd339"
+    },
+    {
+      "bytes": 1380,
+      "path": "release-check.json",
+      "sha256": "79c17fc21fa5fc64862f7da0c6adc17b9d0d920eaae364c836eb7e09b8333d01"
+    },
+    {
+      "bytes": 422,
+      "path": "release.json",
+      "sha256": "1069b420d63d0030c5c339246e1bd9f81785f4d0d2801f01fad0f8e4257ed354"
+    },
+    {
+      "bytes": 596,
+      "path": "resource-release.json",
+      "sha256": "e0281822ba0d58202eb1cad9cbf2480eedfeee59a780cdd8ad12fd3ed37d5bbc"
+    },
+    {
+      "bytes": 14114,
+      "path": "sbom.json",
+      "sha256": "559db55763ad4e4e6ff2615ba6f666ff6d56c69532560063a295090eb02417f3"
+    },
+    {
+      "bytes": 1056,
+      "path": "secrets-sweep.json",
+      "sha256": "fbb9a92e2a5f56bfbcaee2959964e5dba64b83a4faa3ecc200ce13d1d67e375a"
+    }
+  ],
+  "root": "d10-release-20261013T144830Z"
+}
