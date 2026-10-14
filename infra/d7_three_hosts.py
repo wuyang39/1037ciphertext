@@ -31,6 +31,7 @@ import argparse
 import datetime as dt
 import json
 import posixpath
+import re
 import shlex
 import tempfile
 import time
@@ -396,6 +397,33 @@ def _privileged(password: str | None) -> str:
     return f"echo {shlex.quote(password)} | sudo -S -p ''"
 
 
+def peer_subnet(hosts: Sequence[str]) -> str:
+    """The /24 the peers share, as a filter prefix.
+
+    ``posixpath.dirname`` treats an address as a filename and hands back an
+    empty string, which once produced a filter matching ``dst 0/24``: it
+    installed without complaint and classified nothing, so a run labelled
+    ``wan-40ms`` moved its traffic at LAN latency. The octets are used here
+    instead, and a set that does not share a prefix is refused rather than
+    silently shaped into nothing.
+    """
+    prefixes = set()
+    for host in hosts:
+        parts = host.strip().split(".")
+        if len(parts) != 4 or not all(part.isdigit() for part in parts):
+            raise ThreeHostError(f"not an IPv4 address: {host!r}")
+        prefixes.add(".".join(parts[:3]))
+    if len(prefixes) != 1:
+        raise ThreeHostError(f"peers do not share a /24: {sorted(hosts)}")
+    return prefixes.pop() + ".0/24"
+
+
+def measured_rtt_ms(text: str) -> float | None:
+    """The average from one ``ping`` summary line, when it printed one."""
+    match = re.search(r"rtt min/avg/max/mdev = [\d.]+/([\d.]+)/", text)
+    return float(match.group(1)) if match else None
+
+
 def netem_apply_script(
     *,
     iface: str,
@@ -428,6 +456,8 @@ def netem_apply_script(
             f"{sudo} tc filter add dev {shlex.quote(iface)} protocol ip "
             f"parent 1:0 prio 1 u32 match ip dst {shlex.quote(dst)} flowid 1:3",
             f"{sudo} tc qdisc show dev {shlex.quote(iface)}",
+            f"{sudo} tc filter show dev {shlex.quote(iface)} parent 1:0 "
+            "| grep -q 'flowid 1:3' && echo FILTER-OK || echo FILTER-MISSING",
         ]
     )
 
@@ -1181,46 +1211,72 @@ def run_three_hosts(
                 facts[role] = parse_facts(out)
                 write_json(out_dir / f"d8-platform-{role.lower()}.json", facts[role])
             net["platform"] = facts
-        if net_profile != "lan":
-            profile = NET_PROFILES[net_profile]
-            shaped = net_shape_dst or (
-                posixpath.dirname(private[DESTINATION]["host"]) + "0/24"
-            )
-            applied: dict[str, Any] = {}
-            for role in ROLES:
-                _status, out, err = transport.run(
-                    role_routes[role],
-                    netem_apply_script(
-                        iface=iface,
-                        delay_ms=int(profile["delay_ms"]),
-                        rate_mbit=profile["rate_mbit"],
-                        dst=shaped,
-                        sudo_password=sudo_password,
-                    ),
-                    timeout=60,
-                    check=False,
-                )
-                applied[role] = (out + err).strip().splitlines()
-            net["profile"] = {
-                "name": net_profile,
-                "delay_ms": profile["delay_ms"],
-                "rate_mbit": profile["rate_mbit"],
-                "shaped_destination": shaped,
-                "shaped_interface": iface,
-            }
-            net["qdisc"] = applied
-            measured: dict[str, Any] = {}
-            for role in ROLES:
-                peers = [private[other]["host"] for other in ROLES if other != role]
-                _status, out, _err = transport.run(
-                    role_routes[role],
-                    ping_peers_script(peers=peers),
-                    timeout=120,
-                    check=False,
-                )
-                measured[role] = out.strip().splitlines()
-            net["rtt"] = measured
+        # A profile that is not in effect is worse than no profile, so the
+        # shaping, the check that it landed and the teardown are one unit:
+        # anything that fails between them leaves the instance unshaped.
         try:
+            if net_profile != "lan":
+                profile = NET_PROFILES[net_profile]
+                shaped = net_shape_dst or peer_subnet(
+                    [private[role]["host"] for role in ROLES]
+                )
+                applied: dict[str, Any] = {}
+                for role in ROLES:
+                    _status, out, err = transport.run(
+                        role_routes[role],
+                        netem_apply_script(
+                            iface=iface,
+                            delay_ms=int(profile["delay_ms"]),
+                            rate_mbit=profile["rate_mbit"],
+                            dst=shaped,
+                            sudo_password=sudo_password,
+                        ),
+                        timeout=60,
+                        check=False,
+                    )
+                    applied[role] = (out + err).strip().splitlines()
+                    if "FILTER-OK" not in out:
+                        raise ThreeHostError(
+                            f"{role}: the {net_profile} filter is not installed "
+                            f"on {iface}, so nothing would be shaped: {applied[role]}"
+                        )
+                net["profile"] = {
+                    "name": net_profile,
+                    "delay_ms": profile["delay_ms"],
+                    "rate_mbit": profile["rate_mbit"],
+                    "shaped_destination": shaped,
+                    "shaped_interface": iface,
+                }
+                net["qdisc"] = applied
+                measured: dict[str, Any] = {}
+                for role in ROLES:
+                    peers = [
+                        private[other]["host"] for other in ROLES if other != role
+                    ]
+                    _status, out, _err = transport.run(
+                        role_routes[role],
+                        ping_peers_script(peers=peers),
+                        timeout=120,
+                        check=False,
+                    )
+                    measured[role] = out.strip().splitlines()
+                net["rtt"] = measured
+                delay_ms = float(profile["delay_ms"])
+                for role in ROLES:
+                    round_trips = [
+                        value
+                        for value in (
+                            measured_rtt_ms(line) for line in measured[role]
+                        )
+                        if value is not None
+                    ]
+                    if not round_trips or max(round_trips) < delay_ms * 0.5:
+                        raise ThreeHostError(
+                            f"{role}: {net_profile} claims {delay_ms:.0f} ms but "
+                            f"the measured round trip stayed at {round_trips}; "
+                            "refusing to report a profiled run whose profile was "
+                            "not in effect"
+                        )
             if sample_resources:
                 for role in ROLES:
                     transport.start_background(

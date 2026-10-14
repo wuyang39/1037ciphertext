@@ -35,6 +35,8 @@ from infra.d7_three_hosts import (
     capture_headroom_error,
     netem_apply_script,
     netem_clear_script,
+    measured_rtt_ms,
+    peer_subnet,
     resource_sampler_script,
     scrub_script,
     session_root,
@@ -154,10 +156,38 @@ def test_the_netem_script_shapes_the_peer_subnet_and_not_the_session() -> None:
     assert "prio bands 3" in script
     assert "match ip dst 172.27.172.0/24 flowid 1:3" in script
     assert script.index("prio bands 3") < script.index("netem")
+    # Installing is not the same as classifying: the run only treats the
+    # profile as applied when the filter the shaping depends on is listed.
+    assert "FILTER-OK" in script and "FILTER-MISSING" in script
     assert "tc qdisc del dev eth0 root" in netem_clear_script(
         iface="eth0", sudo_password="pw"
     )
     assert NET_PROFILES["lan"] == {"delay_ms": 0, "rate_mbit": None}
+
+
+def test_the_shaped_prefix_is_built_from_the_octets() -> None:
+    """``dirname`` on an address returns nothing, which shaped ``dst 0/24``.
+
+    The filter then installed cleanly and classified no packet, so a run
+    labelled as a 40 ms profile kept moving its traffic at LAN latency. The
+    prefix has to come out of the addresses themselves.
+    """
+    assert (
+        peer_subnet(["172.27.172.201", "172.27.172.202", "172.27.172.203"])
+        == "172.27.172.0/24"
+    )
+    with pytest.raises(ThreeHostError):
+        peer_subnet(["172.27.172.201", "10.0.0.4"])
+    with pytest.raises(ThreeHostError):
+        peer_subnet(["not-an-address"])
+
+
+def test_the_measured_round_trip_is_read_out_of_the_ping_line() -> None:
+    assert (
+        measured_rtt_ms("rtt min/avg/max/mdev = 40.106/40.135/40.191/0.029 ms")
+        == 40.135
+    )
+    assert measured_rtt_ms("5 packets transmitted, 5 received, 0% packet loss") is None
 
 
 def test_the_sampler_does_not_match_its_own_command_line() -> None:
