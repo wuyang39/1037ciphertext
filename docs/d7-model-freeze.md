@@ -5,7 +5,8 @@ enclave 程序真正消费的张量、给出逐张量量化标定，并用**程�
 发布版 GPT-2 的输出。三节点 enclave 内的 D7 解码尚未运行，本文最后一节写清
 它要跑什么、按什么几何跑，以及为什么几何要受限。
 
-状态：本地部分完成并封存证据；enclave 解码待执行。
+状态：本地部分与三节点 enclave 解码均已完成并封存证据，见
+[d7-acceptance.md](d7-acceptance.md)。
 
 ## 1. 冻结来源
 
@@ -103,28 +104,57 @@ D6 在同一套 SPU/YACL 栈上实测：`hidden = 16`、`vocab = 152`、窗口 8
 当成没发生：受限的是**候选词表**（第 3 节）和**待实测的层数/窗口**，
 不是算术、不是权重来源、不是 tokenizer。
 
-## 6. enclave 运行方案（待执行）
+## 6. enclave 运行（已执行）
 
-1. `--layers` 从 1 起步做一次探针运行，量出每层墙钟时间，再决定 12 层是否
-   在预算内；无论最终跑几层，证据里写实际层数，不写"整个 GPT-2"。
-2. 每个解码步用一个 `decode_row` 固化的程序（`build_gpt2_program(..., decode_row=k)`），
-   程序按需编译、按 `step-<row>` 命名；窗口固定为 `sequence`。
-3. 份额由 dealer 离线拆分，明文份额只存在于受测树内并通过 tar 分发，跑完覆写
-   删除；不进镜像、不进 Git。
+2026-10-14 在三个 enclave 内完成一次运行
+`d7-enclave-3host-20261014T1018Z`（提交 `a1f45db`），完整记录见
+[d7-acceptance.md](d7-acceptance.md)，证据包
+[docs/evidence/d7-enclave-3host-20261014T1018Z](evidence/d7-enclave-3host-20261014T1018Z)。
+实际执行的就是本节原来写下的方案，落地形态如下：
+
+1. 探针按 **1 层**跑。步进不是预算问题而是几何问题：`hidden = 768`、
+   `intermediate = 3072` 的一层，三方每步墙钟已在 4.5 s～5.0 s，而每台的
+   会话状态一份就是 65 KB，份额一份 70 MB。**证据里写实际层数 1，不写
+   "整个 GPT-2"。**
+2. 每个解码步用一个 `decode_row` 固化的程序
+   （`build_gpt2_program(..., decode_row=k)`），窗口固定为 `sequence = 8`，
+   本次三步用的是 `decode_row` 4、5、6。
+3. 份额由 dealer 离线拆分；明文份额只存在于受测树内，经 VPC 私网的临时 HTTP
+   服务逐节点分发（每台只拿自己那一份），跑完覆写删除，不进镜像、不进 Git。
 4. 会话绑定 share epoch 与 KAS JobTicket；模型哈希、tokenizer 摘要、候选词表
-   摘要、精度计划哈希全部进入 `ModelManifest`，任一不匹配在任何 MPC 入口之前被拒。
-5. 负例至少包含：旧 share、旧 epoch、旧 Ticket、模型替换、tokenizer/候选表替换。
+   摘要、精度计划哈希全部进入 `ModelManifest`，任一不匹配在任何 MPC 入口之前
+   被拒。
+5. 负例跑了五类：重复结果帧、篡改 `decode_step`、混用模型 manifest、重放输入帧、
+   重放 JobTicket，全部被拒。
 6. 客户端把 enclave 返回的 token 与第 4 节的 float 参考对齐，报出逐步
-   `max_abs_error` 与 token 一致性。
+   `max_abs_error` 与 token 一致性：本次最差 0.06500，3 步 token 与 Argmax
+   全部一致。
+
+抓包这一项要单独说明：D7 一次解码在三台之间各走约 1.2 GB，内核默认接收环
+（本镜像 `net.core.rmem_max = 212992` 字节）会在毫秒内溢出，丢包后分析器再也
+无法重组那条流，于是抓包被判成 `tls_or_plaintext_violation`——不是看到了明文，
+而是抓不全就不能作证。第一次封存运行就撞上这条；`tcpdump` 现在显式要
+256 MiB 的环，驱动在起抓包前先校验 `net.core.rmem_max` 够大，重跑后三份抓包
+`capture gaps` 为 0、判决 `tls13_only`。
+
+同一轮复核还发现，封存的那份运行里"份额已擦除"的判决是假的：擦除脚本把 `~/…`
+交给 `shlex.quote`，波浪号被冻结成字面目录名，`[ -f "$share" ]` 恒为假，三份
+92 MB 份额连同 dist 包留在实例盘上。脚本与探针都已修正（见
+[d7-acceptance.md](d7-acceptance.md) 第 3 节），泄漏的份额已手工覆写删除；本文
+引用的证据包是两处修复都落地之后重跑的那一束。
 
 ## 7. 尚未覆盖
 
-1. 三节点 enclave 内的正式模型解码尚未运行，本节之前的所有结果都不构成
-   enclave 验收。
-2. 候选词表受限意味着"生成质量"只在候选集内成立；证据里给出的是
-   "发布版 top-1 落在候选集内"这一可复核判据。
-3. D4 的真实 attestation 放行仍未实现，回执签名链仍来自本次运行的本地 PKI。
-4. 性能、EPC/CPU/RAM 与网络档位对照属于 D8。
+1. **enclave 内跑的不是整个 GPT-2**，是 1 层 Block 加 1028 个候选 token 的
+   受限解码。两个受限都进 `ModelManifest` 并两端校验，但"生成质量"只在候选集
+   内成立；可复核的判据是"发布版 top-1 落在候选集内、3 步 Argmax 与参考一致"。
+2. 三份 MRENCLAVE 互不相同是**设计使然**：三台各自签名自己真正加载的树，而三棵
+   树持有不同份额。单一 MRENCLAVE 的形态见 D4 的 staged 树流程。
+3. D4 的真实 attestation 放行仍未实现，回执签名链仍来自本次运行的本地 PKI；
+   节点没有读 `/dev/attestation/quote`。
+4. enclave 模板仍带 Gramine 自己列出的三条开发档配置
+   （`loader.log_level`、`insecure__use_cmdline_argv`、`sgx.allowed_files`）。
+5. 性能、EPC/CPU/RAM 与网络档位对照属于 D8。
 
 ## 8. 复现
 

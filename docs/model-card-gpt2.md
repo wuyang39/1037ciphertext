@@ -59,8 +59,14 @@ CycloneDX SBOM 把该模型记为 `machine-learning-model` 组件并附全部六
 - 纯 Python GPT-2 字节级 BPE 与 `GPT2TokenizerFast` 在 16 条固定语料上逐 id
   相同，客户端无需在目标机装 `transformers`。
 
-**尚未在 enclave 内运行**：三节点 `gramine-sgx` 内的正式模型解码尚未执行，
-本次发布时三个验收实例已释放，因此该步在本轮不再具备运行条件。
+**已在三节点 enclave 内运行**（运行 `d7-enclave-3host-20261014T1018Z`，见
+[d7-acceptance.md](d7-acceptance.md)）：三个 `gramine-sgx` enclave 各自加载自己
+那一份正式权重份额，用提示 `the cipher key is secret` 连续生成 3 个 token
+` secret secret secret`；逐步安全 Argmax 与客户端重建 logits 的 Argmax 一致，
+与 dealer 侧 float64 参考的最差 `max_abs_error` 为 **0.0650**；五类篡改/重放负例
+全部被拒；close 之后会话目录被覆写删除、清洁度与 reveal 扫描干净；三份抓包判决
+`tls13_only`、空洞 0。**这一次跑的是 1 层 Block 加 1028 个候选 token 的受限解码，
+不是整个 GPT-2**——层数与候选宽度都写进 model manifest 并由两端各自校验。
 
 程序内有**两个与发布版不同的输入**，两者都写进 model manifest：
 
@@ -74,18 +80,25 @@ CycloneDX SBOM 把该模型记为 `machine-learning-model` 组件并附全部六
 ## 4. 已知限制
 
 - 候选词表受限意味着"生成质量"只在候选集内成立。证据给出的可复核判据是
-  "发布版 top-1 落在候选集内"，而不是完整词表下的等价。
-- enclave 内实际可跑的层数与窗口受 EPC、时延和份额规模限制，需要先做 1 层
-  探针再定；无论最终跑几层，证据里只写实际层数。
+  "发布版 top-1 落在候选集内"，以及 enclave 内逐步 Argmax 与参考一致，
+  而不是完整词表下的等价。
+- enclave 内实际跑的是 **1 层**、窗口 8、候选 1028：一层就要三方各自 4.5 s～5.0 s
+  的墙钟、每台 65 KB 的会话状态和每份 70 MB 的份额包，所以本轮停在 1 层探针，
+  证据里只写实际层数，不写"整个 GPT-2"。
 - 每方明文份额规模约 693 MB（86,642,180 个 float64），因此正式权重不进镜像、
   不进 Git，只以受测树内的一次性 tar 分发并在跑完覆写删除。
 - D4 的真实 attestation 放行仍未实现，回执签名链目前来自本地 PKI。
-- 本轮发布的模型 hash、tokenizer 摘要、候选表摘要与精度计划哈希已冻结进
-  D10 release；它们描述的是**本地已验证**的那一份，不代表 enclave 实测。
+- 本轮发布的模型 hash（`c0394f50…`）、tokenizer 摘要（`8414cab9…`）、候选表
+  摘要（`53767094…`）与精度计划哈希已冻结进 D10 release，并作为
+  `ModelManifest` 绑定到 enclave 会话（`3afdeb07…` / `db1950d9…`）；两端各自
+  校验，任一不匹配在任何 MPC 入口之前被拒。
+- 三节点 enclave 内实际验证的是 **1 层**：更高层数没有实测，不得按已验证陈述。
 
 ## 5. 不适用范围
 
 - 不用于任何安全、事实准确性或生产生成能力的对外声明。
 - 不用于中文或非 GPT-2 词表覆盖的语言。
-- 不把本卡第 3 节的本地结果当作 SGX/enclave 验收结论；enclave 结论必须以
-  现场证据包为准。
+- 不把本卡第 3 节的 enclave 结论外推到 1 层以外的几何或完整词表；也不把其中
+  仍属本地的部分（程序 float 参考与发布版的一致性、纯 Python BPE 的逐 id 相同）
+  当成 enclave 结论。
+- 超出本次实测范围的任何说法，都必须以新的现场证据包为准。

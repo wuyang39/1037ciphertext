@@ -128,8 +128,11 @@ D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
 
 ## D7-D8 模型与指标
 
-- [ ] 正式英文 GPT-2（`gpt2`）模型完成至少 1 token 生成。
-- [ ] `model_hash`、tokenizer、`precision_plan`、epoch、Ticket 全部绑定。
+- [x] 正式英文 GPT-2（`gpt2`）模型完成至少 1 token 生成。三个 enclave 内连续
+  生成 3 个 token（运行 `d7-enclave-3host-20261014T1018Z`，实际几何 1 层 +
+  1028 候选），见 [d7-acceptance.md](d7-acceptance.md)。
+- [x] `model_hash`、tokenizer、`precision_plan`、epoch、Ticket 全部绑定。五类
+  篡改/重放负例（含混用模型 manifest、重放 JobTicket）在进入 MPC 前全部被拒。
 - [ ] 每项优化有开/关对照，报告 token 一致率、误差、延迟、通信量、内存和安全回归。
 - [ ] 原始 trace 可由固定脚本重算图表。
 

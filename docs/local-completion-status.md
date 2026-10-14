@@ -29,7 +29,12 @@
 > 在三个 enclave 内跑通（运行 `d6-enclave-3host-20261013T1324Z`：连续生成 3 个
 > token、逐步安全 Argmax 与客户端重建 logits 的 Argmax 一致、五类篡改/重放负例
 > 全部被拒、close 后会话目录被覆写删除且清洁度与 reveal 扫描干净），见
-> [d6-acceptance.md](d6-acceptance.md)。D7 及之后仍待执行；D4 还差
+> [d6-acceptance.md](d6-acceptance.md)。D7 的正式模型随后也在同一套栈上跑通
+> （运行 `d7-enclave-3host-20261014T1018Z`：三节点各自加载正式权重份额、连续
+> 生成 3 个 token、逐步安全 Argmax 与客户端重建 logits 一致、五类负例全拒、
+> close 后会话目录被覆写删除、三份抓包 `tls13_only` 且空洞 0），见
+> [d7-acceptance.md](d7-acceptance.md)；受限几何是 **1 层 + 1028 候选**，不写
+> "整个 GPT-2"。D8 及之后仍待执行；D4 还差
 > 真实 attestation 放行，
 > 以及把 staging 固化成一条命令（三台共享同一份受测树已经跑通，运行
 > `d4-enclave-shared-3host-20261013T1715Z` 给出单一 MRENCLAVE）。
@@ -42,10 +47,10 @@
 | D4 | 3PC RSS topology、add/mul/matmul/truncate/compare/reciprocal、固定点 adapter、1,000 组向量、MaterialLedger、mTLS policy mock | 真实 YACL/BRPC TLS 1.3、证书与 SAN/CA 校验、抓包、关闭 TLS 时 fail-closed 已在同一实例（三进程）通过；正向网格、抓包与四类 fail-closed 负例已在三台独立实例通过；三个节点也已在 `gramine-sgx` 内跑通单实例与三实例两种形态，enclave 内负例并连跑三次全部拒绝；三台在三实例 enclave 里跑同一份 staged 受测树、给出单一 MRENCLAVE；剩余真实 attestation 放行与 staging 的入口化 |
 | D5 | secure embedding、QKV、causal attention、稳定 Softmax、A*V、残差、LayerNorm、FFN、GELU、Argmax、脱敏 trace | 三个 `gramine-sgx` enclave 内执行完整 Block、真实 secure nonlinear operator、enclave 内通信 profile 均已通过（运行 `d5-enclave-3host-20261013T1057Z`，38/38、溢出 0、无生产 reveal）；剩余正式模型权重（D7）与端到端自回归（D6） |
 | D6 | Session runtime、ResultFrame、三帧一致性与篡改拒绝、KV cache、secure wipe | 三个 enclave 内的端到端自回归、五类篡改/重放负例、close 前后 tmpfs 扫描均已在三台实例通过（运行 `d6-enclave-3host-20261013T1324Z`，3 个 token、逐步 Argmax 一致、会话目录被覆写删除、扫描干净）；真实回执签名仍待 attestation 放行 |
-| D7 | 正式英文 GPT-2（`gpt2` @ `607a30d7…`）冻结复核、safetensors 读取、候选词表规则、逐张量标定、静态图、纯 Python BPE、模型份额与加密份额包均已本地跑通；程序的浮点参考在候选列上与发布版最大差 5.8e-5、3 步贪心 token 完全一致，见 [d7-model-freeze.md](d7-model-freeze.md) 与 `docs/evidence/d7-local-model-20261013T1425Z` | 三个 enclave 内加载正式模型份额并生成 token；EPC/时延决定的层数与窗口需先做 1 层探针再定 |
+| D7 | 正式英文 GPT-2（`gpt2` @ `607a30d7…`）冻结复核、safetensors 读取、候选词表规则、逐张量标定、静态图、纯 Python BPE、模型份额与加密份额包均已本地跑通；程序的浮点参考在候选列上与发布版最大差 5.8e-5、3 步贪心 token 完全一致，见 [d7-model-freeze.md](d7-model-freeze.md) 与 `docs/evidence/d7-local-model-20261013T1425Z` | 三个 `gramine-sgx` enclave 内加载正式权重份额并生成 3 个 token 已通过（运行 `d7-enclave-3host-20261014T1018Z`：逐步 Argmax 与客户端重建一致、与 float64 参考最差 `max_abs_error` 0.0650、五类负例全拒、close 后会话目录被覆写删除、清洁度与 reveal 扫描干净、三份抓包 `tls13_only` 空洞 0、staged 份额跑完覆写 92,542,258 字节后删除），见 [d7-acceptance.md](d7-acceptance.md)；仍待补的是更高层数与完整词表的几何（本次受 EPC/时延/份额规模限制为 1 层 + 1028 候选，已如实写进 manifest 与证据） |
 | D8 | StagePlanner、softmax/GELU/rsqrt 近似边界、脱敏 benchmark collector、网络 profile、报告脚本 | EPC/CPU/RAM、真实延迟、通信量、开关对照和安全回归 |
 | D9 | 本地负例脚本、证据采集脚本、拓扑模板、验收清单 | 三域部署、独立账号/安全组、pcap、宿主机材料演示、离线复现 |
-| D10 | 安装手册、[正式模型卡](model-card-gpt2.md)、CycloneDX SBOM 生成器、[结论映射表](conclusion-map.md)、确定性 release 构建（`--tracked-only`）、空目录演练脚本、仓库密钥扫描与实例释放探测均已本地跑通，见 [d10-release-acceptance.md](d10-release-acceptance.md) 与 `docs/evidence/d10-release-20261013T144830Z` | 真实云账号的 15 分钟答辩演练、费用中心无持续计费确认（人工输入）；D7 的 enclave 解码因验收实例已释放而无法在本轮执行 |
+| D10 | 安装手册、[正式模型卡](model-card-gpt2.md)、CycloneDX SBOM 生成器、[结论映射表](conclusion-map.md)、确定性 release 构建（`--tracked-only`）、空目录演练脚本、仓库密钥扫描与实例释放探测均已本地跑通，见 [d10-release-acceptance.md](d10-release-acceptance.md) 与 `docs/evidence/d10-release-20261013T144830Z` | 真实云账号的 15 分钟答辩演练、费用中心无持续计费确认（人工输入） |
 
 ## 本机 Linux/WSL 增量完成
 

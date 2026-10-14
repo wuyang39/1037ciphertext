@@ -31,7 +31,7 @@ SGX 验收。
 | enclave 内端到端私有自回归 3 token、安全 Argmax 与客户端一致 | 服务器已验证 | `d6-acceptance.md`；`docs/evidence/d6-enclave-3host-20261013T1324Z` |
 | 会话关闭后 KV/份额被覆写删除、host 扫描干净 | 服务器已验证 | `d6-acceptance.md`；同上证据包 |
 
-## 3. 正式模型（D7 本地部分）
+## 3. 正式模型（D7）
 
 | 结论 | 状态 | 证据 |
 | --- | --- | --- |
@@ -40,7 +40,12 @@ SGX 验收。
 | 3 步贪心 token 与发布版一致（`,` ` and` ` the`） | 本地已验证 | 同上 `d7-generation.json`、`d7-summary.json` |
 | 逐张量最差标定误差 1.9e-6、最窄位宽 18 | 本地已验证 | 同上 `d7-calibration.json`、`d7-precision-plan.json` |
 | 纯 Python BPE 与 `GPT2TokenizerFast` 逐 id 一致 | 本地已验证 | `tests/unit/test_d7_gpt2_tools.py` |
-| 三节点 enclave 内加载正式模型份额并生成 token | **未完成** | `d7-model-freeze.md` §6 方案；本轮验收实例已释放，无运行条件 |
+| 三节点 enclave 各自加载正式权重份额并连续生成 3 个 token（提示 `the cipher key is secret` → ` secret secret secret`） | 服务器已验证 | `docs/d7-acceptance.md`；`docs/evidence/d7-enclave-3host-20261014T1018Z` |
+| 逐步安全 Argmax 与客户端重建 logits 的 Argmax 一致；与 float64 参考最差 `max_abs_error` 0.0650 | 服务器已验证 | 同上 `d7-client-result.json` |
+| 五类篡改/重放负例（重复结果帧、篡改 `decode_step`、混用模型 manifest、重放输入帧、重放 JobTicket）在进入 MPC 前全部被拒 | 服务器已验证 | 同上 `d7-summary.json`、`d7-three-p1-node-status.json` |
+| close 后会话目录被覆写删除、KV 无残留、清洁度与 reveal 扫描干净、staged 份额跑完覆写删除 | 服务器已验证 | 同上 `d7-hygiene-p{0,1,2}.json`、`d7-reveal-scan.json` |
+| 三份抓包判决 `tls13_only`、非 TLS 字节 0、空洞 0 | 服务器已验证 | 同上 `d7-three-P{0,1,2}-tls-summary.txt` |
+| 层数与候选词表超出本次实测范围（1 层 + 1028 候选） | **未完成** | 本次是 1 层探针；更高层数与完整 `vocab = 50257` 没有实测 |
 
 ## 4. D10 交付与其边界
 
@@ -56,5 +61,7 @@ SGX 验收。
 
 1. 只报告由 trace、日志、hash 或测试输出直接支持的结论。
 2. 任何仍依赖服务器阶段的指标标为 `pending_server`，不得用模拟值代替实测值。
-3. 第 1、2 节标为"服务器已验证"的结论可以对外陈述；第 3 节的 D7 本地结论
-   必须带"本地"限定；第 1、3 节的"未完成"条目不得在答辩中表述为已完成。
+3. 第 1、2 节与第 3 节标为"服务器已验证"的结论可以对外陈述；第 3 节里仍标
+   "本地已验证"的 D7 结论必须带"本地"限定；任何标为"未完成"的条目不得在答辩中
+   表述为已完成。D7 的 enclave 结论必须同时带上 1 层 + 1028 候选的几何限定，
+   不得说成"整个 GPT-2 跑在 enclave 里"。
