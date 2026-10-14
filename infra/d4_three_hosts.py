@@ -2323,7 +2323,13 @@ def _attestation_request(
     )
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
+    """The command line the acceptance runs are driven through.
+
+    Split out of :func:`main` so a test can parse each subcommand and check the
+    namespace carries every attribute ``main`` reads; the attested run once
+    crashed on a ``--dry-run`` that only ``run`` defined.
+    """
     parser = argparse.ArgumentParser(
         description="Run the D4 acceptance across three instances"
     )
@@ -2415,6 +2421,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="commit every instance must be on, or 'HEAD' for this checkout",
     )
     _add_enclave_arguments(negatives)
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = build_parser()
     args = parser.parse_args(argv)
 
     run_id = args.run_id or (
@@ -2465,7 +2476,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 expect_commit=expect_commit or None,
                 enclave_template=args.enclave_template,
                 enclave_dir=args.enclave_dir,
-                dry_run=args.dry_run,
+                # Only the ``run`` subcommand carries --dry-run; the attested
+                # and negatives runs have nothing to preview.
+                dry_run=getattr(args, "dry_run", False),
                 attestation=_attestation_request(args),
             )
     except ThreeHostError as exc:
@@ -2498,6 +2511,7 @@ __all__ = [
     "ThreeHostError",
     "Transport",
     "assert_attested_evidence",
+    "build_parser",
     "capture_command",
     "capture_filter",
     "close_attestation",

@@ -13,6 +13,7 @@ from infra.d4_three_hosts import (
     SSHRoute,
     ThreeHostError,
     Transport,
+    build_parser,
     capture_command,
     enclave_sign_command,
     endpoints,
@@ -737,6 +738,62 @@ class _WedgingTransport(Transport):
 
 def _route() -> SSHRoute:
     return SSHRoute.from_document("P0", {"host": "10.0.0.1"}, user="ops")
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["run", "--cluster", "c.json", "--out-dir", "out"],
+        ["attested", "--cluster", "c.json", "--out-dir", "out"],
+        ["negatives", "--cluster", "c.json", "--out-dir", "out"],
+    ],
+)
+def test_every_subcommand_carries_the_attributes_main_reads(argv: list[str]) -> None:
+    """main() reads one flat namespace; every subcommand has to fill it.
+
+    The attested run shipped without --dry-run, so ``args.dry_run`` raised
+    before the first SSH call. Reading the attributes through getattr hides
+    that, so this asserts the parser itself defines them.
+    """
+    args = build_parser().parse_args(argv)
+    required = {
+        "command",
+        "run_id",
+        "expect_commit",
+        "ssh_user",
+        "ssh_host",
+        "ssh_key",
+        "ssh_key_password",
+        "repo",
+        "python",
+        "workspace",
+        "node_timeout",
+        "enclave_template",
+        "enclave_dir",
+    }
+    # The attested run is the only one that turns the KAS identity on; the
+    # negatives run leaves it off, which is why _attestation_request reads it
+    # through getattr.
+    if args.command == "attested":
+        required |= {"attest"}
+    if args.command in {"run", "attested"}:
+        required |= {"iface", "vectors", "batch"}
+    if args.command == "negatives":
+        required |= {"probe_timeout", "no_probes"}
+    missing = sorted(required - set(vars(args)))
+    assert missing == []
+
+
+def test_run_and_attested_arms_ask_for_the_same_grid() -> None:
+    parser = build_parser()
+    run = parser.parse_args(["run", "--cluster", "c.json", "--out-dir", "out"])
+    attested = parser.parse_args(
+        ["attested", "--cluster", "c.json", "--out-dir", "out"]
+    )
+    assert (run.vectors, run.batch) == (attested.vectors, attested.batch)
+    # --dry-run stays a property of the plain run; the attested arm is never
+    # a preview, so getattr is what keeps main() honest about it.
+    assert getattr(attested, "dry_run", False) is False
 
 
 def test_a_wedged_exec_session_reconnects_and_runs_the_command() -> None:
