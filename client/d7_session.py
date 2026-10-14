@@ -30,7 +30,7 @@ import hashlib
 import secrets
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from typing import Any, Callable, Mapping, Protocol, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from client.d6_session import NodeChannel, step_request_hash
 from client.gpt2_bpe import Gpt2Bpe

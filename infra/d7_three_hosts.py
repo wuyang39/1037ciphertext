@@ -45,7 +45,6 @@ from infra.d4_three_hosts import (
     DEFAULT_PYTHON,
     DEFAULT_REPO,
     DEFAULT_STACK_SIZE,
-    DRIVER,
     NO_BYTECODE,
     ROLES,
     ThreeHostError,
@@ -868,7 +867,7 @@ def run_three_hosts(
             transport.run(
                 role_routes[role],
                 "getcap $(command -v tcpdump) 2>/dev/null | grep -q cap_net_raw || "
-                f"sudo -n setcap cap_net_raw,cap_net_admin+eip $(command -v tcpdump)",
+                "sudo -n setcap cap_net_raw,cap_net_admin+eip $(command -v tcpdump)",
                 check=False,
             )
             transport.start_background(

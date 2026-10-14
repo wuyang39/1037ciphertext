@@ -122,7 +122,7 @@ def build_manifest(
     model_version = str(run["model_version"])
     config = load_config(tokenizer_dir)
     candidates = candidate_token_ids(
-        candidate_size=D7_CANDIDATE_SIZE,
+        D7_CANDIDATE_SIZE,
         required=[int(value) for value in required_tokens],
         vocab_size=config.vocab_size,
     )

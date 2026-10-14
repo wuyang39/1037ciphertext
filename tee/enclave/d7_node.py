@@ -92,6 +92,10 @@ def run_d7_node(config: D6NodeConfig, *, session_timeout: float = 1800.0) -> int
             result=result_payload,
         ),
         session_timeout=session_timeout,
+        # The driver waits for the D7 markers, and the node has to say which
+        # phase it is announcing rather than inherit the D6 node's lines.
+        ready_marker=READY_MARKER,
+        done_marker=DONE_MARKER,
     )
 
 

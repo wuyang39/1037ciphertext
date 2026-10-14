@@ -741,6 +741,8 @@ def run_node(
     programs: SessionPrograms | None = None,
     payloads: SessionPayloads | None = None,
     session_timeout: float = 1800.0,
+    ready_marker: str = READY_MARKER,
+    done_marker: str = DONE_MARKER,
 ) -> int:
     config.out_dir.mkdir(parents=True, exist_ok=True)
     policy = config.policy()
@@ -782,7 +784,7 @@ def run_node(
     runner.start()
     link_seconds = round(time.monotonic() - started, 3)
     log(
-        f"{READY_MARKER} "
+        f"{ready_marker} "
         + json.dumps(
             {
                 "run_id": config.run_id,
@@ -836,7 +838,7 @@ def run_node(
         }
     )
     write_json(config.out_dir / "node-status.json", status)
-    log(f"{DONE_MARKER} {config.role}")
+    log(f"{done_marker} {config.role}")
     return 0
 
 

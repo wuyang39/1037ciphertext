@@ -33,7 +33,7 @@ import json
 import shutil
 import tarfile
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 from infra.d7_workspace import CLIENT, ROLES, D7WorkspaceError, build_workspace
 from infra.evidence import sha256_file, write_json
@@ -93,14 +93,23 @@ def stage(
     dist_root: Path,
     session_root: str | None = None,
     max_new_tokens: int | None = None,
+    splitter: Callable[[Any], Sequence[str]] | None = None,
 ) -> dict[str, Any]:
-    """Provision the run, then write one tarball per node."""
+    """Provision the run, then write one tarball per node.
+
+    ``splitter`` is the same seam ``build_workspace`` offers: only the share
+    split needs the SPU runtime, so the rest of the dealer path -- the digest
+    checks, the candidate table, the per-node trees and the tarballs -- can be
+    exercised without libspu.
+    """
     root = Path(root)
     client_dir = Path(client_dir)
     dist_root = Path(dist_root)
     kwargs: dict[str, Any] = {}
     if max_new_tokens is not None:
         kwargs["max_new_tokens"] = int(max_new_tokens)
+    if splitter is not None:
+        kwargs["splitter"] = splitter
     manifest = build_workspace(
         root,
         run_id=run_id,
@@ -140,10 +149,13 @@ def stage(
             for path in tree.rglob("*")
             if path.is_file()
         )
+        # What this node's own tree actually carries, which is the thing the
+        # leak check below is about: the dealer's ``shares`` directory holds
+        # all three, and only the one copied into ``tree`` is shipped.
         extra = {
             role: sorted(
-                path.relative_to(root).as_posix()
-                for path in (root / "shares").glob("*.json")
+                path.name
+                for path in (tree / "shares").glob("*.json")
             )
         }
         bundles[role] = {

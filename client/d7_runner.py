@@ -15,7 +15,6 @@ into "the private loop produced the numbers the public reference did".
 from __future__ import annotations
 
 import argparse
-import datetime as dt
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
