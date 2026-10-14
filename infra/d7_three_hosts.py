@@ -93,6 +93,17 @@ D7_PORTS = (47100, 47101, 47102, 47200, 47201, 47202, SHARE_PORT)
 # kernel's stock capture ring is overrun in under a millisecond. Ask for 256 MiB
 # and check ``net.core.rmem_max`` can grant it before the run starts.
 CAPTURE_BUFFER_KIB = 262144
+
+# D8 repeats this workload while the network and the host are measured, so a
+# number leaves the instance with the conditions it was taken under. ``lan``
+# injects nothing, which keeps a plain D7 run free of any traffic shaping.
+NET_PROFILES: dict[str, dict[str, Any]] = {
+    "lan": {"delay_ms": 0, "rate_mbit": None},
+    "wan-40ms": {"delay_ms": 40, "rate_mbit": 100},
+    "wan-80ms": {"delay_ms": 80, "rate_mbit": 100},
+}
+RESOURCE_SAMPLE_INTERVAL_S = 0.5
+NODE_MATCH_PATTERN = "d7[_]node"
 REVEAL_SCAN = "d7-reveal-scan.json"
 README = "README.md"
 EXCLUSION_NOTE = (
@@ -371,6 +382,185 @@ def scrub_script(*, role_root: str, dist_root: str, role: str) -> str:
             "true",
         ]
     )
+
+
+def _privileged(password: str | None) -> str:
+    """The prefix for a command that needs root on the instance.
+
+    The instances answer ``sudo`` with a password, and an unattended run has
+    nobody to type it, so the driver pipes it when it was given one and falls
+    back to passwordless sudo when it was not.
+    """
+    if password is None:
+        return "sudo -n"
+    return f"echo {shlex.quote(password)} | sudo -S -p ''"
+
+
+def netem_apply_script(
+    *,
+    iface: str,
+    delay_ms: int,
+    rate_mbit: int | None,
+    dst: str,
+    sudo_password: str | None = None,
+) -> str:
+    """Inject a delay and a rate on the peer subnet only.
+
+    The shaping goes under a priority qdisc and is reached through a filter
+    that matches the private peer addresses, so the session that carries the
+    commands is never shaped: a run that cuts its own transport the moment it
+    starts cannot report anything afterwards. Only egress is shaped, and it is
+    shaped on every instance, so both directions of the MPC link end up with
+    the profile.
+    """
+    sudo = _privileged(sudo_password)
+    netem = f"{sudo} tc qdisc add dev {shlex.quote(iface)} parent 1:3 handle 30: netem"
+    if delay_ms:
+        netem += f" delay {int(delay_ms)}ms"
+    if rate_mbit:
+        netem += f" rate {int(rate_mbit)}mbit"
+    return "\n".join(
+        [
+            "set -u",
+            f"{sudo} tc qdisc del dev {shlex.quote(iface)} root 2>/dev/null || true",
+            f"{sudo} tc qdisc add dev {shlex.quote(iface)} root handle 1: prio bands 3",
+            netem,
+            f"{sudo} tc filter add dev {shlex.quote(iface)} protocol ip "
+            f"parent 1:0 prio 1 u32 match ip dst {shlex.quote(dst)} flowid 1:3",
+            f"{sudo} tc qdisc show dev {shlex.quote(iface)}",
+        ]
+    )
+
+
+def netem_clear_script(*, iface: str, sudo_password: str | None = None) -> str:
+    """Remove the shaping, whether or not this run was the one that added it."""
+    sudo = _privileged(sudo_password)
+    return "\n".join(
+        [
+            "set -u",
+            f"{sudo} tc qdisc del dev {shlex.quote(iface)} root 2>/dev/null || true",
+            f"{sudo} tc qdisc show dev {shlex.quote(iface)} | head -1",
+        ]
+    )
+
+
+def ping_peers_script(*, peers: Sequence[str]) -> str:
+    """Measure the round trip the profile actually produced, from the peer side."""
+    return "\n".join(
+        ["set -u"]
+        + [
+            f"echo 'peer {peer}'; "
+            f"ping -c 5 -q -i 0.3 {shlex.quote(peer)} 2>&1 | tail -2"
+            for peer in peers
+        ]
+    )
+
+
+def platform_facts_script(*, sudo_password: str | None = None) -> str:
+    """What the instance is, as the kernel and the runtime see it.
+
+    The EPC section comes out of the kernel ring buffer rather than out of a
+    configuration file, because that is the only place this driver can read
+    the platform's real enclave memory size from; the per-process EPC
+    residency counter is not exposed by this kernel, and the run does not
+    invent one.
+    """
+    sudo = _privileged(sudo_password)
+    return "\n".join(
+        [
+            "set -u",
+            "echo \"cpu_model=$(grep -m1 'model name' /proc/cpuinfo "
+            "| cut -d: -f2- | sed 's/^ *//')\"",
+            "echo \"cpu_count=$(nproc)\"",
+            "echo \"mem_total_kb=$(awk '/MemTotal/{print $2}' /proc/meminfo)\"",
+            "echo \"mem_available_kb=$(awk '/MemAvailable/{print $2}' /proc/meminfo)\"",
+            "echo \"kernel=$(uname -r)\"",
+            "echo \"gramine=$(gramine-sgx --version 2>/dev/null | head -1)\"",
+            "echo \"epc_section=$("
+            f"{sudo} dmesg 2>/dev/null | grep -m1 'EPC section' | sed 's/^.*sgx: //')"
+            "\"",
+            "echo \"sgx_device=$([ -c /dev/sgx_enclave ] && echo /dev/sgx_enclave "
+            "|| echo none)\"",
+        ]
+    )
+
+
+def parse_facts(text: str) -> dict[str, str]:
+    """Read the ``key=value`` lines :func:`platform_facts_script` prints."""
+    facts: dict[str, str] = {}
+    for line in text.splitlines():
+        key, sep, value = line.partition("=")
+        if sep and key.strip():
+            facts[key.strip()] = value.strip()
+    return facts
+
+
+def resource_sampler_script(
+    *,
+    path: str,
+    marker: str,
+    interval_s: float = RESOURCE_SAMPLE_INTERVAL_S,
+) -> str:
+    """Sample the host every ``interval_s`` while the client drives the steps.
+
+    Each line holds the raw counters -- cumulative CPU ticks, available memory,
+    and the enclave process's resident set and CPU ticks -- so the report can
+    derive utilisation from consecutive samples instead of trusting a number
+    the sampler computed for itself. ``marker`` rides along in the command line
+    so the run can stop exactly this loop again.
+    """
+    pattern = shlex.quote(NODE_MATCH_PATTERN)
+    return "\n".join(
+        [
+            "set -u",
+            f"# {marker}",
+            f"out={remote_path(path)}",
+            ': > "$out"',
+            "while :; do",
+            "  ts=$(date +%s.%N)",
+            "  read -r _cpu user nice system idle iowait irq softirq steal _rest "
+            "< /proc/stat",
+            "  total=$((user+nice+system+idle+iowait+irq+softirq+steal))",
+            "  busy=$((total-idle-iowait))",
+            "  avail=$(awk '/MemAvailable/{print $2}' /proc/meminfo)",
+            "  rss=0",
+            "  ticks=0",
+            f"  for p in $(pgrep -f {pattern} 2>/dev/null); do",
+            "    r=$(awk '/VmRSS/{print $2}' \"/proc/$p/status\" 2>/dev/null); "
+            "r=${r:-0}",
+            "    s=$(awk '{print $14+$15}' \"/proc/$p/stat\" 2>/dev/null); "
+            "s=${s:-0}",
+            "    rss=$((rss+r))",
+            "    ticks=$((ticks+s))",
+            "  done",
+            "  printf "
+            "'{\"t\":%s,\"cpu_total\":%s,\"cpu_busy\":%s,\"mem_available_kb\":%s,"
+            "\"gramine_rss_kb\":%s,\"gramine_cpu_ticks\":%s}\\n' "
+            '"$ts" "$total" "$busy" "$avail" "$rss" "$ticks" >> "$out"',
+            f"  sleep {float(interval_s)}",
+            "done",
+        ]
+    )
+
+
+def parse_resource_samples(text: str) -> list[dict[str, float]]:
+    """Keep the well-formed sampler lines and drop anything else."""
+    samples: list[dict[str, float]] = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line.startswith("{"):
+            continue
+        try:
+            document = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(document, dict) or "t" not in document:
+            continue
+        try:
+            samples.append({str(key): float(value) for key, value in document.items()})
+        except (TypeError, ValueError):
+            continue
+    return samples
 
 
 def _scrub_staging(
@@ -775,7 +965,16 @@ def run_three_hosts(
     enclave_size: str = DEFAULT_ENCLAVE_SIZE,
     max_threads: int = DEFAULT_MAX_THREADS,
     stack_size: str = DEFAULT_STACK_SIZE,
+    net_profile: str = "lan",
+    net_shape_dst: str | None = None,
+    sudo_password: str | None = None,
+    sample_resources: bool = False,
 ) -> dict[str, Any]:
+    if net_profile not in NET_PROFILES:
+        raise ThreeHostError(
+            f"unknown network profile {net_profile!r}; "
+            f"expected one of {sorted(NET_PROFILES)}"
+        )
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     role_routes = routes(cluster, user=ssh_user, ssh_host=ssh_host)
@@ -800,6 +999,9 @@ def run_three_hosts(
     before: dict[str, Any] | None = None
     after: dict[str, Any] = {}
     export_digests = ""
+    sampler_marker = f"a122-resource-sampler-{run_id}"
+    samplers = {role: f"/tmp/{run_id}-{role}-resources.jsonl" for role in ROLES}
+    net: dict[str, Any] = {}
 
     if expect_commit:
         for role in ROLES:
@@ -965,26 +1167,115 @@ def run_three_hosts(
             )
             time.sleep(1.0)
         wait_for_node_ready(transport, role_routes, logs=node_logs, timeout=node_timeout)
-        transport.start_background(
-            role_routes[DESTINATION],
-            _client_command(
-                python=python,
-                repo=repo,
-                config=f"{client_dir}/C.json",
-                kas=f"{client_dir}/kas.json",
-                out=client_result,
+        # D8: the profile is injected once the nodes are up and the trees are
+        # already in place, so it shapes the session and nothing else.
+        if sample_resources:
+            facts: dict[str, Any] = {}
+            for role in ROLES:
+                _status, out, err = transport.run(
+                    role_routes[role],
+                    platform_facts_script(sudo_password=sudo_password),
+                    timeout=60,
+                    check=False,
+                )
+                facts[role] = parse_facts(out)
+                write_json(out_dir / f"d8-platform-{role.lower()}.json", facts[role])
+            net["platform"] = facts
+        if net_profile != "lan":
+            profile = NET_PROFILES[net_profile]
+            shaped = net_shape_dst or (
+                posixpath.dirname(private[DESTINATION]["host"]) + "0/24"
+            )
+            applied: dict[str, Any] = {}
+            for role in ROLES:
+                _status, out, err = transport.run(
+                    role_routes[role],
+                    netem_apply_script(
+                        iface=iface,
+                        delay_ms=int(profile["delay_ms"]),
+                        rate_mbit=profile["rate_mbit"],
+                        dst=shaped,
+                        sudo_password=sudo_password,
+                    ),
+                    timeout=60,
+                    check=False,
+                )
+                applied[role] = (out + err).strip().splitlines()
+            net["profile"] = {
+                "name": net_profile,
+                "delay_ms": profile["delay_ms"],
+                "rate_mbit": profile["rate_mbit"],
+                "shaped_destination": shaped,
+                "shaped_interface": iface,
+            }
+            net["qdisc"] = applied
+            measured: dict[str, Any] = {}
+            for role in ROLES:
+                peers = [private[other]["host"] for other in ROLES if other != role]
+                _status, out, _err = transport.run(
+                    role_routes[role],
+                    ping_peers_script(peers=peers),
+                    timeout=120,
+                    check=False,
+                )
+                measured[role] = out.strip().splitlines()
+            net["rtt"] = measured
+        try:
+            if sample_resources:
+                for role in ROLES:
+                    transport.start_background(
+                        role_routes[role],
+                        resource_sampler_script(
+                            path=samplers[role], marker=sampler_marker
+                        ),
+                    )
+            transport.start_background(
+                role_routes[DESTINATION],
+                _client_command(
+                    python=python,
+                    repo=repo,
+                    config=f"{client_dir}/C.json",
+                    kas=f"{client_dir}/kas.json",
+                    out=client_result,
+                    log=client_log,
+                    prompt=prompt,
+                    max_new_tokens=max_new_tokens,
+                ),
+            )
+            outcome, before = _watch_client(
+                transport,
+                role_routes,
+                session_dirs=session_dirs,
                 log=client_log,
-                prompt=prompt,
-                max_new_tokens=max_new_tokens,
-            ),
-        )
-        outcome, before = _watch_client(
-            transport,
-            role_routes,
-            session_dirs=session_dirs,
-            log=client_log,
-            timeout=node_timeout,
-        )
+                timeout=node_timeout,
+            )
+        finally:
+            if sample_resources:
+                for role in ROLES:
+                    transport.run(
+                        role_routes[role],
+                        f"pkill -f {shlex.quote(sampler_marker)} || true",
+                        check=False,
+                    )
+                    try:
+                        transport.get(
+                            role_routes[role],
+                            samplers[role],
+                            out_dir / f"d8-resources-{role.lower()}.jsonl",
+                        )
+                    except Exception:  # noqa: BLE001 - a missing sample is not a failed run
+                        pass
+            if net_profile != "lan":
+                cleared: dict[str, Any] = {}
+                for role in ROLES:
+                    _status, out, err = transport.run(
+                        role_routes[role],
+                        netem_clear_script(iface=iface, sudo_password=sudo_password),
+                        timeout=60,
+                        check=False,
+                    )
+                    cleared[role] = (out + err).strip().splitlines()
+                net["cleared"] = cleared
         for role in ROLES:
             wait_for_marker(
                 transport,
@@ -1163,6 +1454,8 @@ def run_three_hosts(
         "session_state_after_close": dict(after),
         "verdicts": dict(verdicts),
     }
+    if net:
+        document["network"] = net
     write_json(out_dir / "d7-summary.json", document)
     sealed: dict[str, Any] = {}
     if seal:
@@ -1216,6 +1509,29 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("--ssh-key-password", default=None)
     parser.add_argument("--expect-commit", default=None)
+    parser.add_argument(
+        "--net-profile",
+        choices=sorted(NET_PROFILES),
+        default="lan",
+        help="network profile to inject on the peer subnet for this run",
+    )
+    parser.add_argument(
+        "--net-shape-dst",
+        default=None,
+        help="destination prefix the shaping filter matches (default: the "
+        "private /24 of this cluster)",
+    )
+    parser.add_argument(
+        "--sudo-password",
+        default=None,
+        help="password for the instances' sudo; without it the driver asks for "
+        "passwordless sudo and a profiled run cannot shape anything",
+    )
+    parser.add_argument(
+        "--sample-resources",
+        action="store_true",
+        help="sample host CPU, memory and the enclave process while the client runs",
+    )
     parser.add_argument("--seal", action="store_true")
     args = parser.parse_args(argv)
     cluster = load_cluster(args.cluster, user=args.ssh_user, ssh_host=args.ssh_host)
@@ -1245,6 +1561,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             node_timeout=args.timeout,
             expect_commit=args.expect_commit,
             seal=args.seal,
+            net_profile=args.net_profile,
+            net_shape_dst=args.net_shape_dst,
+            sudo_password=args.sudo_password,
+            sample_resources=args.sample_resources,
         )
     except BaseException:
         # A run that died half way through must not leave a node holding its
@@ -1259,9 +1579,20 @@ def main(argv: Sequence[str] | None = None) -> int:
                     stray[role],
                     f"pkill -9 -f {shlex.quote('http.server ' + str(SHARE_PORT))} "
                     f"|| true; "
-                    f"pkill -9 -f {shlex.quote('tcpdump -i ' + args.iface)} || true",
+                    f"pkill -9 -f {shlex.quote('tcpdump -i ' + args.iface)} || true; "
+                    f"pkill -f {shlex.quote('a122-resource-sampler')} || true",
                     check=False,
                 )
+                if args.net_profile != "lan":
+                    # Shaping that outlives the run would quietly distort the
+                    # next one, so the failure path takes it down too.
+                    transport.run(
+                        stray[role],
+                        netem_clear_script(
+                            iface=args.iface, sudo_password=args.sudo_password
+                        ),
+                        check=False,
+                    )
         except Exception:  # noqa: BLE001 - the original failure matters more
             pass
         raise
@@ -1275,12 +1606,20 @@ __all__ = [
     "D7_PORTS",
     "DEFAULT_PROMPT",
     "MODULE",
+    "NET_PROFILES",
     "NODE_NAME",
     "SHARE_PORT",
     "assert_capture_headroom",
     "capture_filter",
     "capture_headroom_error",
     "main",
+    "netem_apply_script",
+    "netem_clear_script",
+    "parse_facts",
+    "parse_resource_samples",
+    "ping_peers_script",
+    "platform_facts_script",
+    "resource_sampler_script",
     "run_three_hosts",
     "scrub_script",
     "session_root",

@@ -27,11 +27,15 @@ from infra.d7_three_hosts import (
     D7_PORTS,
     DONE_MARKER,
     MODULE,
+    NET_PROFILES,
     NODE_PATTERN,
     READY_MARKER,
     assert_capture_headroom,
     capture_filter,
     capture_headroom_error,
+    netem_apply_script,
+    netem_clear_script,
+    resource_sampler_script,
     scrub_script,
     session_root,
 )
@@ -128,6 +132,47 @@ def test_the_scrub_script_expands_the_home_directory() -> None:
     assert "dd if=/dev/zero" in script
     # And the verification has to look at a size only a share reaches.
     assert "-size +1048576c" in script
+
+
+def test_the_netem_script_shapes_the_peer_subnet_and_not_the_session() -> None:
+    """The shaping has to be reachable only through the private filter.
+
+    A ``netem`` qdisc on the root would delay and rate-limit the very session
+    that carries the next command, so the profile goes under a priority band
+    that only the peer subnet's filter selects. ``lan`` stays a no-op so a
+    plain D7 run never touches ``tc``.
+    """
+    script = netem_apply_script(
+        iface="eth0",
+        delay_ms=40,
+        rate_mbit=100,
+        dst="172.27.172.0/24",
+        sudo_password="pw",
+    )
+    assert "delay 40ms" in script
+    assert "rate 100mbit" in script
+    assert "prio bands 3" in script
+    assert "match ip dst 172.27.172.0/24 flowid 1:3" in script
+    assert script.index("prio bands 3") < script.index("netem")
+    assert "tc qdisc del dev eth0 root" in netem_clear_script(
+        iface="eth0", sudo_password="pw"
+    )
+    assert NET_PROFILES["lan"] == {"delay_ms": 0, "rate_mbit": None}
+
+
+def test_the_sampler_does_not_match_its_own_command_line() -> None:
+    """``pgrep -f d7_node`` would find the sampler's own script text.
+
+    The loop is started through a shell whose command line carries the script,
+    so a literal pattern would match the sampler itself and fold its own
+    resident set into the enclave process's. The bracket keeps the pattern from
+    matching the characters it is written with.
+    """
+    script = resource_sampler_script(path="~/x.jsonl", marker="marker")
+    assert "d7_node" not in script
+    assert "pgrep -f 'd7[_]node'" in script
+    assert "# marker" in script
+    assert '/proc/meminfo' in script
 
 
 def test_the_capture_ring_is_refused_when_the_kernel_would_clamp_it() -> None:
