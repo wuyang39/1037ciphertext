@@ -43,6 +43,7 @@ from infra.d7_three_hosts import (
     DEFAULT_ROOT,
     DEFAULT_TOKENIZER_DIR,
     NET_PROFILES,
+    measured_rtt_ms,
     parse_resource_samples,
     run_three_hosts,
 )
@@ -52,6 +53,8 @@ from infra.evidence import seal_directory, verify_directory, write_json
 DEFAULT_PROFILES = ("lan", "wan-40ms", "wan-80ms")
 
 HOST_USER_HZ = 100.0
+
+README = "README.md"
 
 
 def summarise_capture(text: str) -> dict[str, Any]:
@@ -148,6 +151,7 @@ def collect_profile(profile_dir: Path) -> dict[str, Any]:
     steps = document.get("steps") or []
     return {
         "run_id": document.get("run_id"),
+        "model": document.get("model"),
         "profile": (document.get("network") or {}).get("profile"),
         "network": document.get("network") or {},
         "tokens": document.get("generated_tokens"),
@@ -180,6 +184,7 @@ def build_summary(
     commit: str | None,
     profiles: Mapping[str, Mapping[str, Any]],
     platform: Mapping[str, Any],
+    timestamp_utc: str | None = None,
 ) -> dict[str, Any]:
     """Fold the per-profile records into the comparison D8 exists to make."""
     baseline = profiles.get("lan") or {}
@@ -189,9 +194,21 @@ def build_summary(
         wire = record.get("wire") or {}
         total_bytes = sum(int(value.get("wire_bytes", 0)) for value in wire.values())
         wall = record.get("client_wall_seconds")
+        round_trips = [
+            value
+            for lines in ((record.get("network") or {}).get("rtt") or {}).values()
+            for value in (measured_rtt_ms(line) for line in lines)
+            if value is not None
+        ]
         comparison.append(
             {
                 "profile": name,
+                "injected_delay_ms": (record.get("profile") or {}).get("delay_ms"),
+                "measured_rtt_ms_mean": (
+                    round(sum(round_trips) / len(round_trips), 2)
+                    if round_trips
+                    else None
+                ),
                 "client_wall_seconds": wall,
                 "slowdown_vs_lan": (
                     round(wall / baseline_wall, 2)
@@ -221,9 +238,10 @@ def build_summary(
     return {
         "run_id": run_id,
         "phase": "D8",
-        "timestamp_utc": dt.datetime.now(dt.timezone.utc).strftime(
-            "%Y-%m-%dT%H:%M:%SZ"
-        ),
+        # A rebuild passes the stamp it read back out of the traces, so
+        # re-deriving a bundle reproduces its bytes rather than re-dating it.
+        "timestamp_utc": timestamp_utc
+        or dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "commit": commit,
         "prompt": DEFAULT_PROMPT,
         "metric_definition": {
@@ -260,12 +278,18 @@ def build_summary(
     }
 
 
+def _cell(value: Any) -> str:
+    """Render an absent figure as an empty cell, never as an invented zero."""
+    return "-" if value is None else str(value)
+
+
 def report_markdown(summary: Mapping[str, Any]) -> str:
     """Render the comparison from the summary, never from hand-typed figures."""
     lines = [
         "# D8: the D7 workload under a stated network profile",
         "",
-        f"Run `{summary['run_id']}` at {summary['timestamp_utc']}"
+        f"Run `{summary['run_id']}`: profiles recorded through "
+        f"{summary['timestamp_utc']}"
         + (f", commit `{summary['commit']}`." if summary.get("commit") else "."),
         "",
         "Every figure below is read back from the sealed traces of the runs it",
@@ -286,6 +310,22 @@ def report_markdown(summary: Mapping[str, Any]) -> str:
             f"{','.join(str(t) for t in row['tokens'] or [])} | "
             f"{row['worst_max_abs_error']} | "
             f"{'tls13_only' if row['captures_tls13_only'] else 'not clean'} |"
+        )
+    lines += [
+        "",
+        "The delay is injected on each instance's egress towards its peers, so a",
+        "profile labelled 40 ms measures about 80 ms round trip; the table above",
+        "carries that measured round trip next to the injected number. `lan`",
+        "injects nothing and the run takes no ping for it, so its row stays",
+        "empty: it is the baseline the other two are compared against.",
+        "",
+        "| profile | injected delay per instance (ms) | measured round trip (ms) |",
+        "| --- | --- | --- |",
+    ]
+    for row in summary["comparison"]:
+        lines.append(
+            f"| {row['profile']} | {_cell(row['injected_delay_ms'])} | "
+            f"{_cell(row['measured_rtt_ms_mean'])} |"
         )
     lines += ["", "## Per-step latency (ms)", ""]
     for name, record in summary["profiles"].items():
@@ -325,6 +365,166 @@ def report_markdown(summary: Mapping[str, Any]) -> str:
     lines += [f"- {gap}" for gap in summary["gaps"]]
     lines += [""]
     return "\n".join(lines)
+
+
+def _readme(summary: Mapping[str, Any]) -> str:
+    """Describe the bundle from the summary, so the README is not hand-typed.
+
+    The README is written by the same pass that writes the summary, which is
+    why ``--rebuild`` reproduces it as well: every sentence here that carries a
+    figure reads it back out of the record instead of restating a number
+    somebody typed.
+    """
+    profiles = summary.get("profiles") or {}
+    geometry: Mapping[str, Any] = {}
+    for record in profiles.values():
+        if record.get("model"):
+            geometry = record["model"]
+            break
+    lines = [
+        "# D8 network profiles: the D7 workload under stated conditions",
+        "",
+        f"Run `{summary['run_id']}`: profiles recorded through "
+        f"{summary['timestamp_utc']}"
+        + (f", commit `{summary['commit']}`." if summary.get("commit") else "."),
+        "",
+        "## What ran",
+        "",
+    ]
+    if geometry:
+        lines += [
+            f"- Model: `{geometry.get('model_version')}` "
+            f"(model hash `{geometry.get('model_hash')}`)",
+            f"- Blocks stacked: {geometry.get('layers')}, candidate vocabulary: "
+            f"{geometry.get('vocab_size')} ids. The geometry is D7's, unchanged; "
+            "this bundle measures it, it does not widen it.",
+        ]
+    lines += [
+        f"- Prompt: `{summary.get('prompt')}`",
+        f"- Profiles, in order: {', '.join(f'`{name}`' for name in profiles)}",
+        "- The delay and the rate are installed with `tc` on each instance's "
+        "egress towards its peers after the nodes are ready and removed in a "
+        "`finally`, so a profile labelled 40 ms measures about 80 ms round "
+        "trip. The round trip the run's own ping measured is reported next to "
+        "the injected number in `d8-report.md`; a profile whose delay did not "
+        "appear fails the run instead of appearing in the table.",
+        "",
+        "## Verdicts",
+        "",
+        "| profile | tokens | token agreement | hygiene | shares scrubbed | captures |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for row in summary.get("comparison") or []:
+        tokens = ",".join(str(token) for token in row.get("tokens") or [])
+        lines.append(
+            f"| {row['profile']} | {tokens} | "
+            f"`{row.get('token_agreement_with_reference')}` | "
+            f"{row.get('hygiene')} | {row.get('staged_shares_scrubbed')} | "
+            f"{'tls13_only' if row.get('captures_tls13_only') else 'not clean'} |"
+        )
+    lines += ["", "## What this does not cover", ""]
+    lines += [f"- {gap}" for gap in summary.get("gaps") or []]
+    lines += [""]
+    return "\n".join(lines)
+
+
+def _write_bundle(
+    out_dir: Path,
+    *,
+    run_id: str,
+    commit: str | None,
+    records: Mapping[str, Mapping[str, Any]],
+    platform: Mapping[str, Any],
+    seal: bool,
+    timestamp_utc: str | None = None,
+) -> dict[str, Any]:
+    """Write the summary and the report, and seal the bundle when asked."""
+    summary = build_summary(
+        run_id=run_id,
+        commit=commit,
+        profiles=records,
+        platform=platform,
+        timestamp_utc=timestamp_utc,
+    )
+    write_json(out_dir / f"{run_id}-summary.json", summary)
+    (out_dir / "d8-report.md").write_text(
+        report_markdown(summary), encoding="utf-8", newline="\n"
+    )
+    (out_dir / README).write_text(_readme(summary), encoding="utf-8", newline="\n")
+    sealed: dict[str, Any] = {}
+    if seal:
+        index = seal_directory(out_dir)
+        verified = verify_directory(out_dir, require_seal=True)
+        sealed = {
+            "seal": index.get("seal"),
+            "verified": bool(verified.get("verified", True)),
+        }
+    return {
+        "run_id": run_id,
+        "comparison": summary["comparison"],
+        "summary": str(out_dir / f"{run_id}-summary.json"),
+        "report": str(out_dir / "d8-report.md"),
+        **sealed,
+    }
+
+
+def rebuild_summary(
+    out_dir: Path,
+    *,
+    run_id: str | None = None,
+    commit: str | None = None,
+    profiles: Sequence[str] | None = None,
+    seal: bool = False,
+) -> dict[str, Any]:
+    """Re-derive the summary and report from profile runs already on disk.
+
+    The report is a function of the traces, not a transcription of them, so a
+    change to how a figure is presented does not need another measurement on
+    the instances: the profile directories are found, read back through the
+    same collectors, and the summary is written again.
+    """
+    out_dir = Path(out_dir)
+    run_id = run_id or out_dir.name
+    names = (
+        list(profiles)
+        if profiles is not None
+        else sorted(
+            path.name
+            for path in out_dir.iterdir()
+            if path.is_dir() and (path / "d7-summary.json").is_file()
+        )
+    )
+    if not names:
+        raise ThreeHostError(f"no profile directories under {out_dir}")
+    records: dict[str, Any] = {}
+    platform: dict[str, Any] = {}
+    stamps: list[str] = []
+    for name in names:
+        document = _read_json(out_dir / name / "d7-summary.json")
+        recorded = document.get("commit")
+        if commit is not None and recorded and recorded != commit:
+            raise ThreeHostError(
+                f"{name}: the traces record commit {recorded}, not the "
+                f"{commit} this rebuild was told to expect"
+            )
+        if commit is None:
+            commit = recorded
+        records[name] = collect_profile(out_dir / name)
+        for role, facts in (document.get("network") or {}).get("platform", {}).items():
+            platform.setdefault(role, facts)
+        if document.get("timestamp_utc"):
+            stamps.append(str(document["timestamp_utc"]))
+    return _write_bundle(
+        out_dir,
+        run_id=run_id,
+        commit=commit,
+        records=records,
+        platform=platform,
+        seal=seal,
+        # The traces carry when each profile finished, so the rebuilt bundle is
+        # stamped with the work rather than with the moment of the rebuild.
+        timestamp_utc=max(stamps) if stamps else None,
+    )
 
 
 def run_profiles(
@@ -393,32 +593,19 @@ def run_profiles(
         document = _read_json(profile_dir / "d7-summary.json")
         for role, facts in (document.get("network") or {}).get("platform", {}).items():
             platform.setdefault(role, facts)
-    summary = build_summary(
-        run_id=run_id, commit=expect_commit, profiles=records, platform=platform
+    return _write_bundle(
+        out_dir,
+        run_id=run_id,
+        commit=expect_commit,
+        records=records,
+        platform=platform,
+        seal=seal,
     )
-    write_json(out_dir / f"{run_id}-summary.json", summary)
-    (out_dir / "d8-report.md").write_text(
-        report_markdown(summary), encoding="utf-8", newline="\n"
-    )
-    sealed: dict[str, Any] = {}
-    if seal:
-        index = seal_directory(out_dir)
-        verified = verify_directory(out_dir, require_seal=True)
-        sealed = {
-            "seal": index.get("seal"),
-            "verified": bool(verified.get("verified", True)),
-        }
-    return {
-        "run_id": run_id,
-        "comparison": summary["comparison"],
-        "summary": str(out_dir / f"{run_id}-summary.json"),
-        **sealed,
-    }
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="A1-22 D8 network profiles")
-    parser.add_argument("--cluster", required=True, type=Path)
+    parser.add_argument("--cluster", type=Path)
     parser.add_argument("--out-dir", required=True, type=Path)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--profiles", default=",".join(DEFAULT_PROFILES))
@@ -431,8 +618,22 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--ssh-key-password", default=None)
     parser.add_argument("--sudo-password", default=None)
     parser.add_argument("--expect-commit", default=None)
+    parser.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="re-derive the summary and report from the profile directories "
+        "already under --out-dir instead of running anything",
+    )
     parser.add_argument("--seal", action="store_true")
     args = parser.parse_args(argv)
+    if args.rebuild:
+        result = rebuild_summary(
+            args.out_dir, run_id=args.run_id, commit=args.expect_commit, seal=args.seal
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+    if args.cluster is None:
+        parser.error("--cluster is required unless --rebuild is given")
     cluster = load_cluster(args.cluster, user=args.ssh_user, ssh_host=args.ssh_host)
     transport = Transport(
         key_path=args.ssh_key, key_password=args.ssh_key_password
@@ -467,6 +668,7 @@ __all__ = [
     "build_summary",
     "collect_profile",
     "main",
+    "rebuild_summary",
     "report_markdown",
     "run_profiles",
     "summarise_capture",

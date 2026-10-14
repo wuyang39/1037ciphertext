@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
+
+import pytest
 
 from infra.d8_three_hosts import (
+    ThreeHostError,
     build_summary,
+    rebuild_summary,
     report_markdown,
     summarise_capture,
     summarise_samples,
@@ -174,3 +179,119 @@ def test_report_renders_the_numbers_and_refuses_to_leave_gaps_unstated() -> None
     assert "| wan-40ms | 48.0 | 3.0 |" in markdown
     assert "EPC" in markdown
     assert "TODO" not in markdown and "TBD" not in markdown
+
+
+def _profile_dir(
+    root: Path,
+    name: str,
+    *,
+    delay_ms: int,
+    stamp: str = "2026-10-14T10:59:38Z",
+) -> None:
+    """A stand-in for one finished profile run, with the files it ships."""
+    target = root / name
+    target.mkdir(parents=True)
+    rtt = "\n".join(
+        [
+            "peer 172.27.172.202",
+            "5 packets transmitted, 5 received, 0% packet loss, time 1276ms",
+            f"rtt min/avg/max/mdev = {delay_ms}.0/{delay_ms}.5/{delay_ms}.9/0.02 ms",
+        ]
+    )
+    document = {
+        "run_id": f"d8-demo-{name}",
+        "commit": "df01452",
+        "timestamp_utc": stamp,
+        "generated_tokens": [3200, 3200, 3200],
+        "generated_text": " secret secret secret",
+        "client_wall_seconds": 16.0,
+        "reference_check": {"worst_max_abs_error": 0.065},
+        "steps": [{"step_wall_ms": 5000.0}],
+        "verdicts": {"passed": True},
+        "hygiene": {"verdict": "clean"},
+        "staging_scrub": {"verdict": "clean"},
+        "network": {
+            "profile": {"name": name, "delay_ms": delay_ms, "rate_mbit": 100},
+            "rtt": {"P0": rtt.splitlines()},
+            "platform": {"P0": {"cpu_model": "Xeon", "cpu_count": "4"}},
+        },
+    }
+    (target / "d7-summary.json").write_text(json.dumps(document), encoding="utf-8")
+    for role in ("p0", "p1", "p2"):
+        (target / f"d7-three-{role}-node-status.json").write_text(
+            json.dumps({"steps": [{"elapsed_ms": 5000.0}], "link_seconds": 4.6}),
+            encoding="utf-8",
+        )
+    for role in ("P0", "P1", "P2"):
+        (target / f"d7-three-{role}-tls-summary.txt").write_text(
+            "\n".join(
+                [
+                    "packets on expected ports: 10",
+                    "TLS 1.3 flows: 1",
+                    "application-data records: 5",
+                    "non-TLS payload bytes: 0",
+                    "TCP retransmissions: 2 (300 bytes, deduplicated)",
+                    "capture gaps: 0 (unreassembled bytes: 0)",
+                    "verdict: tls13_only",
+                    "a -> b packets=4 bytes=1000 records={} non_tls=0 retransmits=0",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+
+def test_the_report_can_be_rebuilt_from_the_profile_directories(tmp_path: Path) -> None:
+    """The report is a function of the traces, so it can be recomputed."""
+    for name, delay in (("lan", 0), ("wan-40ms", 40)):
+        _profile_dir(tmp_path, name, delay_ms=delay)
+    result = rebuild_summary(tmp_path, run_id="d8-demo")
+    summary = json.loads(
+        (tmp_path / "d8-demo-summary.json").read_text(encoding="utf-8")
+    )
+    assert result["run_id"] == "d8-demo"
+    assert summary["commit"] == "df01452"
+    rows = {row["profile"]: row for row in summary["comparison"]}
+    assert rows["wan-40ms"]["injected_delay_ms"] == 40
+    assert rows["wan-40ms"]["measured_rtt_ms_mean"] == 40.5
+    assert rows["lan"]["measured_rtt_ms_mean"] == 0.5
+    markdown = (tmp_path / "d8-report.md").read_text(encoding="utf-8")
+    assert "| wan-40ms | 40 | 40.5 |" in markdown
+    assert "slowdown" in markdown
+
+
+def test_the_readme_is_written_from_the_summary(tmp_path: Path) -> None:
+    """The README is a product of the same pass, not a hand-typed companion."""
+    for name, delay in (("lan", 0), ("wan-40ms", 40)):
+        _profile_dir(tmp_path, name, delay_ms=delay)
+    rebuild_summary(tmp_path, run_id="d8-demo")
+    readme = (tmp_path / "README.md").read_text(encoding="utf-8")
+    assert "`lan`, `wan-40ms`" in readme
+    assert "What this does not cover" in readme
+    assert "EPC" in readme
+    assert "TODO" not in readme and "TBD" not in readme
+
+
+def test_rebuild_refuses_a_commit_the_traces_do_not_show(tmp_path: Path) -> None:
+    """A rebuild may not stamp a commit the profile runs were not taken at."""
+    for name, delay in (("lan", 0), ("wan-40ms", 40)):
+        _profile_dir(tmp_path, name, delay_ms=delay)
+    with pytest.raises(ThreeHostError, match="the traces record commit"):
+        rebuild_summary(tmp_path, run_id="d8-demo", commit="deadbeef")
+
+
+def test_rebuild_reproduces_its_own_bytes(tmp_path: Path) -> None:
+    """Re-deriving the bundle twice yields the same bytes, stamp included."""
+    _profile_dir(tmp_path, "lan", delay_ms=0, stamp="2026-10-14T10:59:38Z")
+    _profile_dir(tmp_path, "wan-40ms", delay_ms=40, stamp="2026-10-14T11:05:02Z")
+    names = ("d8-demo-summary.json", "d8-report.md", "README.md")
+
+    def rendered() -> dict[str, bytes]:
+        return {name: (tmp_path / name).read_bytes() for name in names}
+
+    rebuild_summary(tmp_path, run_id="d8-demo")
+    first = rendered()
+    rebuild_summary(tmp_path, run_id="d8-demo")
+    assert first == rendered()
+    # The stamp describes the work the traces record, not the rebuild.
+    summary = json.loads(first["d8-demo-summary.json"])
+    assert summary["timestamp_utc"] == "2026-10-14T11:05:02Z"
