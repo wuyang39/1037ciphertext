@@ -56,7 +56,7 @@ from infra.d7_three_hosts import (
     run_three_hosts,
 )
 from infra.d8_three_hosts import summarise_capture
-from infra.evidence import seal_directory, verify_directory, write_json
+from infra.evidence import SEAL_NAME, seal_directory, verify_directory, write_json
 
 
 README = "README.md"
@@ -507,7 +507,9 @@ def _write_bundle(
         index = seal_directory(out_dir)
         verified = verify_directory(out_dir, require_seal=True)
         sealed = {
-            "seal": index.get("seal"),
+            # The detached seal is the digest of the index file, so it is read
+            # back from the file the seal wrote rather than from the index.
+            "seal_sha256": (out_dir / SEAL_NAME).read_text(encoding="utf-8").split()[0],
             "verified": bool(verified.get("verified", True)),
         }
     landed = all(row["arm_landed"] for row in summary["comparison"])

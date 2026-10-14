@@ -1,0 +1,2 @@
+{"fractional_bits": 18, "generated_text": " secret secret secret", "generated_tokens": [3200, 3200, 3200], "negative_verdicts": "passed", "prompt_tokens": [1169, 38012, 1994, 318, 3200], "reference_verdicts": "passed", "runtime_options": {"enable_lower_accuracy_rsqrt": true, "fxp_div_goldschmidt_iters": 1, "fxp_exp_iters": 2}, "session_id": "d7e6f627b87d73db993938126d555f9ecc63b47be34dda19f7737ec22d7c3339", "shutdown_verdicts": "passed", "wall_seconds": 16.395, "worst_max_abs_error": 7.272384400570399}
+A122-D7-CLIENT-DONE

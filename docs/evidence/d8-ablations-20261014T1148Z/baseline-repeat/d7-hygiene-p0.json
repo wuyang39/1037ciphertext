@@ -1,0 +1,63 @@
+{
+  "exit_status": 0,
+  "expect_absent": [
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-baseline-repeat/P0",
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-baseline-repeat/P1",
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-baseline-repeat/P2"
+  ],
+  "expect_empty": [
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-baseline-repeat"
+  ],
+  "file_hits": [],
+  "findings": [],
+  "journal": {
+    "available": true,
+    "bytes_searched": 351,
+    "hits": []
+  },
+  "journal_hits": [],
+  "not_empty": [],
+  "probes": [
+    "CICAAxqAgAM/1XHP4QIpXQU6QBpTQMnj",
+    "CICAAxqAgAMJfpGhLYeV6A619EYThwuS",
+    "CICAAxqAgANIG/KBqDAFka9vWkfK8UgE",
+    "CICAAxqAgANJP9gL0ZmTE/qFmISJL3XT",
+    "CICAAxqAgANfE67p2yrNLUPDtYID5Pwa",
+    "CICAAxqAgANsRnAl2tFU+pIky5d8QTLu",
+    "CICAAxqAgAOBczNyhjVnW2hECTSs3kEo",
+    "CICAAxqAgAOOCfw4+KYVHXFgPCFwN8J/",
+    "CICAAxqAgAOe5d1GQtIJdcg8BmOp2zkB",
+    "CICCBBqAggQaAZZlNA49zBylTPmKWbbg",
+    "CICCBBqAggRdmjReHsYHq4A6DG/ap+0D",
+    "CICCBBqAggSGnZen/M3bywLwlZouzRv5",
+    "CICCBBqAggSJdwxt/0aiUT3edJJYGH8L",
+    "CICCBBqAggT+8XmL1wQjXlGeJw3y32Vq",
+    "CICCBBqAggTKiHIxjHCfMD0gj+atd+8b",
+    "CICCBBqAggTZ3FhwVclYJEOlZKp34CLg",
+    "CICCBBqAggToDPAO9Oyf1ZO8i/mCxuO0",
+    "CICCBBqAggTx6lvrA+uB4sEx9dJ4GmX7"
+  ],
+  "process_hits": [],
+  "roots": [
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-baseline-repeat",
+    "/tmp",
+    "/home/jiahao/a122-d7/three/workspace/out",
+    "/var/log"
+  ],
+  "roots_that_exist": [
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-baseline-repeat",
+    "/tmp",
+    "/home/jiahao/a122-d7/three/workspace/out",
+    "/var/log"
+  ],
+  "skipped": [
+    "/home/jiahao/a122-d7/three/workspace/out/C/client-result.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P0/node-status.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P1/node-status.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P2/node-status.json",
+    "/tmp/d8-ablations-20261014T1148Z-baseline-repeat-P0-probes.json",
+    "/tmp/d8-ablations-20261014T1148Z-baseline-repeat-P0-hygiene.json"
+  ],
+  "still_present": [],
+  "verdict": "clean"
+}

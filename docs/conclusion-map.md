@@ -57,8 +57,9 @@ D8 把同一份 D7 工作负载放进三档声明网络条件下各跑一遍，�
 | 客户端整段 16.534 s / 164.21 s / 274.871 s；线上流量三档相同（每台约 1.25 GB） | 服务器已验证 | 同上，`d8-report.md` |
 | 宿主 CPU 均值、enclave RSS 峰值（约 16~17 MB）与 enclave CPU 秒逐档实测 | 服务器已验证 | 同上，`d8-resources-p{0,1,2}.jsonl` 与 `d8-report.md` |
 | 报告可由固定脚本从 trace 重算，重算逐字节相同 | 服务器已验证 | 同上，`python -m infra.d8_three_hosts ... --rebuild`，摘要/报告/README 的 sha256 见 [d8-acceptance.md](d8-acceptance.md) 第 4 节 |
-| 优化项的开/关消融（softmax/GELU/rsqrt 近似、量化、layout） | **未完成** | 冻结程序没有运行时开关，消融需要第二个冻结程序；缺口见 [d8-acceptance.md](d8-acceptance.md) 第 5 节 |
-| 每进程 EPC 常驻量 | **未完成** | 本内核只暴露 EPC 段大小，`/proc` 里没有该计数 |
+| 运行时近似开关与定点位宽的同条件开/关消融（四臂 × 三台 enclave，每臂的开关与位宽从三台 READY 行与客户端记录回读核对） | 服务器已验证 | [d8-ablation-acceptance.md](d8-ablation-acceptance.md)；`docs/evidence/d8-ablations-20261014T1148Z` |
+| 替换 MHLO 算子本身的近似（`mhlo.exponential` / `mhlo.tanh` / `mhlo.rsqrt` 换成第二套多项式，需第二个冻结程序） | **未完成** | 本次只动运行时开关；缺口见 [d8-ablation-acceptance.md](d8-ablation-acceptance.md) 第 8 节 |
+| 每进程 EPC 常驻量 | 未完成（负结果已实测） | 专用探测确认本内核不暴露该计数；`docs/evidence/d8-epc-probe-20261014T1205Z` |
 
 ## 4. D10 交付与其边界
 
@@ -77,5 +78,6 @@ D8 把同一份 D7 工作负载放进三档声明网络条件下各跑一遍，�
 3. 第 1、2 节与第 3 节标为"服务器已验证"的结论可以对外陈述；第 3 节里仍标
    "本地已验证"的 D7 结论必须带"本地"限定；任何标为"未完成"的条目不得在答辩中
    表述为已完成。D7 的 enclave 结论必须同时带上 1 层 + 1028 候选的几何限定，
-   不得说成"整个 GPT-2 跑在 enclave 里"。D8 的档位结论只能说成"三档声明网络
-   条件下的实测"，不得说成"每项优化都有开/关对照"，也不得给出 EPC 占用量。
+   不得说成"整个 GPT-2 跑在 enclave 里"。D8 可以说"三档声明网络条件下的实测"
+   和"运行时近似开关与定点位宽的同条件开/关对照"，不得说成"换掉了算子本身"
+   或"每项优化都有开/关对照"，也不得给出 EPC 占用量（本内核不暴露该计数）。

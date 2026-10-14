@@ -1,0 +1,63 @@
+{
+  "exit_status": 0,
+  "expect_absent": [
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-approx-low/P0",
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-approx-low/P1",
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-approx-low/P2"
+  ],
+  "expect_empty": [
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-approx-low"
+  ],
+  "file_hits": [],
+  "findings": [],
+  "journal": {
+    "available": true,
+    "bytes_searched": 351,
+    "hits": []
+  },
+  "journal_hits": [],
+  "not_empty": [],
+  "probes": [
+    "CICAAxqAgAM/iovOxUAcbaTFrDIABogy",
+    "CICAAxqAgAM79+ZHpckmMfrOFYpz/z0c",
+    "CICAAxqAgAMCdJqrXCRmZjRYXbmDcbGi",
+    "CICAAxqAgAOFNKHQ2EWXBFv3GEPqaCVH",
+    "CICAAxqAgAOGAv9vdcs7Hm6m4KvjjkdP",
+    "CICAAxqAgAOWFP3cAQPf1i/8qyuiNReR",
+    "CICAAxqAgAOeyBnbWDP692dtOkrqyqpS",
+    "CICAAxqAgAOpR3PBxPOndHnMbiEcazB+",
+    "CICAAxqAgAPmK8KDypUClQTphQOSJSkW",
+    "CICCBBqAggRZY8bR7Z8eZL8l6k78GBTb",
+    "CICCBBqAggS46UFzqKNtSmES6RswrKmQ",
+    "CICCBBqAggSHrlx+iUml1ARCH6QqJUAd",
+    "CICCBBqAggSKbYzZfZi+RL4f2Pc/JCpx",
+    "CICCBBqAggSMUP51vIRNzEWGWt4mdbOy",
+    "CICCBBqAggStcXQrUM47H3ab/XOz5Gme",
+    "CICCBBqAggTJIP/6MZkFnMxEKpQM92vw",
+    "CICCBBqAggTtAKULujENX7c3hn2uZQww",
+    "CICCBBqAggTvsve6abxzUeDHLJXTOkKU"
+  ],
+  "process_hits": [],
+  "roots": [
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-approx-low",
+    "/tmp",
+    "/home/jiahao/a122-d7/three/workspace/out",
+    "/var/log"
+  ],
+  "roots_that_exist": [
+    "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-approx-low",
+    "/tmp",
+    "/home/jiahao/a122-d7/three/workspace/out",
+    "/var/log"
+  ],
+  "skipped": [
+    "/home/jiahao/a122-d7/three/workspace/out/C/client-result.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P0/node-status.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P1/node-status.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P2/node-status.json",
+    "/tmp/d8-ablations-20261014T1148Z-approx-low-P1-probes.json",
+    "/tmp/d8-ablations-20261014T1148Z-approx-low-P1-hygiene.json"
+  ],
+  "still_present": [],
+  "verdict": "clean"
+}

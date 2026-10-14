@@ -1,0 +1,87 @@
+{
+  "close_evidence": {
+    "closed_at": "2026-10-14T11:51:00.020032+00:00",
+    "kv": {
+      "all_zero": true,
+      "buffer_bytes": 196839,
+      "buffers": 3,
+      "entries": 0,
+      "unscrubbed": []
+    },
+    "reason": "client-close",
+    "session_dir_removed": true,
+    "session_keys_wiped_bytes": 80,
+    "spilled_bytes_overwritten": 196839,
+    "spilled_files": 3,
+    "spilled_probes": [
+      "CICAAxqAgAPHmPobEEgZp/9KScBtAk7E",
+      "CICAAxqAgAMBbvNSV5zgxIpEj0hAuXSS",
+      "CICAAxqAgANHPvWTgrGMxPsjokJFky6c"
+    ],
+    "steps": 3
+  },
+  "closed": true,
+  "identity_sha256": "a5992bc32741e3bc74387224ba62f74f2e531eb6447b82a55b3c1a86c7477bf9",
+  "inside_enclave": true,
+  "link_seconds": 9.518,
+  "opened_at": "2026-10-14T11:50:44.108233+00:00",
+  "partition_id": "a122-d7-d8-ablations-20261014T1148Z-baseline",
+  "peer_certificates": {
+    "P0": "9069b34bfebfc80b0a2ade25a194a976ebf171616afb4d8dcc780e2da47306a3",
+    "P2": "2e9527558fe287830849db71329f29df74c22414ca8ff0c294a2ce871e2c755c"
+  },
+  "plan_manifest": {
+    "model_manifest_hash": "3afdeb07d5a3e66e7b598b770517b3e2cc5788d63c6ea4241c89321bf15b493b",
+    "precision_plan_hash": "db1950d960701a64b3900c0c0ebd8ff93f9bf18971436ad90c3e3afaf6a74b57",
+    "release_id": "a122-d7",
+    "share_epoch": 1
+  },
+  "refusals": [
+    {
+      "message": "step",
+      "reason": "ReplayRejected: counter is duplicated or out of order"
+    },
+    {
+      "message": "hello",
+      "reason": "D6NodeError: the JobTicket has already been accepted by this node"
+    }
+  ],
+  "role": "P1",
+  "run_id": "d8-ablations-20261014T1148Z-baseline",
+  "session_dir": "/dev/shm/a122-d7/d8-ablations-20261014T1148Z-baseline/P1",
+  "spill_enabled": true,
+  "steps": [
+    {
+      "decode_step": 1,
+      "elapsed_ms": 4688.719,
+      "hidden_share_digest": "40d1e92bf73eed99a6d2bf5d8f5b3e4b85a2090178b260fdc67b9555fe3934b6",
+      "history_share_digest": "179475b6195ee457d6bae3c4d2bc86d546e68a3278123635455b6899578c6f6f",
+      "logits_share_digest": "af032948fd220c1dbdaf40fe05e20316d56764a8d4e78a94e6c5dd8a1ee333f8",
+      "spilled": true,
+      "token_share_digest": "e7f5ae7d9db0f91aadb21a7d720ee52d60c3da5bf4cd6795e9da5643e39b1efc"
+    },
+    {
+      "decode_step": 2,
+      "elapsed_ms": 4760.64,
+      "hidden_share_digest": "eb0590cfffaca6a0709698b58bebaf95b11ddc284882637ccd3e41f4ab9cfff5",
+      "history_share_digest": "0c0a08ed64be8ee77b571c9b34dbfb4fc83a8ca19d240487356aa951718fa1bf",
+      "logits_share_digest": "ad56557ae10aca4b70a15a7e03a0e67c694e0c73739b1b54037ad4e5c6641e2c",
+      "spilled": true,
+      "token_share_digest": "932addc1843fb93675702faca2fdc88b9b85b26fa696392e273aca13ad0fe6bb"
+    },
+    {
+      "decode_step": 3,
+      "elapsed_ms": 4711.839,
+      "hidden_share_digest": "121511aeb944a8e7391f87898c2e5dd9d1a6a7a9477b7cf974b39cf6f9c638c0",
+      "history_share_digest": "b3866c58fa44cd407c7bcda5c905774fa7ba1623c1fef99661870d900df5a315",
+      "logits_share_digest": "2386a95b6edc6a09cbca212f169e6e72bf6d9a5d406586a512d60c7d38e60916",
+      "spilled": true,
+      "token_share_digest": "ba457ea53c3dd85721de4b67e51dfb159daa543590b6adace6ffd479cf5e756a"
+    }
+  ],
+  "steps_served": 3,
+  "teardown_finished": true,
+  "ticket_sha256": "0ab5929bdfd43af0f49a9165074a7481d9d739b1382c02f418f0a9384af9fcc0",
+  "transport": "SPU/YACL/BRPC over TLS 1.3 inside a Gramine-SGX enclave",
+  "verdicts": "served"
+}

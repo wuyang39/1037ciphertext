@@ -1,0 +1,10 @@
+{
+  "cpu_count": "4",
+  "cpu_model": "Intel(R) Xeon(R) Platinum 8369B CPU @ 2.70GHz",
+  "epc_section": "EPC section 0x240000000-0x42fffffff",
+  "gramine": "Gramine 1.9 (0d1a4b7607592dab4c8a720c962acee3de6b4ca8)",
+  "kernel": "5.15.0-191-generic",
+  "mem_available_kb": "6668688",
+  "mem_total_kb": "7703064",
+  "sgx_device": "/dev/sgx_enclave"
+}

@@ -19,7 +19,8 @@
 [`docs/d5-acceptance.md`](docs/d5-acceptance.md)、
 [`docs/d6-acceptance.md`](docs/d6-acceptance.md)、
 [`docs/d7-acceptance.md`](docs/d7-acceptance.md)、
-[`docs/d8-acceptance.md`](docs/d8-acceptance.md)。
+[`docs/d8-acceptance.md`](docs/d8-acceptance.md)、
+[`docs/d8-ablation-acceptance.md`](docs/d8-ablation-acceptance.md)。
 
 当前已经冻结的 canonical JSON、REPORTDATA 和 KAS 接口见
 [`docs/protocol-baseline.md`](docs/protocol-baseline.md)。
@@ -58,9 +59,11 @@ manifest 静态检查、模型份额包、release 校验和证据封存：
 详细能力边界和 Ubuntu/WSL 命令见
 [`docs/local-linux-development.md`](docs/local-linux-development.md)。
 
-本地 mock、encrypted FS、RSS、三节点 runtime 和 mTLS 均不是真实 SGX
-验收。真实 Quote、Gramine encrypted FS、YACL/BRPC、三节点 enclave 和 EPC
-指标待服务器阶段完成，清单见 [`docs/server-acceptance-checklist.md`](docs/server-acceptance-checklist.md)。
+D1、D3、D4、D5、D6、D7、D8 都已经在真实 SGX 实例上运行并封存证据，逐条结论
+与边界见 [`docs/conclusion-map.md`](docs/conclusion-map.md)。仍待服务器阶段的是
+D4 的真实 attestation 放行、D8 中替换 MHLO 算子本身的消融、D9 的三域部署与
+D10 的答辩演练；每进程 EPC 常驻量已实测确认本内核不暴露该计数（负结果）。
+清单见 [`docs/server-acceptance-checklist.md`](docs/server-acceptance-checklist.md)。
 
 从账号采购、真实 D1 证明到 D10 证据冻结的完整执行顺序和成本控制见
 [`docs/后续开发总计划.md`](docs/后续开发总计划.md)。

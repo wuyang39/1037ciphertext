@@ -1,0 +1,2 @@
+{"fractional_bits": 18, "generated_text": " secret secret secret", "generated_tokens": [3200, 3200, 3200], "negative_verdicts": "passed", "prompt_tokens": [1169, 38012, 1994, 318, 3200], "reference_verdicts": "passed", "runtime_options": {}, "session_id": "e54c385fd1be8c430a8d4772775de8d3b46bfecf5ad753730d9aef60a3000b1c", "shutdown_verdicts": "passed", "wall_seconds": 16.185, "worst_max_abs_error": 0.06608011008293602}
+A122-D7-CLIENT-DONE

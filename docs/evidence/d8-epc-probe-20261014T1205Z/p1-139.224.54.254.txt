@@ -1,0 +1,60 @@
+===== 139.224.54.254 =====
+=== host ===
+iZuf6bd6qnhgtveg5khyf1Z
+Linux 5.15.0-191-generic x86_64 GNU/Linux
+=== dmesg sgx/epc ===
+[    0.428091] sgx: EPC section 0x240000000-0x42fffffff
+[    0.445806] sgx: [Firmware Bug]: Unable to map EPC section to online node. Fallback to the NUMA node 0.
+=== /proc/meminfo ===
+(no epc/sgx line)
+=== /proc/self/status ===
+(no sgx/epc field)
+=== /sys/fs ===
+bpf
+btrfs
+cgroup
+ecryptfs
+ext4
+fuse
+pstore
+=== sgx sysfs directories ===
+/sys/class/misc/sgx_provision
+/sys/class/misc/sgx_enclave
+/sys/devices/virtual/misc/sgx_provision
+/sys/devices/virtual/misc/sgx_enclave
+(none)
+=== epc sysfs directories ===
+/sys/class/pci_epc
+(none)
+=== /sys/kernel/debug/sgx ===
+ls: cannot access '/sys/kernel/debug/sgx': No such file or directory
+=== loaded sgx kernel module ===
+(no sgx module loaded; the driver is built in if present)
+(no sgx module directory)
+=== enclave devices ===
+crw-rw---- 1 root sgx     10, 125 Oct 14 16:23 /dev/sgx_enclave
+crw-rw---- 1 root sgx_prv 10, 126 Oct 14 16:23 /dev/sgx_provision
+
+/dev/sgx:
+total 0
+lrwxrwxrwx 1 root root 14 Oct 14 16:23 enclave -> ../sgx_enclave
+lrwxrwxrwx 1 root root 16 Oct 14 16:23 provision -> ../sgx_provision
+=== perf ===
+(perf is not installed on this image)
+=== PMU event sources ===
+breakpoint
+kprobe
+msr
+power
+software
+tracepoint
+uprobe
+=== sgx PMU ===
+(no sgx PMU, so no perf event could count EPC pages even with perf installed)
+=== intel sgx tools ===
+(no intel sgx tooling on PATH)
+=== runner ===
+the D8 sampler reads host CPU, memory and the enclave process's own RSS and
+CPU jiffies from /proc; none of these surfaces carries EPC pages, so the
+acceptance reports no per-process EPC residency rather than an estimate.
+=== PROBE-DONE ===

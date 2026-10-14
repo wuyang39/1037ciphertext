@@ -293,13 +293,19 @@ python -m infra.d8_three_hosts \
 
 以下内容未被本次运行证明，不得按已通过计：
 
-1. **没有开/关消融。** D7 冻结的程序没有软近似或量化的运行时开关，"打开/关闭
-   softmax/GELU/rsqrt 近似"需要第二个冻结程序与第二组份额，本次没有做。因此
-   验收门里"每项优化都有同条件对照"这一条**没有达成**；本次能证明的是同一份
-   程序在半 LAN、40 ms、80 ms 三档下的时间、资源与安全判决。
+1. **本档位运行没有开/关消融。** 本次能证明的是同一份程序在 LAN、40 ms、
+   80 ms 三档下的时间、资源与安全判决。随后另起一轮把消融做到了运行时开关层
+   （`fxp_exp_iters` / `fxp_exp_mode` / `fxp_div_goldschmidt_iters` /
+   `enable_lower_accuracy_rsqrt` 与定点位宽 `fractional_bits`），四臂在同条件
+   LAN 下各跑一遍三节点 enclave 流程并封存证据，见
+   [d8-ablation-acceptance.md](d8-ablation-acceptance.md)（运行
+   `d8-ablations-20261014T1148Z`）。**仍未做**的是替换 MHLO 算子本身
+   （把 `mhlo.exponential` / `mhlo.tanh` / `mhlo.rsqrt` 换成另一套多项式），
+   那需要第二个冻结程序与第二组份额，报告里按未完成标注。
 2. **没有每进程 EPC 常驻量。** 本内核只暴露 EPC 段大小，`/proc` 里没有
-   per-process 的 EPC 计数，报告里也就没有这一列。EPC 预算是本项目几何选择的
-   依据，但本次没有重新量它。
+   per-process 的 EPC 计数，报告里也就没有这一列。2026-10-14 专门探过一次，
+   负结果与探测脚本封存在 `docs/evidence/d8-epc-probe-20261014T1205Z`。EPC
+   预算是本项目几何选择的依据，但本次没有重新量它。
 3. **长度桶与 batch 未覆盖。** 1 层探针几何固定了窗口 8 与单条请求，长度分桶、
    批处理与更大的 prompt 都没有跑。
 4. **档位不是链路仿真。** 延迟与速率由 `tc netem` 注入在对端子网上，往返来自

@@ -1,0 +1,713 @@
+{
+  "arms": {
+    "approx-low": {
+      "argmax_agreement": "passed",
+      "client_runtime": {
+        "fractional_bits": 18,
+        "options": {
+          "enable_lower_accuracy_rsqrt": true,
+          "fxp_div_goldschmidt_iters": 1,
+          "fxp_exp_iters": 2
+        }
+      },
+      "client_wall_seconds": 16.395,
+      "declared_arm": {
+        "declared_in_staging": {
+          "export_fractional_bits": 18,
+          "fractional_bits": 18,
+          "options": {
+            "enable_lower_accuracy_rsqrt": true,
+            "fxp_div_goldschmidt_iters": 1,
+            "fxp_exp_iters": 2
+          }
+        },
+        "fractional_bits": null,
+        "options": {
+          "enable_lower_accuracy_rsqrt": true,
+          "fxp_div_goldschmidt_iters": 1,
+          "fxp_exp_iters": 2
+        }
+      },
+      "generated_text": " secret secret secret",
+      "hygiene": "clean",
+      "mean_abs_error_worst": 4.20970263153357,
+      "model": {
+        "candidate_vocabulary_hash": "53767094384b1632531ed619682e7a1aa412e2b5ed0db98131775fa69ce4d3b5",
+        "export_precision_plan_hash": "b58a18ab917c512271e343f34cfc5fa8e730d74e707d00c9fde8c48a98903480",
+        "fractional_bits": 18,
+        "hidden_size": 768,
+        "intermediate_size": 3072,
+        "layers": 1,
+        "model_hash": "c0394f5002ee79e2a9119d85e44d756dcd8b3aa930934919e2cf7f871df85ad9",
+        "model_version": "gpt2-1l-cand1028-v1",
+        "num_heads": 12,
+        "sequence": 8,
+        "tokenizer_hash": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+        "vocab_size": 1028
+      },
+      "node_runtime": {
+        "P0": {
+          "fraction_bits": 18,
+          "options": {
+            "enable_lower_accuracy_rsqrt": true,
+            "fxp_div_goldschmidt_iters": 1,
+            "fxp_exp_iters": 2
+          }
+        },
+        "P1": {
+          "fraction_bits": 18,
+          "options": {
+            "enable_lower_accuracy_rsqrt": true,
+            "fxp_div_goldschmidt_iters": 1,
+            "fxp_exp_iters": 2
+          }
+        },
+        "P2": {
+          "fraction_bits": 18,
+          "options": {
+            "enable_lower_accuracy_rsqrt": true,
+            "fxp_div_goldschmidt_iters": 1,
+            "fxp_exp_iters": 2
+          }
+        }
+      },
+      "run_id": "d8-ablations-20261014T1148Z-approx-low",
+      "staged_shares_scrubbed": "clean",
+      "step_client_ms": [
+        5770.876,
+        4997.168,
+        4975.66
+      ],
+      "step_max_abs_error": [
+        7.164021967714067,
+        7.187499550281281,
+        7.272384400570399
+      ],
+      "step_node_ms": {
+        "P0": [
+          5308.131,
+          4515.492,
+          4510.948
+        ],
+        "P1": [
+          5213.248,
+          4565.245,
+          4509.474
+        ],
+        "P2": [
+          5249.993,
+          4611.268,
+          4541.87
+        ]
+      },
+      "token_agreement": "passed",
+      "tokens": [
+        3200,
+        3200,
+        3200
+      ],
+      "verdicts": {
+        "hygiene_clean": true,
+        "negative_cases": {
+          "duplicate_result_frame": true,
+          "mixed_model_manifest": true,
+          "replayed_job_ticket": true,
+          "replayed_request_frame": true,
+          "tampered_decode_step": true
+        },
+        "negatives_refused": true,
+        "nodes_released": true,
+        "passed": true,
+        "reference_matches_float": true,
+        "staged_shares_scrubbed": true,
+        "tokens": 3,
+        "two_tokens_generated": true
+      },
+      "wire": {
+        "P0": {
+          "application_data_records": 226754,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 130889,
+          "retransmit_bytes": 68492,
+          "retransmits": 225,
+          "tls13_flows": 11,
+          "verdict": "tls13_only",
+          "wire_bytes": 1252725045,
+          "wire_packets": 130889
+        },
+        "P1": {
+          "application_data_records": 226555,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 126811,
+          "retransmit_bytes": 80577,
+          "retransmits": 234,
+          "tls13_flows": 8,
+          "verdict": "tls13_only",
+          "wire_bytes": 1251653916,
+          "wire_packets": 126811
+        },
+        "P2": {
+          "application_data_records": 226601,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 126426,
+          "retransmit_bytes": 73311,
+          "retransmits": 211,
+          "tls13_flows": 7,
+          "verdict": "tls13_only",
+          "wire_bytes": 1251467831,
+          "wire_packets": 126426
+        }
+      },
+      "worst_max_abs_error": 7.272384400570399
+    },
+    "baseline": {
+      "argmax_agreement": "passed",
+      "client_runtime": {
+        "fractional_bits": 18,
+        "options": {}
+      },
+      "client_wall_seconds": 16.247,
+      "declared_arm": {
+        "declared_in_staging": {
+          "export_fractional_bits": 18,
+          "fractional_bits": 18,
+          "options": {}
+        },
+        "fractional_bits": null,
+        "options": {}
+      },
+      "generated_text": " secret secret secret",
+      "hygiene": "clean",
+      "mean_abs_error_worst": 0.014617784934217136,
+      "model": {
+        "candidate_vocabulary_hash": "53767094384b1632531ed619682e7a1aa412e2b5ed0db98131775fa69ce4d3b5",
+        "export_precision_plan_hash": "b58a18ab917c512271e343f34cfc5fa8e730d74e707d00c9fde8c48a98903480",
+        "fractional_bits": 18,
+        "hidden_size": 768,
+        "intermediate_size": 3072,
+        "layers": 1,
+        "model_hash": "c0394f5002ee79e2a9119d85e44d756dcd8b3aa930934919e2cf7f871df85ad9",
+        "model_version": "gpt2-1l-cand1028-v1",
+        "num_heads": 12,
+        "sequence": 8,
+        "tokenizer_hash": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+        "vocab_size": 1028
+      },
+      "node_runtime": {
+        "P0": {
+          "fraction_bits": 18,
+          "options": {}
+        },
+        "P1": {
+          "fraction_bits": 18,
+          "options": {}
+        },
+        "P2": {
+          "fraction_bits": 18,
+          "options": {}
+        }
+      },
+      "run_id": "d8-ablations-20261014T1148Z-baseline",
+      "staged_shares_scrubbed": "clean",
+      "step_client_ms": [
+        5236.413,
+        5187.998,
+        5179.502
+      ],
+      "step_max_abs_error": [
+        0.06548119270815178,
+        0.06091278952293777,
+        0.06524469138176414
+      ],
+      "step_node_ms": {
+        "P0": [
+          4682.115,
+          4705.377,
+          4721.627
+        ],
+        "P1": [
+          4688.719,
+          4760.64,
+          4711.839
+        ],
+        "P2": [
+          4831.914,
+          4806.072,
+          4748.664
+        ]
+      },
+      "token_agreement": "passed",
+      "tokens": [
+        3200,
+        3200,
+        3200
+      ],
+      "verdicts": {
+        "hygiene_clean": true,
+        "negative_cases": {
+          "duplicate_result_frame": true,
+          "mixed_model_manifest": true,
+          "replayed_job_ticket": true,
+          "replayed_request_frame": true,
+          "tampered_decode_step": true
+        },
+        "negatives_refused": true,
+        "nodes_released": true,
+        "passed": true,
+        "reference_matches_float": true,
+        "staged_shares_scrubbed": true,
+        "tokens": 3,
+        "two_tokens_generated": true
+      },
+      "wire": {
+        "P0": {
+          "application_data_records": 228880,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 131616,
+          "retransmit_bytes": 82513,
+          "retransmits": 217,
+          "tls13_flows": 11,
+          "verdict": "tls13_only",
+          "wire_bytes": 1254115797,
+          "wire_packets": 131616
+        },
+        "P1": {
+          "application_data_records": 228838,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 129736,
+          "retransmit_bytes": 92822,
+          "retransmits": 226,
+          "tls13_flows": 8,
+          "verdict": "tls13_only",
+          "wire_bytes": 1253049189,
+          "wire_packets": 129736
+        },
+        "P2": {
+          "application_data_records": 228880,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 129315,
+          "retransmit_bytes": 88883,
+          "retransmits": 245,
+          "tls13_flows": 7,
+          "verdict": "tls13_only",
+          "wire_bytes": 1252863614,
+          "wire_packets": 129315
+        }
+      },
+      "worst_max_abs_error": 0.06548119270815178
+    },
+    "baseline-repeat": {
+      "argmax_agreement": "passed",
+      "client_runtime": {
+        "fractional_bits": 18,
+        "options": {}
+      },
+      "client_wall_seconds": 16.185,
+      "declared_arm": {
+        "declared_in_staging": {
+          "export_fractional_bits": 18,
+          "fractional_bits": 18,
+          "options": {}
+        },
+        "fractional_bits": null,
+        "options": {}
+      },
+      "generated_text": " secret secret secret",
+      "hygiene": "clean",
+      "mean_abs_error_worst": 0.0142674186634539,
+      "model": {
+        "candidate_vocabulary_hash": "53767094384b1632531ed619682e7a1aa412e2b5ed0db98131775fa69ce4d3b5",
+        "export_precision_plan_hash": "b58a18ab917c512271e343f34cfc5fa8e730d74e707d00c9fde8c48a98903480",
+        "fractional_bits": 18,
+        "hidden_size": 768,
+        "intermediate_size": 3072,
+        "layers": 1,
+        "model_hash": "c0394f5002ee79e2a9119d85e44d756dcd8b3aa930934919e2cf7f871df85ad9",
+        "model_version": "gpt2-1l-cand1028-v1",
+        "num_heads": 12,
+        "sequence": 8,
+        "tokenizer_hash": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+        "vocab_size": 1028
+      },
+      "node_runtime": {
+        "P0": {
+          "fraction_bits": 18,
+          "options": {}
+        },
+        "P1": {
+          "fraction_bits": 18,
+          "options": {}
+        },
+        "P2": {
+          "fraction_bits": 18,
+          "options": {}
+        }
+      },
+      "run_id": "d8-ablations-20261014T1148Z-baseline-repeat",
+      "staged_shares_scrubbed": "clean",
+      "step_client_ms": [
+        5409.951,
+        4944.214,
+        4966.994
+      ],
+      "step_max_abs_error": [
+        0.06429863655580803,
+        0.06368225973778152,
+        0.06608011008293602
+      ],
+      "step_node_ms": {
+        "P0": [
+          4855.826,
+          4456.174,
+          4507.638
+        ],
+        "P1": [
+          4919.989,
+          4535.752,
+          4478.39
+        ],
+        "P2": [
+          5058.43,
+          4560.288,
+          4541.501
+        ]
+      },
+      "token_agreement": "passed",
+      "tokens": [
+        3200,
+        3200,
+        3200
+      ],
+      "verdicts": {
+        "hygiene_clean": true,
+        "negative_cases": {
+          "duplicate_result_frame": true,
+          "mixed_model_manifest": true,
+          "replayed_job_ticket": true,
+          "replayed_request_frame": true,
+          "tampered_decode_step": true
+        },
+        "negatives_refused": true,
+        "nodes_released": true,
+        "passed": true,
+        "reference_matches_float": true,
+        "staged_shares_scrubbed": true,
+        "tokens": 3,
+        "two_tokens_generated": true
+      },
+      "wire": {
+        "P0": {
+          "application_data_records": 228939,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 127533,
+          "retransmit_bytes": 64998,
+          "retransmits": 185,
+          "tls13_flows": 11,
+          "verdict": "tls13_only",
+          "wire_bytes": 1254168382,
+          "wire_packets": 127533
+        },
+        "P1": {
+          "application_data_records": 228792,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 125370,
+          "retransmit_bytes": 94990,
+          "retransmits": 239,
+          "tls13_flows": 8,
+          "verdict": "tls13_only",
+          "wire_bytes": 1253119941,
+          "wire_packets": 125370
+        },
+        "P2": {
+          "application_data_records": 228743,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 125936,
+          "retransmit_bytes": 85960,
+          "retransmits": 224,
+          "tls13_flows": 7,
+          "verdict": "tls13_only",
+          "wire_bytes": 1252927569,
+          "wire_packets": 125936
+        }
+      },
+      "worst_max_abs_error": 0.06608011008293602
+    },
+    "fxp-12": {
+      "argmax_agreement": "passed",
+      "client_runtime": {
+        "fractional_bits": 12,
+        "options": {}
+      },
+      "client_wall_seconds": 16.68,
+      "declared_arm": {
+        "declared_in_staging": {
+          "export_fractional_bits": 18,
+          "fractional_bits": 12,
+          "options": {}
+        },
+        "fractional_bits": 12,
+        "options": {}
+      },
+      "generated_text": " secret secret secret",
+      "hygiene": "clean",
+      "mean_abs_error_worst": 0.18521292564438316,
+      "model": {
+        "candidate_vocabulary_hash": "53767094384b1632531ed619682e7a1aa412e2b5ed0db98131775fa69ce4d3b5",
+        "export_precision_plan_hash": "b58a18ab917c512271e343f34cfc5fa8e730d74e707d00c9fde8c48a98903480",
+        "fractional_bits": 12,
+        "hidden_size": 768,
+        "intermediate_size": 3072,
+        "layers": 1,
+        "model_hash": "c0394f5002ee79e2a9119d85e44d756dcd8b3aa930934919e2cf7f871df85ad9",
+        "model_version": "gpt2-1l-cand1028-v1",
+        "num_heads": 12,
+        "sequence": 8,
+        "tokenizer_hash": "8414cab924d8b9b33013f0d221c5862f365ee9be39c5c2bfae8a5a9e970478a6",
+        "vocab_size": 1028
+      },
+      "node_runtime": {
+        "P0": {
+          "fraction_bits": 12,
+          "options": {}
+        },
+        "P1": {
+          "fraction_bits": 12,
+          "options": {}
+        },
+        "P2": {
+          "fraction_bits": 12,
+          "options": {}
+        }
+      },
+      "run_id": "d8-ablations-20261014T1148Z-fxp-12",
+      "staged_shares_scrubbed": "clean",
+      "step_client_ms": [
+        5910.269,
+        5045.615,
+        5079.953
+      ],
+      "step_max_abs_error": [
+        0.9066048637898447,
+        0.764661113910619,
+        0.8401652310972878
+      ],
+      "step_node_ms": {
+        "P0": [
+          5355.827,
+          4565.162,
+          4621.741
+        ],
+        "P1": [
+          5349.208,
+          4619.552,
+          4626.8
+        ],
+        "P2": [
+          5534.222,
+          4662.275,
+          4627.608
+        ]
+      },
+      "token_agreement": "passed",
+      "tokens": [
+        3200,
+        3200,
+        3200
+      ],
+      "verdicts": {
+        "hygiene_clean": true,
+        "negative_cases": {
+          "duplicate_result_frame": true,
+          "mixed_model_manifest": true,
+          "replayed_job_ticket": true,
+          "replayed_request_frame": true,
+          "tampered_decode_step": true
+        },
+        "negatives_refused": true,
+        "nodes_released": true,
+        "passed": true,
+        "reference_matches_float": true,
+        "staged_shares_scrubbed": true,
+        "tokens": 3,
+        "two_tokens_generated": true
+      },
+      "wire": {
+        "P0": {
+          "application_data_records": 228913,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 129962,
+          "retransmit_bytes": 96173,
+          "retransmits": 254,
+          "tls13_flows": 11,
+          "verdict": "tls13_only",
+          "wire_bytes": 1254074028,
+          "wire_packets": 129962
+        },
+        "P1": {
+          "application_data_records": 228888,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 127158,
+          "retransmit_bytes": 109927,
+          "retransmits": 281,
+          "tls13_flows": 8,
+          "verdict": "tls13_only",
+          "wire_bytes": 1253011407,
+          "wire_packets": 127158
+        },
+        "P2": {
+          "application_data_records": 228809,
+          "capture_gaps": 0,
+          "non_tls_payload_bytes": 0,
+          "packets": 127068,
+          "retransmit_bytes": 118572,
+          "retransmits": 273,
+          "tls13_flows": 7,
+          "verdict": "tls13_only",
+          "wire_bytes": 1252833219,
+          "wire_packets": 127068
+        }
+      },
+      "worst_max_abs_error": 0.9066048637898447
+    }
+  },
+  "commit": "b1f87bae5b9822d704e1b17ca924c7fbebc45bec",
+  "comparison": [
+    {
+      "argmax_agreement": "passed",
+      "arm": "baseline",
+      "arm_landed": true,
+      "arm_problems": [],
+      "capture_gaps_total": 0,
+      "captures_tls13_only": true,
+      "client_wall_seconds": 16.247,
+      "description": "the accepted configuration: calibrated width, default approximations",
+      "error_ratio_vs_control": 1.0,
+      "fractional_bits": 18,
+      "generated_text": " secret secret secret",
+      "hygiene": "clean",
+      "options": {},
+      "retransmits_total": 688,
+      "slowdown_vs_control": 1.0,
+      "staged_shares_scrubbed": "clean",
+      "token_agreement": "passed",
+      "tokens": [
+        3200,
+        3200,
+        3200
+      ],
+      "wire_bytes_total": 3760028600,
+      "worst_max_abs_error": 0.06548119270815178
+    },
+    {
+      "argmax_agreement": "passed",
+      "arm": "baseline-repeat",
+      "arm_landed": true,
+      "arm_problems": [],
+      "capture_gaps_total": 0,
+      "captures_tls13_only": true,
+      "client_wall_seconds": 16.185,
+      "description": "the same configuration again, for the run-to-run spread",
+      "error_ratio_vs_control": 1.0091,
+      "fractional_bits": 18,
+      "generated_text": " secret secret secret",
+      "hygiene": "clean",
+      "options": {},
+      "retransmits_total": 648,
+      "slowdown_vs_control": 0.9962,
+      "staged_shares_scrubbed": "clean",
+      "token_agreement": "passed",
+      "tokens": [
+        3200,
+        3200,
+        3200
+      ],
+      "wire_bytes_total": 3760215892,
+      "worst_max_abs_error": 0.06608011008293602
+    },
+    {
+      "argmax_agreement": "passed",
+      "arm": "approx-low",
+      "arm_landed": true,
+      "arm_problems": [],
+      "capture_gaps_total": 0,
+      "captures_tls13_only": true,
+      "client_wall_seconds": 16.395,
+      "description": "softmax exponential and division and the LayerNorm root at reduced iteration counts",
+      "error_ratio_vs_control": 111.0607,
+      "fractional_bits": 18,
+      "generated_text": " secret secret secret",
+      "hygiene": "clean",
+      "options": {
+        "enable_lower_accuracy_rsqrt": true,
+        "fxp_div_goldschmidt_iters": 1,
+        "fxp_exp_iters": 2
+      },
+      "retransmits_total": 670,
+      "slowdown_vs_control": 1.0091,
+      "staged_shares_scrubbed": "clean",
+      "token_agreement": "passed",
+      "tokens": [
+        3200,
+        3200,
+        3200
+      ],
+      "wire_bytes_total": 3755846792,
+      "worst_max_abs_error": 7.272384400570399
+    },
+    {
+      "argmax_agreement": "passed",
+      "arm": "fxp-12",
+      "arm_landed": true,
+      "arm_problems": [],
+      "capture_gaps_total": 0,
+      "captures_tls13_only": true,
+      "client_wall_seconds": 16.68,
+      "description": "the calibrated fixed-point width narrowed from 18 to 12",
+      "error_ratio_vs_control": 13.8453,
+      "fractional_bits": 12,
+      "generated_text": " secret secret secret",
+      "hygiene": "clean",
+      "options": {},
+      "retransmits_total": 808,
+      "slowdown_vs_control": 1.0267,
+      "staged_shares_scrubbed": "clean",
+      "token_agreement": "passed",
+      "tokens": [
+        3200,
+        3200,
+        3200
+      ],
+      "wire_bytes_total": 3759918654,
+      "worst_max_abs_error": 0.9066048637898447
+    }
+  ],
+  "gaps": [
+    "one run per arm: the spread of a single take is not separated except by the repeated control arm",
+    "the nonlinear arms move the SPU runtime's own approximation switches; an arm that replaces the emitted MHLO operators with a different polynomial is still a second frozen program and is not in this table",
+    "no per-process EPC residency counter exists on this kernel, so the arms are compared on time, traffic and fidelity only",
+    "length buckets and batch size are not exercised by the one-layer probe geometry"
+  ],
+  "metric_definition": {
+    "client_wall_seconds": "the client process start to finish on the run host",
+    "fractional_bits": "the fixed-point width the session was pinned to; the export's calibrated width is 18",
+    "step_client_ms": "client-measured wall time of one decode step",
+    "wire_bytes": "sum of bytes on the run's declared ports, from the capture each instance analysed itself",
+    "worst_max_abs_error": "largest per-step |secure logits - float64 reference| over the candidate columns"
+  },
+  "network": "lan (nothing injected; every arm runs unshaped)",
+  "phase": "D8-ablation",
+  "prompt": "the cipher key is secret",
+  "run_id": "d8-ablations-20261014T1148Z",
+  "timestamp_utc": "2026-10-14T11:56:48Z"
+}

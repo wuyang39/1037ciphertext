@@ -138,9 +138,16 @@ D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
   每台实例自己分析的线上流量、宿主 CPU 与可用内存、enclave RSS 与 CPU 秒，
   以及 token/Argmax 一致、五类负例全拒、清洁度与 close 覆写干净这些安全回归
   （运行 `d8-enclave-profiles-20261014T1056Z`，见 [d8-acceptance.md](d8-acceptance.md)）。
-- [ ] **每项优化有开/关对照。未做。** D7 冻结的那个程序没有软近似或量化的
-  运行时开关，"打开/关闭"需要第二个冻结程序与第二组份额；本次只量了同一份
-  程序在三档网络下的表现。缺口见 [d8-acceptance.md](d8-acceptance.md) 第 5 节。
+- [x] 运行时近似开关与定点位宽有同条件开/关对照。四臂（`baseline`、
+  `baseline-repeat`、`approx-low`、`fxp-12`）在同条件 LAN 下各跑一遍完整三节点
+  enclave 流程，每臂的开关与位宽都从三台的 READY 行与客户端记录回读核对，
+  token/Argmax 一致、清洁度与抓包判决干净（运行
+  `d8-ablations-20261014T1148Z`，见
+  [d8-ablation-acceptance.md](d8-ablation-acceptance.md)）。
+- [ ] **替换 MHLO 算子本身的近似未做。** 上述四臂只动了运行时开关；把
+  `mhlo.exponential` / `mhlo.tanh` / `mhlo.rsqrt` 换成另一套多项式需要第二个
+  冻结程序与第二组份额。缺口见 [d8-ablation-acceptance.md](d8-ablation-acceptance.md)
+  第 8 节。长度桶与 batch 仍未覆盖。
 - [x] 原始 trace 可由固定脚本重算图表。摘要、报告与运行说明由
   `infra/d8_three_hosts.py --rebuild` 从三档 trace 原地重算，重算前后三个文件
   逐字节相同（运行 `d8-enclave-profiles-20261014T1056Z`，见
