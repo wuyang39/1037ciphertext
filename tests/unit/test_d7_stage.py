@@ -153,3 +153,44 @@ def test_stage_refuses_a_tree_that_carries_two_shares(
     monkeypatch.setattr(d7_stage, "_node_tree", leaky)
     with pytest.raises(D7StageError, match="another party's shares"):
         _stage(exported_run, tmp_path)
+
+
+def test_the_staged_configs_are_the_documents_the_two_ends_parse(
+    exported_run: Path, tmp_path: Path
+) -> None:
+    """The dealer writes the plans and manifests; the ends read them back.
+
+    Both the node and the client parse the model manifest into a D7 one rather
+    than the D6 one, so this walks the real staged documents through the same
+    entry points the processes call.
+    """
+    from client.d7_session import D7Client  # noqa: F401 - import check only
+    from contracts.d7_session import D7ModelManifest, D7SessionPlan
+    from tee.enclave.d6_node import load_weight_shares
+    from tee.enclave.d7_node import D7NodeConfig, build_d7_programs
+
+    document = _stage(exported_run, tmp_path)
+    workspace = Path(document["workspace"])
+    client_document = json.loads(
+        (workspace / "configs" / "C.json").read_text(encoding="utf-8")
+    )
+    client_plan = D7SessionPlan.from_dict(client_document["plan"])
+    client_model = D7ModelManifest.from_dict(client_document["model"])
+
+    for role in ROLES:
+        node_document = json.loads(
+            (workspace / "configs" / f"{role}.json").read_text(encoding="utf-8")
+        )
+        config = D7NodeConfig.from_document(node_document)
+        assert config.role == role
+        assert config.model.vocab_size == document["candidate_size"]
+        assert config.model.model_hash == document["model_hash"]
+        assert config.model.to_dict() == client_model.to_dict()
+        assert config.plan.to_dict() == client_plan.to_dict()
+        # One program per decoding step, and every tensor the program names is
+        # one this node was handed a share of.
+        programs = build_d7_programs(config)
+        assert len(programs.programs) == config.plan.max_new_tokens
+        assert programs.kv_max_layers == 1
+        shares = load_weight_shares(config.weights_path)
+        assert set(programs.weight_tensors) <= set(shares)

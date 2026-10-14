@@ -22,6 +22,7 @@ from typing import Sequence
 
 from contracts.d7_session import (
     D7_NODE_CONFIG_VERSION,
+    D7ModelManifest,
     D7SessionPlan,
     parse_step_payload,
     result_payload,
@@ -46,6 +47,7 @@ class D7NodeConfig(D6NodeConfig):
 
     CONFIG_VERSION = D7_NODE_CONFIG_VERSION
     plan_from_dict = staticmethod(D7SessionPlan.from_dict)
+    model_from_dict = staticmethod(D7ModelManifest.from_dict)
 
 
 def program_geometry(plan: D7SessionPlan) -> D7Config:

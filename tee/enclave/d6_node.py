@@ -169,8 +169,9 @@ class SessionPayloads:
 class D6NodeConfig:
     """Everything one D6 node needs, already validated by the orchestrator."""
 
-    # A phase that speaks its own config version and plan subclasses this and
-    # overrides the two; the field set and the validator stay shared.
+    # A phase that speaks its own config version, plan and model manifest
+    # subclasses this and overrides the three; the field set and the validator
+    # stay shared.
     CONFIG_VERSION: ClassVar[str] = NODE_CONFIG_VERSION
 
     run_id: str
@@ -202,6 +203,10 @@ class D6NodeConfig:
     @staticmethod
     def plan_from_dict(document: Mapping[str, Any]) -> Any:
         return SessionPlan.from_dict(document)
+
+    @staticmethod
+    def model_from_dict(document: Mapping[str, Any]) -> Any:
+        return ModelManifest.from_dict(document)
 
     @classmethod
     def from_document(cls, document: Mapping[str, Any]) -> "D6NodeConfig":
@@ -235,7 +240,7 @@ class D6NodeConfig:
                 share_port=int(document["share_channel"]["port"]),
                 out_dir=Path(document["out_dir"]),
                 plan=cls.plan_from_dict(document["plan"]),
-                model=ModelManifest.from_dict(document["model"]),
+                model=cls.model_from_dict(document["model"]),
                 weights_path=Path(document["weights"]),
                 sm2_private_key=str(document["sm2_identity"]["private_key"]),
                 sm2_certificate=dict(document["sm2_certificate"]),
