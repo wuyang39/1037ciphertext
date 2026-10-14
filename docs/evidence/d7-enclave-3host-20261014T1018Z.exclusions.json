@@ -1,0 +1,25 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "excluded": [
+    {
+      "bytes": 1265072028,
+      "path": "d7-three-P0.pcap",
+      "reason": "the raw capture is 1265072028 bytes and stays on the instance that produced it (P0) under /tmp/d7-enclave-3host-20261014T1018Z-P0.pcap; the bundle ships its digest and the TLS 1.3 summary that instance derived from it",
+      "sha256": "f019ebf912f9d13ca5bceea73d0867ab2beadec76a37707de582d35eddf729f9"
+    },
+    {
+      "bytes": 1263911253,
+      "path": "d7-three-P1.pcap",
+      "reason": "the raw capture is 1263911253 bytes and stays on the instance that produced it (P1) under /tmp/d7-enclave-3host-20261014T1018Z-P1.pcap; the bundle ships its digest and the TLS 1.3 summary that instance derived from it",
+      "sha256": "034454943e0d0388c25731bb7caa4c3141d48faf490e59f6ab20df9187fb7e56"
+    },
+    {
+      "bytes": 1263687263,
+      "path": "d7-three-P2.pcap",
+      "reason": "the raw capture is 1263687263 bytes and stays on the instance that produced it (P2) under /tmp/d7-enclave-3host-20261014T1018Z-P2.pcap; the bundle ships its digest and the TLS 1.3 summary that instance derived from it",
+      "sha256": "ac7777a804ca9d03897fa888bb513fb2290df019e4b155ee5f55d65c2f9e2ee8"
+    }
+  ],
+  "note": "These raw captures stay on the instances that produced them; the bundle ships their digests and the per-host TLS 1.3 summary. Every excluded file still has to match the sealed index if it is present, so restoring the original capture tightens the check instead of bypassing it.",
+  "run_id": "d7-enclave-3host-20261014T1018Z"
+}

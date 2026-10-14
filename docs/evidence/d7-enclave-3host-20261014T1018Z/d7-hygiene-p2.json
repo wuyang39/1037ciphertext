@@ -1,0 +1,63 @@
+{
+  "exit_status": 0,
+  "expect_absent": [
+    "/dev/shm/a122-d7/d7-enclave-3host-20261014T1018Z/P0",
+    "/dev/shm/a122-d7/d7-enclave-3host-20261014T1018Z/P1",
+    "/dev/shm/a122-d7/d7-enclave-3host-20261014T1018Z/P2"
+  ],
+  "expect_empty": [
+    "/dev/shm/a122-d7/d7-enclave-3host-20261014T1018Z"
+  ],
+  "file_hits": [],
+  "findings": [],
+  "journal": {
+    "available": true,
+    "bytes_searched": 1714,
+    "hits": []
+  },
+  "journal_hits": [],
+  "not_empty": [],
+  "probes": [
+    "CICAAxqAgAMPuo7ImGTUOQEL5FC5F9/w",
+    "CICAAxqAgAMdZfnfcyUV5LXHpr6DUIIA",
+    "CICAAxqAgAN2s+7GztjMe3LNjB1+g9AB",
+    "CICAAxqAgANKBYh15AjIaAIjZvkvOW+E",
+    "CICAAxqAgANmkOS2dMRY/SoZNeGUCp2w",
+    "CICAAxqAgAOwDufBgpJjXR0MsrUWr7GK",
+    "CICAAxqAgAOyr9hTY0WxiLhloBtfoAiL",
+    "CICAAxqAgAPB2B9pFxaSHjRZIGDnpOBO",
+    "CICAAxqAgAPtajblzeGB+/cGz8Yi3CZz",
+    "CICCBBqAggQ9PnRo8W8cs8ui22utedo8",
+    "CICCBBqAggQBtBzd3gcJDNgFPGCY/o8p",
+    "CICCBBqAggR4jQfHXVD4VqZ/31MdLY0y",
+    "CICCBBqAggS45f0xHXV10KE3ZzPfvCWK",
+    "CICCBBqAggS8J4zv5b+qLfPTty0mJovq",
+    "CICCBBqAggSM8nXe/MrfAWz04J76HE+L",
+    "CICCBBqAggSPCtkSfS1yn9jVO8Dfd3VQ",
+    "CICCBBqAggT5Zx8mJYKVCYKq5OsCW/18",
+    "CICCBBqAggTCDW+6L4jaQF1X6DO6h5WZ"
+  ],
+  "process_hits": [],
+  "roots": [
+    "/dev/shm/a122-d7/d7-enclave-3host-20261014T1018Z",
+    "/tmp",
+    "/home/jiahao/a122-d7/three/workspace/out",
+    "/var/log"
+  ],
+  "roots_that_exist": [
+    "/dev/shm/a122-d7/d7-enclave-3host-20261014T1018Z",
+    "/tmp",
+    "/home/jiahao/a122-d7/three/workspace/out",
+    "/var/log"
+  ],
+  "skipped": [
+    "/home/jiahao/a122-d7/three/workspace/out/C/client-result.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P0/node-status.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P1/node-status.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P2/node-status.json",
+    "/tmp/d7-enclave-3host-20261014T1018Z-P2-probes.json",
+    "/tmp/d7-enclave-3host-20261014T1018Z-P2-hygiene.json"
+  ],
+  "still_present": [],
+  "verdict": "clean"
+}

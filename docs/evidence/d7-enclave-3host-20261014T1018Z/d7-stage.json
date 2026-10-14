@@ -1,0 +1,102 @@
+{
+  "bundles": {
+    "P0": {
+      "files": [
+        "configs/P0.json",
+        "pki/nodes/P0/P0-ca-bundle.pem",
+        "pki/nodes/P0/P0-cert.pem",
+        "pki/nodes/P0/P0-key.pem",
+        "pki/nodes/P1/P1-cert.pem",
+        "pki/nodes/P2/P2-cert.pem",
+        "shares/P0.json",
+        "workspace.json"
+      ],
+      "shared_with_this_node": [
+        "P0.json"
+      ],
+      "tarball": "/home/jiahao/a122-d7/dist/P0.tgz",
+      "tarball_bytes": 70110076,
+      "tarball_sha256": "104a2a8d7cfc0eef635b818d07b404d5df335b7ae673bd6447f75850299b2487",
+      "tree": "/home/jiahao/a122-d7/dist/P0/workspace"
+    },
+    "P1": {
+      "files": [
+        "configs/P1.json",
+        "pki/nodes/P0/P0-cert.pem",
+        "pki/nodes/P1/P1-ca-bundle.pem",
+        "pki/nodes/P1/P1-cert.pem",
+        "pki/nodes/P1/P1-key.pem",
+        "pki/nodes/P2/P2-cert.pem",
+        "shares/P1.json",
+        "workspace.json"
+      ],
+      "shared_with_this_node": [
+        "P1.json"
+      ],
+      "tarball": "/home/jiahao/a122-d7/dist/P1.tgz",
+      "tarball_bytes": 70111043,
+      "tarball_sha256": "4615a9f4472031942c9979988312917c2e81e91efbfff5b8018fe9727f77229a",
+      "tree": "/home/jiahao/a122-d7/dist/P1/workspace"
+    },
+    "P2": {
+      "files": [
+        "configs/P2.json",
+        "pki/nodes/P0/P0-cert.pem",
+        "pki/nodes/P1/P1-cert.pem",
+        "pki/nodes/P2/P2-ca-bundle.pem",
+        "pki/nodes/P2/P2-cert.pem",
+        "pki/nodes/P2/P2-key.pem",
+        "shares/P2.json",
+        "workspace.json"
+      ],
+      "shared_with_this_node": [
+        "P2.json"
+      ],
+      "tarball": "/home/jiahao/a122-d7/dist/P2.tgz",
+      "tarball_bytes": 70110961,
+      "tarball_sha256": "6c86e0a5c4da3e16834e2e5804d5129b68b203688d5dcdb9544d7892c739abda",
+      "tree": "/home/jiahao/a122-d7/dist/P2/workspace"
+    }
+  },
+  "candidate_size": 1028,
+  "client_dir": "/home/jiahao/a122-d7/client",
+  "dist_root": "/home/jiahao/a122-d7/dist",
+  "model_hash": "c0394f5002ee79e2a9119d85e44d756dcd8b3aa930934919e2cf7f871df85ad9",
+  "model_manifest_hash": "3afdeb07d5a3e66e7b598b770517b3e2cc5788d63c6ea4241c89321bf15b493b",
+  "plan": {
+    "fractional_bits": 18,
+    "hidden_size": 768,
+    "intermediate_size": 3072,
+    "layers": 1,
+    "length_bound": 1048576,
+    "max_new_tokens": 3,
+    "model_manifest_hash": "3afdeb07d5a3e66e7b598b770517b3e2cc5788d63c6ea4241c89321bf15b493b",
+    "model_version": "gpt2-1l-cand1028-v1",
+    "num_heads": 12,
+    "plan_version": "a122-d7-session-v1",
+    "precision_plan_hash": "db1950d960701a64b3900c0c0ebd8ff93f9bf18971436ad90c3e3afaf6a74b57",
+    "prompt_tokens": 5,
+    "release_id": "a122-d7",
+    "sequence": 8,
+    "share_epoch": 1,
+    "vocab_size": 1028
+  },
+  "prompt_tokens": [
+    1169,
+    38012,
+    1994,
+    318,
+    3200
+  ],
+  "provisioned_children": [
+    "workspace",
+    "pki",
+    "shares",
+    "configs",
+    "workspace.json",
+    "kas.json"
+  ],
+  "run_id": "d7-enclave-3host-20261014T1018Z",
+  "session_root": "/dev/shm/a122-d7/d7-enclave-3host-20261014T1018Z",
+  "workspace": "/home/jiahao/a122-d7/three/workspace"
+}

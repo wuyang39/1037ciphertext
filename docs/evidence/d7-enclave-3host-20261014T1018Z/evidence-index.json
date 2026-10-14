@@ -1,0 +1,135 @@
+{
+  "evidence_version": "a122-evidence-v1",
+  "file_count": 25,
+  "files": [
+    {
+      "bytes": 108594,
+      "path": "d7-client-result.json",
+      "sha256": "ab749a70f5c01d0aa46cddb6e022fb17f9d7987a4dd933765cfce17173e28ee4"
+    },
+    {
+      "bytes": 397,
+      "path": "d7-client.log",
+      "sha256": "5d59f64642fa585350762b2b99f8d47fcfbecef99ba259d078dfe36943df720d"
+    },
+    {
+      "bytes": 9496,
+      "path": "d7-enclave-p0-sign.txt",
+      "sha256": "f258d57718465767acae6175ca60370d8569716d8fe45b8fe4360ce9afbca70b"
+    },
+    {
+      "bytes": 9457,
+      "path": "d7-enclave-p1-sign.txt",
+      "sha256": "1c3b1c6001a12a821d0837036bea2418fbdce92e952f8595b748d5bd0787608b"
+    },
+    {
+      "bytes": 9457,
+      "path": "d7-enclave-p2-sign.txt",
+      "sha256": "de703943ce5878e24f4149dec769988d88db3c5d5bb4305df936092994847532"
+    },
+    {
+      "bytes": 3190447,
+      "path": "d7-enclave.manifest",
+      "sha256": "5382eee046312effed93e8854ab821ffed3f459080e26d18fa5ce3619d4fcda0"
+    },
+    {
+      "bytes": 1994,
+      "path": "d7-hygiene-p0.json",
+      "sha256": "aeddf2e1c275d068301d92b433cee4adf93b627e589cf8728d2d519b1ea344c2"
+    },
+    {
+      "bytes": 1994,
+      "path": "d7-hygiene-p1.json",
+      "sha256": "2fac74d68aab6577b2affdebf927d26b720b0a0079bf67c89c4017d33a84b09f"
+    },
+    {
+      "bytes": 1994,
+      "path": "d7-hygiene-p2.json",
+      "sha256": "ab1234bba1edb53a501b4d04c6850e938ab0cf3ab98c6f68e22491e5aa0449d9"
+    },
+    {
+      "bytes": 24938,
+      "path": "d7-reveal-scan.json",
+      "sha256": "cb0aa45b349e377cbeba598178da078077e31d366dd1d6ac0253bbaeb10a9e46"
+    },
+    {
+      "bytes": 3074,
+      "path": "d7-stage.json",
+      "sha256": "b4ac5a4c008fc9977cddef26981a079152e64ab958974688138ddc545a48b19f"
+    },
+    {
+      "bytes": 136649,
+      "path": "d7-summary.json",
+      "sha256": "2d81c0cc57d27b21cb58146f79e572504c760f617eaab98cba89d3061c5049c6"
+    },
+    {
+      "bytes": 3136,
+      "path": "d7-three-p0-node-status.json",
+      "sha256": "c1b1dca2e16d57c4a52c6fb0a2a229188753d7be6bd101246136cf6023771b0f"
+    },
+    {
+      "bytes": 102032,
+      "path": "d7-three-p0-node.log",
+      "sha256": "bf91f9974a40162fe04e0b25ee56a5c596c0798ce573298d928408e156d2de60"
+    },
+    {
+      "bytes": 10993,
+      "path": "d7-three-P0-tls-summary.txt",
+      "sha256": "58bb4336dcb5892de591264be2ac0ff84b441062e71f8267f623895dc2ee4f1e"
+    },
+    {
+      "bytes": 3371,
+      "path": "d7-three-p1-node-status.json",
+      "sha256": "df98044e6b597fe8db03a776cb29bfba3f848faa986c920a57a262d492de646f"
+    },
+    {
+      "bytes": 79036,
+      "path": "d7-three-p1-node.log",
+      "sha256": "f0b2ad5979f763b1a2de1fe7dbf4a73f1943d7c5306d7aad85dbec411bf20a51"
+    },
+    {
+      "bytes": 7826,
+      "path": "d7-three-P1-tls-summary.txt",
+      "sha256": "d0f3f34a37b7162f86b23dff1447feff6c65304f774205f7a542be416bec032d"
+    },
+    {
+      "bytes": 3135,
+      "path": "d7-three-p2-node-status.json",
+      "sha256": "36c47a337dda08c92090a84efe10733577410842ba57c2c94be2cc58706f6ab7"
+    },
+    {
+      "bytes": 79815,
+      "path": "d7-three-p2-node.log",
+      "sha256": "98bba428e7b22a43e03c18802c4c64b663df16af5fbedcc966c502b2c236010f"
+    },
+    {
+      "bytes": 7113,
+      "path": "d7-three-P2-tls-summary.txt",
+      "sha256": "632ac1d7edb8a6ba7028774f7adaef1420ffdcb02879f3b577af75bed5b7d39d"
+    },
+    {
+      "bytes": 2579,
+      "path": "README.md",
+      "sha256": "31415c695fd2fa04ab7bc9932c79a1c21636ebe6167494ae31377bf07475e979"
+    },
+    {
+      "bytes": 1265072028,
+      "external": true,
+      "path": "d7-three-P0.pcap",
+      "sha256": "f019ebf912f9d13ca5bceea73d0867ab2beadec76a37707de582d35eddf729f9"
+    },
+    {
+      "bytes": 1263911253,
+      "external": true,
+      "path": "d7-three-P1.pcap",
+      "sha256": "034454943e0d0388c25731bb7caa4c3141d48faf490e59f6ab20df9187fb7e56"
+    },
+    {
+      "bytes": 1263687263,
+      "external": true,
+      "path": "d7-three-P2.pcap",
+      "sha256": "ac7777a804ca9d03897fa888bb513fb2290df019e4b155ee5f55d65c2f9e2ee8"
+    }
+  ],
+  "root": "d7-enclave-3host-20261014T1018Z"
+}
