@@ -82,11 +82,20 @@ class D7Config:
         return self.hidden_size // self.num_heads
 
 
+def ssa_name(tensor: str) -> str:
+    """The bare SSA identifier one manifest tensor is bound to in the body.
+
+    The manifest names are the ones the dealer splits and shares, and GPT-2's
+    carry dots -- ``layer_0.attn.q.weight``. An SSA identifier does not, so the
+    body addresses every tensor through this spelling. Callers that want a
+    value name use :func:`ir_name`.
+    """
+    return "".join(character if character.isalnum() else "_" for character in tensor)
+
+
 def ir_name(tensor: str) -> str:
-    """The SSA name one manifest tensor is bound to inside the program."""
-    return "%" + "".join(
-        character if character.isalnum() else "_" for character in tensor
-    )
+    """The SSA value name one manifest tensor is bound to inside the program."""
+    return "%" + ssa_name(tensor)
 
 
 def program_inputs(config: D7Config) -> tuple[TensorSpec, ...]:
@@ -442,7 +451,7 @@ def build_gpt2_program(
             inputs,
             outputs,
             [current, logits, token],
-            name_of=lambda spec: ir_name(spec.name),
+            name_of=lambda spec: ssa_name(spec.name),
         ),
         inputs=inputs,
         outputs=outputs,
@@ -456,4 +465,5 @@ __all__ = [
     "build_gpt2_program",
     "ir_name",
     "program_inputs",
+    "ssa_name",
 ]

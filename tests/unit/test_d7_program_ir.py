@@ -25,6 +25,11 @@ from mpc.spu_backend.d7_program import D7Config, build_gpt2_program
 
 VALUE = re.compile(r"%[A-Za-z_][A-Za-z0-9_.$-]*")
 BLOCK_ARGUMENTS = re.compile(r"\^bb\d+\(([^)]*)\)")
+# An SSA value name is a bare identifier. Dots, dashes and a second percent
+# sign all survive Python string building and then die in the MLIR parser, so
+# the rule is stated with nothing left loose.
+STRICT_VALUE = re.compile(r"^%[A-Za-z_][A-Za-z0-9_]*$")
+ANY_VALUE = re.compile(r"%[^\s,:()\"]+")
 
 
 def undefined_values(text: str) -> list[tuple[int, str]]:
@@ -89,6 +94,15 @@ def test_every_program_body_resolves_its_ssa_values() -> None:
     for label, program in _programs().items():
         problems = undefined_values(program.text)
         assert not problems, f"{label}: {problems[:4]}"
+
+
+def test_every_ssa_name_is_a_bare_identifier() -> None:
+    for label, program in _programs().items():
+        odd = sorted(
+            {token for token in ANY_VALUE.findall(program.text) if not STRICT_VALUE.match(token)}
+        )
+        assert not odd, f"{label}: {odd[:4]}"
+        assert "%%" not in program.text, label
 
 
 def test_the_manifest_names_are_not_the_ssa_names() -> None:
