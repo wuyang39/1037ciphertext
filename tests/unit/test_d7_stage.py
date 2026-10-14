@@ -115,7 +115,7 @@ def test_stage_keeps_the_client_material_out_of_the_measured_trees(
     # key and the client's private key live beside the dealer's workspace.
     assert client_dir != workspace
     assert workspace not in client_dir.parents
-    for name in ("C-key.pem", "C-cert.pem", "C-ca-bundle.pem", "kas.json"):
+    for name in ("C-key.pem", "C-cert.pem", "C-ca-bundle.pem", "kas.json", "C.json"):
         assert (client_dir / name).is_file()
     kas = json.loads((client_dir / "kas.json").read_text(encoding="utf-8"))
     assert kas["kas_signing_private_key"]
@@ -171,8 +171,11 @@ def test_the_staged_configs_are_the_documents_the_two_ends_parse(
 
     document = _stage(exported_run, tmp_path)
     workspace = Path(document["workspace"])
+    # The client reads its configuration from beside the workspace, not from
+    # inside it: the node that drives the session replaces its workspace with
+    # the stripped tree it was sent, and the dealer's copy is gone by then.
     client_document = json.loads(
-        (workspace / "configs" / "C.json").read_text(encoding="utf-8")
+        (Path(document["client_dir"]) / "C.json").read_text(encoding="utf-8")
     )
     client_plan = D7SessionPlan.from_dict(client_document["plan"])
     client_model = D7ModelManifest.from_dict(client_document["model"])

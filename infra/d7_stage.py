@@ -122,11 +122,15 @@ def stage(
         **kwargs,
     )
     # The client's material is moved out of the workspace: a node measures and
-    # mounts that tree, and the KAS signing key must not be inside it.
+    # mounts that tree, and the KAS signing key must not be inside it. The
+    # client's own configuration goes with it, because the node that drives the
+    # session replaces its workspace with the stripped tree it was sent -- the
+    # ``configs/C.json`` the dealer wrote is gone by the time the client starts.
     client_dir.mkdir(parents=True, exist_ok=True)
     for name in ("C-cert.pem", "C-key.pem", "C-ca-bundle.pem"):
         _copy_file(root / "pki" / "nodes" / CLIENT / name, client_dir / name)
     _copy_file(root / "kas.json", client_dir / "kas.json")
+    _copy_file(Path(manifest["configs"][CLIENT]), client_dir / f"{CLIENT}.json")
 
     dist_root.mkdir(parents=True, exist_ok=True)
     children = [root, root / "pki", root / "shares", root / "configs"]
