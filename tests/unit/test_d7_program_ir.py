@@ -23,13 +23,13 @@ from mpc.spu_backend.d6_program import build_step_program
 from mpc.spu_backend.d7_program import D7Config, build_gpt2_program
 
 
-VALUE = re.compile(r"%[A-Za-z_][A-Za-z0-9_.$-]*")
+VALUE = re.compile(r"%[A-Za-z_][A-Za-z0-9_.]*")
 BLOCK_ARGUMENTS = re.compile(r"\^bb\d+\(([^)]*)\)")
-# An SSA value name is a bare identifier. Dots, dashes and a second percent
-# sign all survive Python string building and then die in the MLIR parser, so
-# the rule is stated with nothing left loose.
-STRICT_VALUE = re.compile(r"^%[A-Za-z_][A-Za-z0-9_]*$")
+# An SSA value name may carry dots -- the GPT-2 tensors are named with them --
+# but nothing else that a Python format string could smuggle in.
+STRICT_VALUE = re.compile(r"^%[A-Za-z_][A-Za-z0-9_.]*$")
 ANY_VALUE = re.compile(r"%[^\s,:()\"]+")
+SIGNATURE = re.compile(r"func\.func @main\((.*?)\) -> ")
 
 
 def undefined_values(text: str) -> list[tuple[int, str]]:
@@ -105,15 +105,19 @@ def test_every_ssa_name_is_a_bare_identifier() -> None:
         assert "%%" not in program.text, label
 
 
-def test_the_manifest_names_are_not_the_ssa_names() -> None:
-    """The GPT-2 tensors are named with dots, which the body cannot carry.
+def test_every_declared_parameter_is_its_binding_name() -> None:
+    """The runtime hands a party its share by name, so the two must agree.
 
-    The binding name stays ``layer_0.attn.q.weight`` so the dealer's share
-    bundle keeps its manifest keys, while the parameter list has to spell the
-    same tensor the way the body references it.
+    A node calls ``SetVar("layer_0.attn.q.weight", share)`` and the executable
+    declares ``input_names`` from the manifest. The IR therefore has to declare
+    a parameter spelled exactly that way -- a program that renamed it would
+    compile and then bind nothing.
     """
-    program = _programs()["d7-gpt2-real-row4"]
-    assert "layer_0.attn.q.weight" in program.input_names
-    signature = program.text.splitlines()[0]
-    assert "%layer_0.attn.q.weight:" not in signature
-    assert "%layer_0_attn_q_weight:" in signature
+    for label, program in _programs().items():
+        match = SIGNATURE.search(program.text)
+        assert match, label
+        declared = [
+            entry.split(":")[0].lstrip("%") for entry in match.group(1).split(", ")
+        ]
+        assert declared == list(program.input_names), label
+    assert "layer_0.attn.q.weight" in _programs()["d7-gpt2-real-row4"].input_names

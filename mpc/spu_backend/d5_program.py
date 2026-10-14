@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Any, Callable, Sequence
+from typing import Any, Sequence
 
 
 FXP_FRACTION_BITS = 18
@@ -194,13 +194,10 @@ def _function(
     inputs: Sequence[TensorSpec],
     outputs: Sequence[TensorSpec],
     returns: Sequence[str],
-    name_of: Callable[[TensorSpec], str] | None = None,
 ) -> str:
-    # A phase whose manifest names carry punctuation the SSA grammar would
-    # split passes a mangler here, so the parameter list and the body that
-    # references those parameters agree on one spelling.
-    render = (lambda spec: spec.name) if name_of is None else name_of
-    signature = ", ".join(f"%{render(spec)}: {spec.type}" for spec in inputs)
+    # The parameter name is the tensor's binding name: the runtime hands a
+    # party its share with ``SetVar`` on that key, so the two have to match.
+    signature = ", ".join(f"%{spec.name}: {spec.type}" for spec in inputs)
     types = ", ".join(spec.type for spec in outputs)
     returned = ", ".join(returns)
     return (
