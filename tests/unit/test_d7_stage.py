@@ -197,3 +197,47 @@ def test_the_staged_configs_are_the_documents_the_two_ends_parse(
         assert programs.kv_max_layers == 1
         shares = load_weight_shares(config.weights_path)
         assert set(programs.weight_tensors) <= set(shares)
+
+
+def test_an_ablation_arm_reaches_the_staged_configs_and_the_record(
+    exported_run: Path, tmp_path: Path
+) -> None:
+    """D8's arms travel as staging options, not as a second dealer path.
+
+    The three ends have to disagree with each other about nothing, so the arm
+    is checked where it will be read: the plan the nodes and the client both
+    parse, the runtime block each side builds its IO from, and the record the
+    driver stamps into the bundle.
+    """
+    from contracts.d7_session import D7ModelManifest, D7SessionPlan
+    from tee.enclave.d7_node import D7NodeConfig
+
+    options = {"fxp_exp_iters": 2, "enable_lower_accuracy_rsqrt": True}
+    document = _stage(
+        exported_run, tmp_path, fractional_bits=12, runtime_options=options
+    )
+    assert document["runtime"]["fractional_bits"] == 12
+    assert document["runtime"]["export_fractional_bits"] != 12
+    assert document["runtime"]["options"] == options
+
+    workspace = Path(document["workspace"])
+    client_document = json.loads(
+        (Path(document["client_dir"]) / "C.json").read_text(encoding="utf-8")
+    )
+    client_plan = D7SessionPlan.from_dict(client_document["plan"])
+    client_model = D7ModelManifest.from_dict(client_document["model"])
+    assert client_plan.fractional_bits == 12
+    assert client_model.fractional_bits == 12
+    assert client_document["runtime_options"] == options
+    # The export's own calibrated plan stays visible beside the arm that moved
+    # away from it.
+    assert client_model.export_precision_plan_hash
+
+    for role in ROLES:
+        node_document = json.loads(
+            (workspace / "configs" / f"{role}.json").read_text(encoding="utf-8")
+        )
+        config = D7NodeConfig.from_document(node_document)
+        assert config.runtime_options == options
+        assert config.plan.fractional_bits == 12
+        assert config.plan.to_dict() == client_plan.to_dict()

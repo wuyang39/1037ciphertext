@@ -17,6 +17,7 @@ from mpc.spu_backend.spu_link import (
     NodeIdentity,
     SpuLinkPolicy,
     SpuNodeRuntime,
+    apply_runtime_options,
     make_io,
     runtime_config,
     verify_local_identity,
@@ -34,6 +35,7 @@ class SpuProgramRuntime(SpuNodeRuntime):
         identity: NodeIdentity,
         programs: Sequence[SpuProgram],
         fraction_bits: int = FXP_FRACTION_BITS,
+        runtime_options: Mapping[str, Any] | None = None,
         executor: Any | None = None,
         present_client_certificate: bool = True,
     ) -> None:
@@ -48,6 +50,14 @@ class SpuProgramRuntime(SpuNodeRuntime):
         self.present_client_certificate = present_client_certificate
         self.identity_fingerprint = verify_local_identity(policy, identity)
         self.config = runtime_config(libspu, fraction_bits=fraction_bits)
+        # D8's ablation arms differ only here: an arm that turns a runtime
+        # approximation down says so in its configuration, and the value it
+        # actually landed on is reported back so the run can be checked
+        # against the arm it claims to be.
+        self.runtime_options = apply_runtime_options(
+            libspu, self.config, runtime_options
+        )
+        self.fraction_bits = int(fraction_bits)
         self.io = make_io(libspu, self.config)
         self.executables = {
             program.name: program.executable(libspu) for program in programs

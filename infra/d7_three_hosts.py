@@ -999,6 +999,8 @@ def run_three_hosts(
     net_shape_dst: str | None = None,
     sudo_password: str | None = None,
     sample_resources: bool = False,
+    fractional_bits: int | None = None,
+    runtime_options: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     if net_profile not in NET_PROFILES:
         raise ThreeHostError(
@@ -1053,21 +1055,32 @@ def run_three_hosts(
         }
         for role in ROLES
     }
-    staging_command = (
+    staging_parts = [
         f"cd {remote_path(repo)} && {NO_BYTECODE} PYTHONPATH=. "
-        f"{remote_path(python)} -m infra.d7_stage "
-        f"--run-id {shlex.quote(run_id)} "
-        f"--root {remote_path(root)} "
-        f"--client-dir {remote_path(client_dir)} "
-        f"--export-dir {remote_path(export_dir)} "
-        f"--tokenizer-dir {remote_path(tokenizer_dir)} "
-        f"--cluster-file {shlex.quote(cluster_file)} "
-        f"--dist-root {remote_path(dist_root)} "
-        f"--prompt {shlex.quote(prompt)} "
-        f"--max-new-tokens {int(max_new_tokens)} "
-        f"--session-root {shlex.quote(root_session)} "
-        f"--output {shlex.quote(stage_file)}"
-    )
+        f"{remote_path(python)} -m infra.d7_stage",
+        f"--run-id {shlex.quote(run_id)}",
+        f"--root {remote_path(root)}",
+        f"--client-dir {remote_path(client_dir)}",
+        f"--export-dir {remote_path(export_dir)}",
+        f"--tokenizer-dir {remote_path(tokenizer_dir)}",
+        f"--cluster-file {shlex.quote(cluster_file)}",
+        f"--dist-root {remote_path(dist_root)}",
+        f"--prompt {shlex.quote(prompt)}",
+        f"--max-new-tokens {int(max_new_tokens)}",
+        f"--session-root {shlex.quote(root_session)}",
+    ]
+    # D8's ablation arms reach the staging step as ordinary options, so an arm
+    # run is the accepted run with one argument changed rather than a second
+    # driver path.
+    if fractional_bits is not None:
+        staging_parts.append(f"--fractional-bits {int(fractional_bits)}")
+    if runtime_options:
+        staging_parts.append(
+            "--runtime-options "
+            + shlex.quote(json.dumps(dict(runtime_options), sort_keys=True))
+        )
+    staging_parts.append(f"--output {shlex.quote(stage_file)}")
+    staging_command = " ".join(staging_parts)
     with tempfile.TemporaryDirectory(prefix="a122-d7-three-") as scratch:
         scratch_path = Path(scratch)
         local_cluster = scratch_path / "cluster.json"
@@ -1467,6 +1480,15 @@ def run_three_hosts(
         "mode": mode,
         "timestamp_utc": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "commit": expect_commit,
+        # The ablation arm this run was asked for, beside the block the stage
+        # step wrote down, so the two can be compared instead of assumed equal.
+        "runtime": {
+            "fractional_bits": (
+                int(fractional_bits) if fractional_bits is not None else None
+            ),
+            "options": dict(runtime_options or {}),
+            "declared_in_staging": dict(stage_document.get("runtime") or {}),
+        },
         "roles": {
             role: {
                 "instance_id": role_routes[role].instance_id,
@@ -1588,6 +1610,17 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="sample host CPU, memory and the enclave process while the client runs",
     )
+    parser.add_argument(
+        "--fractional-bits",
+        type=int,
+        default=None,
+        help="pin the session to another fixed-point width (D8 ablation arm)",
+    )
+    parser.add_argument(
+        "--runtime-options",
+        default=None,
+        help="JSON object of named SPU runtime approximation switches",
+    )
     parser.add_argument("--seal", action="store_true")
     args = parser.parse_args(argv)
     cluster = load_cluster(args.cluster, user=args.ssh_user, ssh_host=args.ssh_host)
@@ -1621,6 +1654,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             net_shape_dst=args.net_shape_dst,
             sudo_password=args.sudo_password,
             sample_resources=args.sample_resources,
+            fractional_bits=args.fractional_bits,
+            runtime_options=(
+                json.loads(args.runtime_options) if args.runtime_options else None
+            ),
         )
     except BaseException:
         # A run that died half way through must not leave a node holding its

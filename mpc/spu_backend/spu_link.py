@@ -42,6 +42,37 @@ MIN_TLS_VERSION = "TLS1.3"
 SERVER_VERIFY_DEPTH = 4
 CLIENT_VERIFY_DEPTH = 4
 TEARDOWN_TIMEOUT_SECONDS = 20.0
+
+# The SPU runtime keeps its nonlinear operators behind named approximation
+# switches: ``fxp_exp_*`` for the softmax exponential, ``fxp_div_*`` for the
+# division that normalizes it, ``enable_lower_accuracy_rsqrt`` for the
+# LayerNorm root, and so on. They default to the shipping values, and D8's
+# ablation arms are exactly this table: the same program and the same shares,
+# run with one approximation setting moved and nothing else.
+RUNTIME_ENUM_OPTIONS: dict[str, str] = {
+    "fxp_exp_mode": "ExpMode",
+    "fxp_log_mode": "LogMode",
+    "sigmoid_mode": "SigmoidMode",
+    "sort_method": "SortMethod",
+}
+RUNTIME_BOOL_OPTIONS: frozenset[str] = frozenset(
+    {"enable_lower_accuracy_rsqrt", "trunc_allow_msb_error"}
+)
+RUNTIME_INT_OPTIONS: frozenset[str] = frozenset(
+    {
+        "fxp_exp_iters",
+        "fxp_log_iters",
+        "fxp_log_orders",
+        "fxp_div_goldschmidt_iters",
+        "sine_cosine_iters",
+        "max_concurrency",
+        "share_max_chunk_size",
+        "quick_sort_threshold",
+    }
+)
+RUNTIME_OPTION_NAMES: frozenset[str] = frozenset(
+    set(RUNTIME_ENUM_OPTIONS) | RUNTIME_BOOL_OPTIONS | RUNTIME_INT_OPTIONS
+)
 """How long the node waits for the collective link teardown to finish."""
 """BRPC treats a negative verify depth as "do not check the peer certificate".
 
@@ -392,17 +423,85 @@ def runtime_config(
     fraction_bits: int = FXP_FRACTION_BITS,
     protocol: str = "SEMI2K",
     field: str = "FM64",
+    options: Mapping[str, Any] | None = None,
 ) -> Any:
-    """Build the fixed-point runtime configuration used by every D4 run."""
+    """Build the fixed-point runtime configuration used by every MPC run.
+
+    ``options`` is the D8 ablation surface: a mapping from a named runtime
+    approximation switch to the value the arm wants. It is empty for every
+    accepted run, so the shipping configuration is what an unmodified caller
+    builds. A name outside :data:`RUNTIME_OPTION_NAMES` is refused rather than
+    ignored, because a typo that silently left an arm at the default would
+    turn the ablation table into a fiction.
+    """
     if protocol != "SEMI2K":
         raise SpuBackendError("D4 pins the semi-honest SEMI2K protocol")
     if field != "FM64":
         raise SpuBackendError("D4 pins the FM64 fixed-point field")
-    return libspu.RuntimeConfig(
+    config = libspu.RuntimeConfig(
         protocol=libspu.ProtocolKind.SEMI2K,
         field=libspu.FieldType.FM64,
         fxp_fraction_bits=fraction_bits,
     )
+    apply_runtime_options(libspu, config, options)
+    return config
+
+
+def resolve_runtime_options(
+    libspu: Any, options: Mapping[str, Any] | None
+) -> dict[str, Any]:
+    """Validate one arm's switches and return them as the values to set."""
+    resolved: dict[str, Any] = {}
+    for name, value in sorted((options or {}).items()):
+        if name not in RUNTIME_OPTION_NAMES:
+            raise SpuBackendError(
+                f"unknown SPU runtime option {name!r}; the ablation surface is "
+                + ", ".join(sorted(RUNTIME_OPTION_NAMES))
+            )
+        if name in RUNTIME_ENUM_OPTIONS:
+            members = getattr(
+                getattr(libspu.RuntimeConfig, RUNTIME_ENUM_OPTIONS[name], None),
+                "__members__",
+                None,
+            )
+            if not members:
+                raise SpuBackendError(
+                    f"libspu does not expose the {RUNTIME_ENUM_OPTIONS[name]} "
+                    f"enum that {name} needs"
+                )
+            if isinstance(value, str):
+                if value not in members:
+                    raise SpuBackendError(
+                        f"{name}={value!r} is not one of "
+                        + ", ".join(sorted(members))
+                    )
+                resolved[name] = int(members[value])
+                continue
+            resolved[name] = int(value)
+            continue
+        if name in RUNTIME_BOOL_OPTIONS:
+            resolved[name] = bool(value)
+            continue
+        try:
+            number = int(value)
+        except (TypeError, ValueError) as exc:
+            raise SpuBackendError(f"{name} must be an integer") from exc
+        if number < 0:
+            raise SpuBackendError(f"{name} must not be negative")
+        resolved[name] = number
+    return resolved
+
+
+def apply_runtime_options(
+    libspu: Any, config: Any, options: Mapping[str, Any] | None
+) -> dict[str, Any]:
+    """Set one arm's approximation switches on an already-built config."""
+    resolved = resolve_runtime_options(libspu, options)
+    for name, value in resolved.items():
+        if not hasattr(config, name):
+            raise SpuBackendError(f"this libspu has no runtime field {name!r}")
+        setattr(config, name, value)
+    return resolved
 
 
 def compile_program(
@@ -602,6 +701,10 @@ def reconstruct(libspu: Any, io: Any, shares: Sequence[Any]) -> Any:
 __all__ = [
     "CLIENT_VERIFY_DEPTH",
     "MIN_TLS_VERSION",
+    "RUNTIME_BOOL_OPTIONS",
+    "RUNTIME_ENUM_OPTIONS",
+    "RUNTIME_INT_OPTIONS",
+    "RUNTIME_OPTION_NAMES",
     "SERVER_VERIFY_DEPTH",
     "TEARDOWN_TIMEOUT_SECONDS",
     "NodeIdentity",
@@ -620,7 +723,9 @@ __all__ = [
     "load_libspu",
     "make_executable",
     "make_io",
+    "apply_runtime_options",
     "reconstruct",
+    "resolve_runtime_options",
     "runtime_config",
     "split_inputs",
     "verify_local_identity",

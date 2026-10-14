@@ -113,8 +113,17 @@ def build_manifest(
     *,
     tokenizer_dir: Path,
     required_tokens: Sequence[int],
+    fractional_bits: int | None = None,
 ) -> tuple[D7ModelManifest, Sequence[int]]:
-    """Pin the exported run, and refuse one whose files disagree with it."""
+    """Pin the exported run, and refuse one whose files disagree with it.
+
+    ``fractional_bits`` is D8's ablation arm: the export records the width its
+    calibration chose, and an ablation run may pin the session to another one.
+    The override is carried into the manifest, so the plan the nodes and the
+    client agree on describes the width that actually ran, and the export's own
+    calibrated width stays visible beside it as
+    ``export_precision_plan_hash``.
+    """
     run = exported["run"]
     freeze = exported["freeze"]
     recorded = exported["model_manifest"]
@@ -158,6 +167,7 @@ def build_manifest(
         raise D7WorkspaceError(
             "the frozen-source record is incomplete: " + ", ".join(map(str, unverified))
         )
+    width = int(run["fractional_bits"]) if fractional_bits is None else int(fractional_bits)
     manifest = D7ModelManifest(
         model_version=model_version,
         model_hash=bundle.model_hash,
@@ -170,7 +180,7 @@ def build_manifest(
         num_heads=config.n_head,
         intermediate_size=config.intermediate_size,
         vocab_size=len(candidates),
-        fractional_bits=int(run["fractional_bits"]),
+        fractional_bits=width,
     )
     return manifest, candidates
 
@@ -190,6 +200,7 @@ def _node_config(
     kas_public_key: str,
     authority_public_key: str,
     weights_path: Path,
+    runtime_options: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     identity = credentials[role]
     peers = [other for other in ROLES if other != role]
@@ -239,6 +250,9 @@ def _node_config(
         "connect_retry_times": 240,
         "connect_retry_interval_ms": 1000,
         "spill_session_state": True,
+        # Empty for every accepted run; D8's ablation arms fill it with the
+        # named runtime approximation switches they move.
+        "runtime_options": dict(runtime_options or {}),
     }
 
 
@@ -256,6 +270,7 @@ def _client_config(
     kas_public_key: str,
     authority_public_key: str,
     root: Path,
+    runtime_options: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
         "config_version": "a122-d7-client-v1",
@@ -307,6 +322,11 @@ def _client_config(
         "kas_public_key": kas_public_key,
         "client_authority_public_key": authority_public_key,
         "out_dir": str(root / "out" / CLIENT),
+        # The client's own IO runtime is built from this. It has to agree with
+        # the nodes on the fixed-point width, which is already in the plan, and
+        # it mirrors the approximation switches so the three sides describe one
+        # runtime rather than two.
+        "runtime_options": dict(runtime_options or {}),
     }
 
 
@@ -325,11 +345,18 @@ def build_workspace(
     share_epoch: int = 1,
     length_bound: int = D7_LENGTH_BOUND,
     splitter: Callable[[Any], Sequence[str]] | None = None,
+    fractional_bits: int | None = None,
+    runtime_options: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Create the whole D7 workspace and return its manifest.
 
     ``splitter`` is the only part that needs the SPU runtime; a test can pass
     its own and exercise everything else.
+
+    ``fractional_bits`` and ``runtime_options`` are D8's ablation arms: an arm
+    pins the session to another fixed-point width, or moves a named runtime
+    approximation switch, and everything else -- the tensors, the geometry, the
+    prompt, the plan shape -- is the accepted run's own.
     """
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
@@ -347,7 +374,9 @@ def build_workspace(
         exported,
         tokenizer_dir=Path(tokenizer_dir),
         required_tokens=prompt_ids,
+        fractional_bits=fractional_bits,
     )
+    options = dict(runtime_options or {})
     geometry = D7Config(
         sequence=manifest.sequence,
         layers=manifest.layers,
@@ -433,6 +462,7 @@ def build_workspace(
                 kas_public_key=kas_key.public_key,
                 authority_public_key=authority.public_key,
                 weights_path=share_paths[role],
+                runtime_options=options,
             ),
         )
     client_config_path = configs / f"{CLIENT}.json"
@@ -451,6 +481,7 @@ def build_workspace(
             kas_public_key=kas_key.public_key,
             authority_public_key=authority.public_key,
             root=root,
+            runtime_options=options,
         ),
     )
     write_json(
@@ -475,6 +506,13 @@ def build_workspace(
         "session_dirs": {role: f"{session_root}/{role}" for role in ROLES},
         "plan": plan.to_dict(),
         "model": manifest.to_dict(),
+        # What this session actually ran with, next to what the export's own
+        # calibration chose. They are equal unless an ablation arm moved one.
+        "runtime": {
+            "fractional_bits": int(manifest.fractional_bits),
+            "export_fractional_bits": int(exported["run"]["fractional_bits"]),
+            "options": dict(options),
+        },
         "prompt_tokens": list(prompt_ids),
         "candidate_tokens": list(candidate_tokens),
         "export": {
@@ -533,6 +571,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--max-new-tokens", type=int, default=D7_MAX_NEW_TOKENS)
     parser.add_argument("--session-root", default=None)
     parser.add_argument("--client-dir", type=Path, default=None)
+    parser.add_argument(
+        "--fractional-bits",
+        type=int,
+        default=None,
+        help="pin the session to another fixed-point width (D8 ablation arm)",
+    )
+    parser.add_argument(
+        "--runtime-options",
+        default=None,
+        help="JSON object of named SPU runtime approximation switches",
+    )
     args = parser.parse_args(argv)
     cluster = json.loads(Path(args.cluster_file).read_text(encoding="utf-8"))
     manifest = build_workspace(
@@ -545,6 +594,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         max_new_tokens=args.max_new_tokens,
         session_root=args.session_root,
         client_dir=args.client_dir,
+        fractional_bits=args.fractional_bits,
+        runtime_options=(
+            json.loads(args.runtime_options) if args.runtime_options else None
+        ),
     )
     print(
         json.dumps(

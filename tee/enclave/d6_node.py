@@ -199,6 +199,7 @@ class D6NodeConfig:
     connect_retry_times: int = 120
     connect_retry_interval_ms: int = 500
     spill_session_state: bool = True
+    runtime_options: dict[str, Any] = field(default_factory=dict)
 
     @staticmethod
     def plan_from_dict(document: Mapping[str, Any]) -> Any:
@@ -267,6 +268,7 @@ class D6NodeConfig:
                 spill_session_state=bool(
                     document.get("spill_session_state", True)
                 ),
+                runtime_options=dict(document.get("runtime_options") or {}),
             )
         except D6NodeError:
             raise
@@ -772,6 +774,7 @@ def run_node(
         identity=config.identity,
         programs=list(programs.programs),
         fraction_bits=config.plan.fractional_bits,
+        runtime_options=dict(config.runtime_options),
         present_client_certificate=config.present_client_certificate,
     )
     stop_event = threading.Event()
@@ -803,6 +806,12 @@ def run_node(
                 "link_seconds": link_seconds,
                 "weight_tensors": sorted(weight_shares),
                 "session_dir": str(config.session_dir),
+                # D8's ablation arms are only real if the node says which
+                # runtime approximation settings it actually opened with.
+                "runtime": {
+                    "fraction_bits": runner.fraction_bits,
+                    "options": dict(runner.runtime_options),
+                },
             },
             ensure_ascii=True,
             sort_keys=True,

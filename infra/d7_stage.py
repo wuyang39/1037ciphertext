@@ -94,6 +94,8 @@ def stage(
     session_root: str | None = None,
     max_new_tokens: int | None = None,
     splitter: Callable[[Any], Sequence[str]] | None = None,
+    fractional_bits: int | None = None,
+    runtime_options: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Provision the run, then write one tarball per node.
 
@@ -110,6 +112,10 @@ def stage(
         kwargs["max_new_tokens"] = int(max_new_tokens)
     if splitter is not None:
         kwargs["splitter"] = splitter
+    if fractional_bits is not None:
+        kwargs["fractional_bits"] = int(fractional_bits)
+    if runtime_options:
+        kwargs["runtime_options"] = dict(runtime_options)
     manifest = build_workspace(
         root,
         run_id=run_id,
@@ -191,6 +197,9 @@ def stage(
         "candidate_size": len(manifest["candidate_tokens"]),
         "prompt_tokens": manifest["prompt_tokens"],
         "plan": manifest["plan"],
+        # The ablation arm this staging was built for, copied from the
+        # workspace so a run can be checked against the arm it claims.
+        "runtime": dict(manifest["runtime"]),
         "bundles": bundles,
         # A reader can compare the option beside each leaf directory above.
         "provisioned_children": [path.name for path in children],
@@ -211,6 +220,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--session-root", default=None)
     parser.add_argument("--max-new-tokens", type=int, default=None)
     parser.add_argument("--output", type=Path, default=None)
+    parser.add_argument("--fractional-bits", type=int, default=None)
+    parser.add_argument(
+        "--runtime-options",
+        default=None,
+        help="JSON object of named SPU runtime approximation switches",
+    )
     args = parser.parse_args(argv)
     cluster = json.loads(Path(args.cluster_file).read_text(encoding="utf-8"))
     try:
@@ -225,6 +240,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             dist_root=args.dist_root,
             session_root=args.session_root,
             max_new_tokens=args.max_new_tokens,
+            fractional_bits=args.fractional_bits,
+            runtime_options=(
+                json.loads(args.runtime_options) if args.runtime_options else None
+            ),
         )
     except (OSError, D7WorkspaceError, D7StageError, ValueError) as exc:
         print(json.dumps({"error": f"{type(exc).__name__}: {exc}"}, sort_keys=True))

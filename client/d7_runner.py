@@ -88,7 +88,15 @@ def build_client(
     )
     ledger: JobTicketLedger = build_ledger(kas_document)
     libspu, _ = load_libspu()
-    io = make_io(libspu, runtime_config(libspu, fraction_bits=plan.fractional_bits))
+    runtime_options = dict(client_document.get("runtime_options") or {})
+    io = make_io(
+        libspu,
+        runtime_config(
+            libspu,
+            fraction_bits=plan.fractional_bits,
+            options=runtime_options,
+        ),
+    )
     client = D7Client(
         plan=plan,
         model=manifest,
@@ -237,6 +245,13 @@ def run(
             except Exception:  # pragma: no cover - best effort teardown
                 pass
     result["wall_seconds"] = round(time.monotonic() - started, 3)
+    # The arm this session actually ran with, from the only side that can see
+    # both the plan it was handed and the switches its IO runtime was built
+    # from. D8's ablation table is read out of these records.
+    result["runtime"] = {
+        "fractional_bits": int(plan.fractional_bits),
+        "options": dict(client_document.get("runtime_options") or {}),
+    }
     result["reference_check"] = reference_check(
         result=result, plan=plan, exported=exported
     )
@@ -296,6 +311,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "reference_verdicts": result["reference_verdicts"],
                 "shutdown_verdicts": result["shutdown_verdicts"],
                 "wall_seconds": result["wall_seconds"],
+                "fractional_bits": result["runtime"]["fractional_bits"],
+                "runtime_options": result["runtime"]["options"],
             },
             ensure_ascii=True,
             sort_keys=True,
