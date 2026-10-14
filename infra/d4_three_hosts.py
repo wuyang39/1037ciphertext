@@ -425,12 +425,40 @@ def remote_path(value: str) -> str:
     return shlex.quote(value)
 
 
-def capture_command(*, iface: str, pcap: str, log: str) -> str:
-    """Start a background capture that survives the ssh session ending."""
+def capture_command(
+    *,
+    iface: str,
+    pcap: str,
+    log: str,
+    buffer_kib: int | None = None,
+    ports: Sequence[int] | None = None,
+) -> str:
+    """Start a background capture that survives the ssh session ending.
+
+    ``buffer_kib`` raises the kernel capture ring through ``tcpdump -B``. The
+    stock ring is capped by ``net.core.rmem_max``, a couple of hundred KiB on a
+    default image, which a run that pushes hundreds of megabytes a second
+    overruns: dropped segments leave the analyser unable to reassemble the
+    stream and the capture cannot certify it. The caller has to raise
+    ``net.core.rmem_max`` to match; ``infra.d7_three_hosts`` checks that before
+    it starts a capture and refuses to run with a ring it would overrun.
+
+    ``ports`` narrows the filter. It defaults to this run's six ports, which is
+    what the helper was written for; a driver that opens others passes its own
+    list, so the filter and the analysis that later reads the capture restrict
+    themselves to the same set instead of drifting apart.
+    """
+    ring = f"-B {int(buffer_kib)} " if buffer_kib else ""
+    filter_text = (
+        capture_filter()
+        if ports is None
+        else " or ".join(f"port {int(port)}" for port in ports)
+    )
     return (
         f"rm -f {shlex.quote(pcap)}; "
-        f"setsid nohup tcpdump -i {shlex.quote(iface)} -s 0 -w {shlex.quote(pcap)} "
-        f"{shlex.quote(capture_filter())} > {shlex.quote(log)} 2>&1 < /dev/null & "
+        f"setsid nohup tcpdump -i {shlex.quote(iface)} -s 0 {ring}"
+        f"-w {shlex.quote(pcap)} "
+        f"{shlex.quote(filter_text)} > {shlex.quote(log)} 2>&1 < /dev/null & "
         f"echo started"
     )
 

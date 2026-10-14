@@ -89,6 +89,10 @@ CLIENT_FAILED_MARKER = "A122-D7-CLIENT-FAILED"
 DEFAULT_PROMPT = "the cipher key is secret"
 SHARE_PORT = 47890
 D7_PORTS = (47100, 47101, 47102, 47200, 47201, 47202, SHARE_PORT)
+# The D7 traffic is roughly a gigabyte per host in a single decode, so the
+# kernel's stock capture ring is overrun in under a millisecond. Ask for 256 MiB
+# and check ``net.core.rmem_max`` can grant it before the run starts.
+CAPTURE_BUFFER_KIB = 262144
 REVEAL_SCAN = "d7-reveal-scan.json"
 README = "README.md"
 EXCLUSION_NOTE = (
@@ -106,6 +110,43 @@ def session_root(run_id: str) -> str:
 
 def capture_filter() -> str:
     return " or ".join(f"port {port}" for port in D7_PORTS)
+
+
+def capture_headroom_error(rmem_max: int, *, buffer_kib: int) -> str | None:
+    """Return why the host cannot hold the capture ring, or ``None`` if it can.
+
+    ``tcpdump -B`` only sets ``SO_RCVBUF``; the kernel silently clamps it to
+    ``net.core.rmem_max``. A clamped ring overruns on the D7 volume, and a
+    capture with holes cannot certify the stream it missed, so this fails the
+    run instead of sealing a capture that would be read as a violation later.
+    """
+    wanted = int(buffer_kib) * 1024
+    if rmem_max >= wanted:
+        return None
+    return (
+        f"net.core.rmem_max is {rmem_max} bytes but the capture ring wants "
+        f"{wanted}; raise it first, e.g. "
+        f"sudo sysctl -w net.core.rmem_max={wanted}"
+    )
+
+
+def assert_capture_headroom(
+    transport: Any, routes: Mapping[str, Any], *, buffer_kib: int
+) -> None:
+    """Refuse to start a capture the host's kernel would clamp."""
+    for role in ROLES:
+        status, body, err = transport.run(
+            routes[role], "cat /proc/sys/net/core/rmem_max"
+        )
+        text = body.strip().splitlines()[-1] if body.strip() else ""
+        if status != 0 or not text.isdigit():
+            raise ThreeHostError(
+                f"{role}: could not read net.core.rmem_max "
+                f"(status {status}, {err.strip()[:200]})"
+            )
+        problem = capture_headroom_error(int(text), buffer_kib=buffer_kib)
+        if problem is not None:
+            raise ThreeHostError(f"{role}: {problem}")
 
 
 def _client_command(
@@ -870,9 +911,19 @@ def run_three_hosts(
                 "sudo -n setcap cap_net_raw,cap_net_admin+eip $(command -v tcpdump)",
                 check=False,
             )
+        assert_capture_headroom(
+            transport, role_routes, buffer_kib=CAPTURE_BUFFER_KIB
+        )
+        for role in ROLES:
             transport.start_background(
                 role_routes[role],
-                capture_command(iface=iface, pcap=pcaps[role], log=cap_logs[role]),
+                capture_command(
+                    iface=iface,
+                    pcap=pcaps[role],
+                    log=cap_logs[role],
+                    buffer_kib=CAPTURE_BUFFER_KIB,
+                    ports=D7_PORTS,
+                ),
             )
         time.sleep(2.0)
         kill_nodes(transport, role_routes, pattern=NODE_PATTERN)
@@ -942,7 +993,7 @@ def run_three_hosts(
             analysis = (
                 f"cd {remote_path(repo)} && {NO_BYTECODE} PYTHONPATH=. "
                 f"{remote_path(python)} -m infra.pcap_tls {shlex.quote(pcaps[role])} "
-                f"--d4-ports"
+                + " ".join(f"--port {port}" for port in D7_PORTS)
             )
             _status, body, _err = transport.run(
                 role_routes[role], analysis, timeout=1800
@@ -1196,13 +1247,16 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 __all__ = [
+    "CAPTURE_BUFFER_KIB",
     "CLIENT_MARKER",
     "D7_PORTS",
     "DEFAULT_PROMPT",
     "MODULE",
     "NODE_NAME",
     "SHARE_PORT",
+    "assert_capture_headroom",
     "capture_filter",
+    "capture_headroom_error",
     "main",
     "run_three_hosts",
     "session_root",

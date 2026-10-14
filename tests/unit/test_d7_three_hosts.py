@@ -8,6 +8,7 @@ so those are pinned here rather than discovered after a sign-and-run cycle.
 from __future__ import annotations
 
 import re
+import shlex
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -15,14 +16,22 @@ import pytest
 
 import tee.enclave.d6_node as d6_node
 import tee.enclave.d7_node as d7_node
-from infra.d4_three_hosts import ROLES, enclave_sign_command
+from infra.d4_three_hosts import (
+    ROLES,
+    ThreeHostError,
+    capture_command,
+    enclave_sign_command,
+)
 from infra.d7_three_hosts import (
+    CAPTURE_BUFFER_KIB,
     D7_PORTS,
     DONE_MARKER,
     MODULE,
     NODE_PATTERN,
     READY_MARKER,
+    assert_capture_headroom,
     capture_filter,
+    capture_headroom_error,
     session_root,
 )
 
@@ -76,6 +85,72 @@ def test_the_capture_covers_every_port_the_run_opens() -> None:
     filter_text = capture_filter()
     for port in D7_PORTS:
         assert f"port {port}" in filter_text
+
+
+def test_the_capture_filter_is_the_one_the_command_actually_uses() -> None:
+    """The driver declares its ports; the filter and the analysis must agree.
+
+    The capture helper used to build its filter from the D4 six-port list, so a
+    run that opened more ports was analysed against a set it had never filtered
+    on. Both sides now come from ``D7_PORTS``.
+    """
+    command = capture_command(
+        iface="eth0",
+        pcap="/tmp/p.pcap",
+        log="/tmp/p.log",
+        buffer_kib=CAPTURE_BUFFER_KIB,
+        ports=D7_PORTS,
+    )
+    assert shlex.quote(capture_filter()) in command
+
+
+def test_the_capture_ring_is_refused_when_the_kernel_would_clamp_it() -> None:
+    """``tcpdump -B`` is silently clamped, so a small ring has to stop the run.
+
+    The D7 decode pushes about a gigabyte through each host in seconds. A ring
+    clamped to the stock ``net.core.rmem_max`` drops segments, the analyser
+    cannot reassemble the stream, and the sealed capture reads as a violation
+    that never happened. Checking first turns that into a message instead.
+    """
+    wanted = CAPTURE_BUFFER_KIB * 1024
+    assert capture_headroom_error(wanted, buffer_kib=CAPTURE_BUFFER_KIB) is None
+    assert capture_headroom_error(wanted + 1, buffer_kib=CAPTURE_BUFFER_KIB) is None
+    problem = capture_headroom_error(wanted - 1, buffer_kib=CAPTURE_BUFFER_KIB)
+    assert problem is not None
+    assert str(wanted) in problem
+    # The stock 212992-byte cap is the case the check exists for.
+    assert capture_headroom_error(212992, buffer_kib=CAPTURE_BUFFER_KIB) is not None
+
+
+class _FakeTransport:
+    """A transport that answers every host with the same ``rmem_max``."""
+
+    def __init__(self, body: str, status: int = 0) -> None:
+        self.body = body
+        self.status = status
+        self.commands: list[str] = []
+
+    def run(self, _route: object, command: str, **_kwargs: object) -> tuple[int, str, str]:
+        self.commands.append(command)
+        return self.status, self.body, ""
+
+
+def test_a_host_with_a_clamped_ring_stops_the_run_before_the_capture() -> None:
+    routes = {role: object() for role in ROLES}
+    assert_capture_headroom(
+        _FakeTransport(f"{CAPTURE_BUFFER_KIB * 1024}\n"),
+        routes,
+        buffer_kib=CAPTURE_BUFFER_KIB,
+    )
+    with pytest.raises(ThreeHostError, match="rmem_max"):
+        assert_capture_headroom(
+            _FakeTransport("212992\n"), routes, buffer_kib=CAPTURE_BUFFER_KIB
+        )
+    # A host that cannot be read is not assumed fine either.
+    with pytest.raises(ThreeHostError, match="could not read"):
+        assert_capture_headroom(
+            _FakeTransport("", status=1), routes, buffer_kib=CAPTURE_BUFFER_KIB
+        )
 
 
 def test_the_enclave_template_carries_the_session_root() -> None:

@@ -110,6 +110,16 @@ def test_capture_and_node_commands_quote_their_paths() -> None:
     assert "setsid nohup tcpdump -i eth0" in capture
     assert "port 47100 or port 47101 or port 47102" in capture
     assert "port 47200 or port 47201 or port 47202" in capture
+
+
+def test_capture_command_can_ask_for_a_bigger_kernel_ring() -> None:
+    """A capture that overruns its ring cannot certify the stream it missed."""
+    default = capture_command(iface="eth0", pcap="/tmp/p.pcap", log="/tmp/p.log")
+    assert "-B " not in default
+    sized = capture_command(
+        iface="eth0", pcap="/tmp/p.pcap", log="/tmp/p.log", buffer_kib=262144
+    )
+    assert "-s 0 -B 262144 -w /tmp/p.pcap" in sized
     node = node_command(
         python="/home/u/venv/bin/python",
         repo="/home/u/repo",
