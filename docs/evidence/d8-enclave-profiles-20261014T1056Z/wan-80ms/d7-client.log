@@ -1,0 +1,2 @@
+{"generated_text": " secret secret secret", "generated_tokens": [3200, 3200, 3200], "negative_verdicts": "passed", "prompt_tokens": [1169, 38012, 1994, 318, 3200], "reference_verdicts": "passed", "session_id": "72c25a4620da4caa128c2e27c40af3b179149c67b290bcf98a15d63cb9409146", "shutdown_verdicts": "passed", "wall_seconds": 274.871, "worst_max_abs_error": 0.06563760520012352}
+A122-D7-CLIENT-DONE

@@ -1,0 +1,63 @@
+{
+  "exit_status": 0,
+  "expect_absent": [
+    "/dev/shm/a122-d7/d8-enclave-profiles-20261014T1056Z-wan-40ms/P0",
+    "/dev/shm/a122-d7/d8-enclave-profiles-20261014T1056Z-wan-40ms/P1",
+    "/dev/shm/a122-d7/d8-enclave-profiles-20261014T1056Z-wan-40ms/P2"
+  ],
+  "expect_empty": [
+    "/dev/shm/a122-d7/d8-enclave-profiles-20261014T1056Z-wan-40ms"
+  ],
+  "file_hits": [],
+  "findings": [],
+  "journal": {
+    "available": true,
+    "bytes_searched": 3844,
+    "hits": []
+  },
+  "journal_hits": [],
+  "not_empty": [],
+  "probes": [
+    "CICAAxqAgAMVzZOob/zD+iJBR9sRp3PA",
+    "CICAAxqAgANDKukSTRxjGacQUseScZQc",
+    "CICAAxqAgANrCz7pc/qfuSx40ig0oSQP",
+    "CICAAxqAgAO1qhAWPSERQFFPe0BVCyqU",
+    "CICAAxqAgAO31oBEQ+fY61boYl1b5/ci",
+    "CICAAxqAgAOOFgJ4Qsu2lr37k6swsCRs",
+    "CICAAxqAgAOqQJntE59BXl5YWwQ8Tt9X",
+    "CICAAxqAgAPQdmKaqZUHC/nlDFCTAfw7",
+    "CICAAxqAgAPtF68AT+ROBoZyrpZ2U7Fc",
+    "CICCBBqAggRRjS0OEHBuKcafOpckXswM",
+    "CICCBBqAggRcbWW0obLZO6aG/RtZ7Jmh",
+    "CICCBBqAggRnAR45BJrj5kzCXdZm3Db7",
+    "CICCBBqAggS9k0ug8hcQuL5wFzfQBlai",
+    "CICCBBqAggSgsoCSaau7mByUoswPM/HY",
+    "CICCBBqAggStjluoIn0Y3aFmIxSnjP9P",
+    "CICCBBqAggT3Az+jO9AN57kS38//hmYO",
+    "CICCBBqAggT5S2E0krpggJip/1yJ8Ncr",
+    "CICCBBqAggTy3oZR/XeBHnzvrTELm91Q"
+  ],
+  "process_hits": [],
+  "roots": [
+    "/dev/shm/a122-d7/d8-enclave-profiles-20261014T1056Z-wan-40ms",
+    "/tmp",
+    "/home/jiahao/a122-d7/three/workspace/out",
+    "/var/log"
+  ],
+  "roots_that_exist": [
+    "/dev/shm/a122-d7/d8-enclave-profiles-20261014T1056Z-wan-40ms",
+    "/tmp",
+    "/home/jiahao/a122-d7/three/workspace/out",
+    "/var/log"
+  ],
+  "skipped": [
+    "/home/jiahao/a122-d7/three/workspace/out/C/client-result.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P0/node-status.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P1/node-status.json",
+    "/home/jiahao/a122-d7/three/workspace/out/P2/node-status.json",
+    "/tmp/d8-enclave-profiles-20261014T1056Z-wan-40ms-P0-probes.json",
+    "/tmp/d8-enclave-profiles-20261014T1056Z-wan-40ms-P0-hygiene.json"
+  ],
+  "still_present": [],
+  "verdict": "clean"
+}

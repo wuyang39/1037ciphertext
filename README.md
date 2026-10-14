@@ -16,7 +16,10 @@
 [`docs/d3-encfs-acceptance.md`](docs/d3-encfs-acceptance.md)、
 [`docs/d3-kas-release-acceptance.md`](docs/d3-kas-release-acceptance.md)、
 [`docs/d4-acceptance.md`](docs/d4-acceptance.md)、
-[`docs/d5-acceptance.md`](docs/d5-acceptance.md)。
+[`docs/d5-acceptance.md`](docs/d5-acceptance.md)、
+[`docs/d6-acceptance.md`](docs/d6-acceptance.md)、
+[`docs/d7-acceptance.md`](docs/d7-acceptance.md)、
+[`docs/d8-acceptance.md`](docs/d8-acceptance.md)。
 
 当前已经冻结的 canonical JSON、REPORTDATA 和 KAS 接口见
 [`docs/protocol-baseline.md`](docs/protocol-baseline.md)。

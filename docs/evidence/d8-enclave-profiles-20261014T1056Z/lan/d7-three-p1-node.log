@@ -1,0 +1,1019 @@
+Gramine is starting. Parsing TOML manifest file, this may take some time...
+warning: Could not set up Invariant TSC (CPU is too old or you run on a VM that does not expose corresponding CPUID leaves). This degrades performance.
+-----------------------------------------------------------------------------------------------------------------------
+Gramine detected the following insecure configurations:
+
+  - loader.log_level = warning|debug|trace|all (verbose log level, may leak information)
+  - loader.insecure__use_cmdline_argv = true   (forwarding command-line args from untrusted host to the app)
+  - sgx.allowed_files = [ ... ]                (some files are passed through from untrusted host without verification)
+
+Gramine will continue application execution, but this configuration must not be used in production!
+-----------------------------------------------------------------------------------------------------------------------
+
+[P1:T1:] error: Mounting file:/dev/shm/a122-d7/d8-enclave-profiles-20261014T1056Z-lan may expose unsanitized, unsafe files to unsuspecting application. Gramine will continue application execution, but this configuration is not recommended for use in production!
+[P1:T1:python3.11] warning: Unsupported system call rseq
+[P1:T1:python3.11] warning: Unsupported system call clone3
+W1014 10:58:14.230467     1     0 external/brpc~/src/bvar/default_variables.cpp:434] Fail to open /proc/self/io: No such file or directory
+[P1:T1:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call prctl
+E1014 10:58:14.415570     2     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+W1014 10:58:15.282616     2     0 external/brpc~/src/bvar/default_variables.cpp:281] Fail to open /proc/loadavg: No such file or directory
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T1:python3.11] warning: Unsupported system call mremap
+[P1:T1:python3.11] warning: Unsupported system call mremap
+[P1:T1:python3.11] warning: Unsupported system call mremap
+[P1:T1:python3.11] warning: Unsupported system call mremap
+[P1:T1:python3.11] warning: Unsupported system call mremap
+[P1:T1:python3.11] warning: Unsupported system call mremap
+[P1:T1:python3.11] warning: Unsupported system call mremap
+[P1:T1:python3.11] warning: Unsupported system call mremap
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T4:python3.11] warning: Unsupported system call prctl
+E1014 10:58:18.653793     4     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T6:python3.11] warning: Unsupported system call prctl
+E1014 10:58:18.777341     6     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T5:python3.11] warning: Unsupported system call prctl
+E1014 10:58:18.789738     5     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T7:python3.11] warning: Unsupported system call prctl
+E1014 10:58:18.804981     7     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T8:python3.11] warning: Unsupported system call prctl
+E1014 10:58:18.854960     8     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T16:python3.11] warning: Unsupported system call prctl
+E1014 10:58:18.885322    16     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T9:python3.11] warning: Unsupported system call prctl
+E1014 10:58:18.989104     9     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T10:python3.11] warning: Unsupported system call prctl
+E1014 10:58:19.008374    10     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T12:python3.11] warning: Unsupported system call prctl
+E1014 10:58:19.034106    12     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T11:python3.11] warning: Unsupported system call prctl
+E1014 10:58:19.074722    11     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T13:python3.11] warning: Unsupported system call prctl
+E1014 10:58:19.105677    13     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T17:python3.11] warning: Unsupported system call prctl
+E1014 10:58:19.230837    17     0 external/brpc~/src/butil/threading/platform_thread_linux.cc:73] prctl(PR_SET_NAME): Function not implemented
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+A122-D7-NODE-READY {"identity_sha256": "fe7bc6f6451aeec09981564438485d6ad8df09263c3e6eb530f98d23ea7f0958", "kv_max_layers": 1, "link_seconds": 9.67, "peer_certificates": {"P0": "d8e1f0ae5dfaadac2cddfa57be604f03b0b6fbd82594c65dc5b305ac69f16525", "P2": "3c9f66dbdc4304ed8bc8bf8751404853a97200ac0f260c14217fb231be827d8d"}, "programs": ["step-4", "step-5", "step-6"], "rank": 1, "role": "P1", "run_id": "d8-enclave-profiles-20261014T1056Z-lan", "session_dir": "/dev/shm/a122-d7/d8-enclave-profiles-20261014T1056Z-lan/P1", "share_port": 47201, "weight_tensors": ["layer_0.attn.k.bias", "layer_0.attn.k.weight", "layer_0.attn.proj.bias", "layer_0.attn.proj.weight", "layer_0.attn.q.bias", "layer_0.attn.q.weight", "layer_0.attn.v.bias", "layer_0.attn.v.weight", "layer_0.ln_1.bias", "layer_0.ln_1.weight", "layer_0.ln_2.bias", "layer_0.ln_2.weight", "layer_0.mlp.fc.bias", "layer_0.mlp.fc.weight", "layer_0.mlp.proj.bias", "layer_0.mlp.proj.weight", "lm_head.bias", "lm_head.weight", "ln_f.bias", "ln_f.weight", "position_embedding.weight", "token_embedding.weight"]}
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T3:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[2026-10-14 10:58:43.933] [info] [thread_pool.cc:30] Create a fixed thread pool with size 3
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+Emulating a raw syscall instruction. This degrades performance, consider patching your application to use Gramine syscall API.
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T21:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T20:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T20:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T19:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T3:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T18:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T24:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T24:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T24:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T24:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T2:python3.11] warning: Unsupported system call getrusage
+[P1:T3:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+A122-D7-NODE-DONE P1
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG
+[P1:T1:python3.11] warning: Ignoring FUTEX_CLOCK_REALTIME flag
+[P1:T1:python3.11] warning: Non-private futexes are not supported, assuming implicit FUTEX_PRIVATE_FLAG

@@ -133,14 +133,27 @@ D4 已完成项的记录见 [d4-acceptance.md](d4-acceptance.md)，证据在
   1028 候选），见 [d7-acceptance.md](d7-acceptance.md)。
 - [x] `model_hash`、tokenizer、`precision_plan`、epoch、Ticket 全部绑定。五类
   篡改/重放负例（含混用模型 manifest、重放 JobTicket）在进入 MPC 前全部被拒。
-- [ ] 每项优化有开/关对照，报告 token 一致率、误差、延迟、通信量、内存和安全回归。
-- [ ] 原始 trace 可由固定脚本重算图表。
+- [x] 报告 token 一致率、误差、延迟、通信量、内存和安全回归。三档网络下各跑
+  一遍同一份工作负载，逐档给出客户端整段与逐步延迟、三个节点自报的单步耗时、
+  每台实例自己分析的线上流量、宿主 CPU 与可用内存、enclave RSS 与 CPU 秒，
+  以及 token/Argmax 一致、五类负例全拒、清洁度与 close 覆写干净这些安全回归
+  （运行 `d8-enclave-profiles-20261014T1056Z`，见 [d8-acceptance.md](d8-acceptance.md)）。
+- [ ] **每项优化有开/关对照。未做。** D7 冻结的那个程序没有软近似或量化的
+  运行时开关，"打开/关闭"需要第二个冻结程序与第二组份额；本次只量了同一份
+  程序在三档网络下的表现。缺口见 [d8-acceptance.md](d8-acceptance.md) 第 5 节。
+- [x] 原始 trace 可由固定脚本重算图表。摘要、报告与运行说明由
+  `infra/d8_three_hosts.py --rebuild` 从三档 trace 原地重算，重算前后三个文件
+  逐字节相同（运行 `d8-enclave-profiles-20261014T1056Z`，见
+  [d8-acceptance.md](d8-acceptance.md) 第 4 节）。
 
 ## D9-D10 交付
 
 - [ ] P0/P1/P2 使用独立账号、管理员、密钥权限、安全组和审计域。三节点验收已用
   独立实例完成，账号/安全组隔离的审计证据仍待补。
-- [ ] 测试 LAN、`100 Mbps/40 ms`、`100 Mbps/80 ms`。属于 D8，未执行。
+- [x] 测试 LAN、`100 Mbps/40 ms`、`100 Mbps/80 ms`。三档各跑一遍完整流程，
+  延迟与速率由 `tc` 注入在每台的出向上，实测往返 80.16 ms / 160.15 ms，
+  客户端整段 16.534 s / 164.21 s / 274.871 s（运行
+  `d8-enclave-profiles-20261014T1056Z`，见 [d8-acceptance.md](d8-acceptance.md)）。
 - [x] 从新机器按安装手册部署一次。本机空目录演练已通过
   （`infra/d10_rehearsal.py`，`verdict=runs-without-patching`）；真实新机器
   部署仍待云账号恢复后补。

@@ -34,7 +34,12 @@
 > 生成 3 个 token、逐步安全 Argmax 与客户端重建 logits 一致、五类负例全拒、
 > close 后会话目录被覆写删除、三份抓包 `tls13_only` 且空洞 0），见
 > [d7-acceptance.md](d7-acceptance.md)；受限几何是 **1 层 + 1028 候选**，不写
-> "整个 GPT-2"。D8 及之后仍待执行；D4 还差
+> "整个 GPT-2"。D8 的网络档位与资源实测随后也在同一套栈上跑完（运行
+> `d8-enclave-profiles-20261014T1056Z`：LAN、每台出向 40 ms、80 ms 三档各跑
+> 一遍完整流程，客户端整段 16.5 s / 164.2 s / 274.9 s，三档的 token 与误差
+> 一致，九次节点运行的清洁度、close 覆写与抓包判决都干净），见
+> [d8-acceptance.md](d8-acceptance.md)；**开/关消融没有做**（冻结程序没有
+> 运行时开关），也没有每进程 EPC 计数。D9 及之后仍待执行；D4 还差
 > 真实 attestation 放行，
 > 以及把 staging 固化成一条命令（三台共享同一份受测树已经跑通，运行
 > `d4-enclave-shared-3host-20261013T1715Z` 给出单一 MRENCLAVE）。
@@ -48,7 +53,7 @@
 | D5 | secure embedding、QKV、causal attention、稳定 Softmax、A*V、残差、LayerNorm、FFN、GELU、Argmax、脱敏 trace | 三个 `gramine-sgx` enclave 内执行完整 Block、真实 secure nonlinear operator、enclave 内通信 profile 均已通过（运行 `d5-enclave-3host-20261013T1057Z`，38/38、溢出 0、无生产 reveal）；剩余正式模型权重（D7）与端到端自回归（D6） |
 | D6 | Session runtime、ResultFrame、三帧一致性与篡改拒绝、KV cache、secure wipe | 三个 enclave 内的端到端自回归、五类篡改/重放负例、close 前后 tmpfs 扫描均已在三台实例通过（运行 `d6-enclave-3host-20261013T1324Z`，3 个 token、逐步 Argmax 一致、会话目录被覆写删除、扫描干净）；真实回执签名仍待 attestation 放行 |
 | D7 | 正式英文 GPT-2（`gpt2` @ `607a30d7…`）冻结复核、safetensors 读取、候选词表规则、逐张量标定、静态图、纯 Python BPE、模型份额与加密份额包均已本地跑通；程序的浮点参考在候选列上与发布版最大差 5.8e-5、3 步贪心 token 完全一致，见 [d7-model-freeze.md](d7-model-freeze.md) 与 `docs/evidence/d7-local-model-20261013T1425Z` | 三个 `gramine-sgx` enclave 内加载正式权重份额并生成 3 个 token 已通过（运行 `d7-enclave-3host-20261014T1018Z`：逐步 Argmax 与客户端重建一致、与 float64 参考最差 `max_abs_error` 0.0650、五类负例全拒、close 后会话目录被覆写删除、清洁度与 reveal 扫描干净、三份抓包 `tls13_only` 空洞 0、staged 份额跑完覆写 92,542,258 字节后删除），见 [d7-acceptance.md](d7-acceptance.md)；仍待补的是更高层数与完整词表的几何（本次受 EPC/时延/份额规模限制为 1 层 + 1028 候选，已如实写进 manifest 与证据） |
-| D8 | StagePlanner、softmax/GELU/rsqrt 近似边界、脱敏 benchmark collector、网络 profile、报告脚本 | EPC/CPU/RAM、真实延迟、通信量、开关对照和安全回归 |
+| D8 | StagePlanner、softmax/GELU/rsqrt 近似边界、脱敏 benchmark collector、网络 profile、报告脚本 | 三档网络（LAN / 每台出向 40 ms / 80 ms）、宿主 CPU 与可用内存、enclave RSS 与 CPU 秒、线上流量、逐档安全回归已在三台 enclave 上实测，报告可由固定脚本从 trace 重算（运行 `d8-enclave-profiles-20261014T1056Z`，见 [d8-acceptance.md](d8-acceptance.md)）；剩余开/关消融（冻结程序无运行时开关，需第二个冻结程序）、每进程 EPC 计数（本内核不提供该文件）、长度桶与 batch |
 | D9 | 本地负例脚本、证据采集脚本、拓扑模板、验收清单 | 三域部署、独立账号/安全组、pcap、宿主机材料演示、离线复现 |
 | D10 | 安装手册、[正式模型卡](model-card-gpt2.md)、CycloneDX SBOM 生成器、[结论映射表](conclusion-map.md)、确定性 release 构建（`--tracked-only`）、空目录演练脚本、仓库密钥扫描与实例释放探测均已本地跑通，见 [d10-release-acceptance.md](d10-release-acceptance.md) 与 `docs/evidence/d10-release-20261013T144830Z` | 真实云账号的 15 分钟答辩演练、费用中心无持续计费确认（人工输入） |
 
