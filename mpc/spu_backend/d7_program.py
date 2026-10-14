@@ -316,7 +316,12 @@ def _emit_block(
     return emitter.assign("ho", f"mhlo.add {residual}, {ffn} : {matrix}")
 
 
-def build_gpt2_program(config: D7Config, *, decode_row: int | None = None) -> SpuProgram:
+def build_gpt2_program(
+    config: D7Config,
+    *,
+    decode_row: int | None = None,
+    name: str | None = None,
+) -> SpuProgram:
     """The whole decoding step: private embedding, every block, head, Argmax.
 
     ``decode_row`` is the context position the step predicts from. A prompt is
@@ -326,6 +331,10 @@ def build_gpt2_program(config: D7Config, *, decode_row: int | None = None) -> Sp
     partly used are the same computation; the second one lets one fixed window
     width serve every step of a session. Only the logits at ``decode_row`` reach
     the Argmax, so the unused rows cannot influence the token.
+
+    ``name`` lets a node host one program per decode row -- the row is a
+    constant baked into the slice, so each row is a different program and needs
+    a different name in the runtime's program table.
     """
     row = config.sequence - 1 if decode_row is None else int(decode_row)
     if not 0 <= row < config.sequence:
@@ -425,7 +434,7 @@ def build_gpt2_program(config: D7Config, *, decode_row: int | None = None) -> Sp
     )
     inputs = program_inputs(config)
     return SpuProgram(
-        name="gpt2-step",
+        name=name or "gpt2-step",
         text=_function(emitter, inputs, outputs, [current, logits, token]),
         inputs=inputs,
         outputs=outputs,

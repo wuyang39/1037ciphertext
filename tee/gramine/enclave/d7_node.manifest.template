@@ -1,0 +1,79 @@
+# A1-22 D7 enclave node manifest (gramine-sgx).
+#
+# @PLACEHOLDERS@ are substituted by infra/d7_three_hosts.py through
+# infra/d4_three_hosts.enclave_sign_command, then rendered by gramine-manifest.
+# This is the D6 manifest unchanged in structure: the GPT-2 node spills its
+# per-step state into the same host-visible session directory, loads libspu
+# from the same venv path, and mounts the same repo and workspace, so the two
+# phases differ only in the program the node compiles and the weights it
+# holds.
+#
+# The spill path is mounted from the host's /dev/shm rather than kept as an
+# enclave-private tmpfs on purpose. A single additive share is uniform on its
+# own, so what the host can read there reveals nothing, while a directory the
+# host owns makes the cleanup the acceptance measures observable from the host
+# instead of a claim about memory nobody else can look at.
+#
+# Every mount keeps the host path, so the absolute paths the node configs and
+# the runner already carry stay valid inside the enclave.
+
+libos.entrypoint = "@PYTHON@"
+
+loader.log_level = "warning"
+# @ARCH_LIBDIR@ and @USR_LIBDIR@ stay separate so the rendered paths never
+# collapse into a "/usr//lib/..." that Gramine treats as unmounted.
+loader.env.LD_LIBRARY_PATH = "/lib:@ARCH_LIBDIR@:@USR_LIBDIR@"
+loader.env.PYTHONPATH = "@REPO@:@SITE@"
+loader.env.PYTHONDONTWRITEBYTECODE = "1"
+# The LibOS starts the app with cwd "/" rather than the host working
+# directory, so without this the `-m` import would probe "/tee/__init__.py"
+# before reaching the mounted repo.
+loader.env.PYTHONSAFEPATH = "1"
+# The node loads libspu.so through this path rather than importing the spu
+# package, which keeps JAX out of the enclave.
+loader.env.A122_LIBSPU_PATH = "@LIBSPU@"
+loader.insecure__use_cmdline_argv = true
+
+sys.stack.size = "@STACK_SIZE@"
+
+sgx.debug = false
+sgx.enclave_size = "@ENCLAVE_SIZE@"
+sgx.max_threads = @MAX_THREADS@
+sgx.remote_attestation = "dcap"
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "@ARCH_LIBDIR@", uri = "file:@ARCH_LIBDIR@" },
+  { path = "@USR_LIBDIR@", uri = "file:@USR_LIBDIR@" },
+  { path = "@UV_ROOT@", uri = "file:@UV_ROOT@" },
+  { path = "@SITE@", uri = "file:@SITE@" },
+  { path = "@REPO@", uri = "file:@REPO@" },
+  { path = "@WORKSPACE@", uri = "file:@WORKSPACE@" },
+  { path = "@SESSION_ROOT@", uri = "file:@SESSION_ROOT@" },
+  { type = "tmpfs", path = "/tmp" },
+]
+
+sgx.trusted_files = [
+  "file:@PYTHON@",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:@ARCH_LIBDIR@/",
+  "file:@USR_LIBDIR@/",
+  "file:@UV_ROOT@/",
+  "file:@SITE@/",
+  "file:@LIBSPU@",
+  "file:@REPO@/",
+  "file:@WORKSPACE@/",
+]
+
+sgx.allowed_files = [
+  "file:/lib64/ld-linux-x86-64.so.2",
+  "file:@ARCH_LIBDIR@/ld-linux-x86-64.so.2",
+  # The workspace is trusted above, so only the out/ subtree is opened for
+  # writing: the role status and the client result land there and the collector
+  # reads them back on the host.
+  "file:@WORKSPACE@/out/",
+  # The session root is the only writable tree that is neither trusted nor
+  # measured: it holds per-step shares for the lifetime of one session and is
+  # emptied and removed before the node calls the session closed.
+  "file:@SESSION_ROOT@/",
+]

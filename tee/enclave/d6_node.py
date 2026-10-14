@@ -32,7 +32,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, ClassVar, Mapping, Sequence
 
 from client.session_runtime import NodeSessionRuntime
 from contracts.d6_session import (
@@ -50,7 +50,7 @@ from crypto.sm2 import SM2KeyPair
 from infra.evidence import write_json
 from kas.tickets import JobTicket, assert_ticket_matches_session, verify_job_ticket
 from mpc.secure_ops.kv_cache import SecureKVCache
-from mpc.spu_backend.d5_program import D5Config
+from mpc.spu_backend.d5_program import D5Config, SpuProgram
 from mpc.spu_backend.d6_program import build_step_program
 from mpc.spu_backend.program_runtime import SpuProgramRuntime
 from mpc.spu_backend.spu_link import (
@@ -96,8 +96,82 @@ class D6NodeError(NodeError):
 
 
 @dataclass(frozen=True)
+class SessionPrograms:
+    """The program set one node hosts and how a decoding step selects from it.
+
+    D6 runs one fixed-shape step program for the whole session, so the default
+    mapping answers every step with the same name. D7 bakes the row it predicts
+    from into each program, so a step has to name the program built for its own
+    context length; everything else about the node -- the handshake, the
+    ticket, the spill and the wipe -- is unchanged.
+    """
+
+    programs: tuple[SpuProgram, ...]
+    program_for_step: Callable[[int], str]
+    kv_max_layers: int = 1
+
+    def __post_init__(self) -> None:
+        if not self.programs:
+            raise D6NodeError("a node needs at least one program")
+        names = [program.name for program in self.programs]
+        if len(set(names)) != len(names):
+            raise D6NodeError("program names must be unique")
+        if self.kv_max_layers <= 0:
+            raise D6NodeError("the KV cache needs at least one layer")
+
+    @property
+    def names(self) -> tuple[str, ...]:
+        return tuple(program.name for program in self.programs)
+
+    @property
+    def weight_tensors(self) -> tuple[str, ...]:
+        """Every secret input the node has to hold a share of."""
+        found: list[str] = []
+        for program in self.programs:
+            for name in program.input_names:
+                if name != "history" and name not in found:
+                    found.append(name)
+        return tuple(found)
+
+    def name_for_step(self, decode_step: int) -> str:
+        name = self.program_for_step(int(decode_step))
+        if name not in set(self.names):
+            raise D6NodeError(f"no program is bound to decoding step {decode_step}")
+        return name
+
+    @classmethod
+    def fixed(cls, program: SpuProgram) -> "SessionPrograms":
+        return cls(
+            programs=(program,),
+            program_for_step=lambda step: program.name,
+            kv_max_layers=1,
+        )
+
+
+@dataclass(frozen=True)
+class SessionPayloads:
+    """The two payload shapes one session speaks, as callables.
+
+    The node's frame handling does not care which phase it is serving; only the
+    protocol tag and the field names of the step and result payloads differ, so
+    they are injected rather than branched on inside the state machine.
+    """
+
+    parse_step: Callable[[bytes], dict[str, Any]]
+    result: Callable[..., bytes]
+
+    @classmethod
+    def d6(cls) -> "SessionPayloads":
+        return cls(parse_step=parse_step_payload, result=result_payload)
+
+
+@dataclass(frozen=True)
 class D6NodeConfig:
     """Everything one D6 node needs, already validated by the orchestrator."""
+
+    # A phase that speaks its own config version and plan subclasses this and
+    # overrides the two; the field set and the validator stay shared.
+    CONFIG_VERSION: ClassVar[str] = NODE_CONFIG_VERSION
 
     run_id: str
     role: str
@@ -125,11 +199,15 @@ class D6NodeConfig:
     connect_retry_interval_ms: int = 500
     spill_session_state: bool = True
 
+    @staticmethod
+    def plan_from_dict(document: Mapping[str, Any]) -> Any:
+        return SessionPlan.from_dict(document)
+
     @classmethod
     def from_document(cls, document: Mapping[str, Any]) -> "D6NodeConfig":
         try:
-            if document.get("config_version") != NODE_CONFIG_VERSION:
-                raise D6NodeError("unknown D6 node configuration version")
+            if document.get("config_version") != cls.CONFIG_VERSION:
+                raise D6NodeError("unknown node configuration version")
             identity_document = document["identity"]
             return cls(
                 run_id=str(document["run_id"]),
@@ -156,7 +234,7 @@ class D6NodeConfig:
                 share_host=str(document["share_channel"]["host"]),
                 share_port=int(document["share_channel"]["port"]),
                 out_dir=Path(document["out_dir"]),
-                plan=SessionPlan.from_dict(document["plan"]),
+                plan=cls.plan_from_dict(document["plan"]),
                 model=ModelManifest.from_dict(document["model"]),
                 weights_path=Path(document["weights"]),
                 sm2_private_key=str(document["sm2_identity"]["private_key"]),
@@ -265,12 +343,19 @@ class SessionState:
         config: D6NodeConfig,
         runner: SpuProgramRuntime,
         weight_shares: Mapping[str, str],
+        programs: SessionPrograms | None = None,
+        payloads: SessionPayloads | None = None,
         clock: Callable[[], dt.datetime] | None = None,
         ticket_registry: set[str] | None = None,
     ) -> None:
         self.config = config
         self.runner = runner
         self.weight_shares = dict(weight_shares)
+        # ``None`` means the caller put the D6 step program into the runtime
+        # itself -- the in-process session tests do exactly that -- so the
+        # default the node keeps is the single program name D6 has always used.
+        self.programs = programs
+        self.payloads = payloads or SessionPayloads.d6()
         self.clock = clock or (lambda: dt.datetime.now(dt.timezone.utc))
         self.identity_key = SM2KeyPair.from_private_key(config.sm2_private_key)
         self.certificate = SM2Certificate.from_dict(config.sm2_certificate)
@@ -282,7 +367,8 @@ class SessionState:
             config.client_authority_public_key
         )
         self.cache = SecureKVCache(
-            max_layers=1, max_tokens=config.plan.max_new_tokens + 1
+            max_layers=(programs.kv_max_layers if programs else 1),
+            max_tokens=config.plan.max_new_tokens + 1,
         )
         self.handshake: NodeHandshake | None = None
         self.runtime: NodeSessionRuntime | None = None
@@ -380,7 +466,7 @@ class SessionState:
 
     def _graph(self, payload: bytes) -> bytes:
         """Run one decoding step and return this party's result payload."""
-        document = parse_step_payload(payload)
+        document = self.payloads.parse_step(payload)
         if self.runtime is None:
             raise D6NodeError("the session runtime is missing")
         token_budget = self.ticket.max_new_tokens if self.ticket else 0
@@ -395,7 +481,14 @@ class SessionState:
         }
         inputs["history"] = decode_share(self.runner.libspu, history)
         started = time.monotonic()
-        outputs = self.runner.run(program="step", inputs=inputs)
+        outputs = self.runner.run(
+            program=(
+                self.programs.name_for_step(int(document["decode_step"]))
+                if self.programs is not None
+                else "step"
+            ),
+            inputs=inputs,
+        )
         elapsed_ms = round((time.monotonic() - started) * 1000, 3)
         hidden_share = encode_share(outputs["hidden"])
         token_share = encode_share(outputs["token"])
@@ -418,7 +511,7 @@ class SessionState:
                 "spilled": spill,
             }
         )
-        return result_payload(
+        return self.payloads.result(
             decode_step=int(document["decode_step"]),
             token_share=token_share,
             logits_share=logits_share,
@@ -514,6 +607,8 @@ def _serve(
     config: D6NodeConfig,
     runner: SpuProgramRuntime,
     weight_shares: Mapping[str, str],
+    programs: SessionPrograms,
+    payloads: SessionPayloads,
     holder: dict[str, Any],
     stop_event: threading.Event,
     served: dict[str, int],
@@ -554,6 +649,8 @@ def _serve(
                         config=config,
                         runner=runner,
                         weight_shares=weight_shares,
+                        programs=programs,
+                        payloads=payloads,
                         ticket_registry=holder["tickets"],
                     )
                     server_hello = candidate.hello(
@@ -638,7 +735,13 @@ def block_config(config: D6NodeConfig) -> D5Config:
     )
 
 
-def run_node(config: D6NodeConfig, *, session_timeout: float = 1800.0) -> int:
+def run_node(
+    config: D6NodeConfig,
+    *,
+    programs: SessionPrograms | None = None,
+    payloads: SessionPayloads | None = None,
+    session_timeout: float = 1800.0,
+) -> int:
     config.out_dir.mkdir(parents=True, exist_ok=True)
     policy = config.policy()
     peer_fingerprints = verify_peer_certificates(
@@ -647,9 +750,10 @@ def run_node(config: D6NodeConfig, *, session_timeout: float = 1800.0) -> int:
         ca_bundle_path=config.identity.ca_bundle_path,
     )
     libspu, _ = load_libspu()
-    program = build_step_program(block_config(config))
+    programs = programs or SessionPrograms.fixed(build_step_program(block_config(config)))
+    payloads = payloads or SessionPayloads.d6()
     weight_shares = load_weight_shares(config.weights_path)
-    expected = set(program.input_names) - {"history"}
+    expected = set(programs.weight_tensors)
     missing = sorted(expected - set(weight_shares))
     if missing:
         raise D6NodeError(
@@ -659,7 +763,7 @@ def run_node(config: D6NodeConfig, *, session_timeout: float = 1800.0) -> int:
         libspu=libspu,
         policy=policy,
         identity=config.identity,
-        programs=[program],
+        programs=list(programs.programs),
         fraction_bits=config.plan.fractional_bits,
         present_client_certificate=config.present_client_certificate,
     )
@@ -670,7 +774,9 @@ def run_node(config: D6NodeConfig, *, session_timeout: float = 1800.0) -> int:
     # post-close scan can only find what this session wrote.
     if config.session_dir.exists():
         shutil.rmtree(config.session_dir, ignore_errors=True)
-    server = _serve(config, runner, weight_shares, holder, stop_event, served)
+    server = _serve(
+        config, runner, weight_shares, programs, payloads, holder, stop_event, served
+    )
 
     started = time.monotonic()
     runner.start()
@@ -682,7 +788,8 @@ def run_node(config: D6NodeConfig, *, session_timeout: float = 1800.0) -> int:
                 "run_id": config.run_id,
                 "role": config.role,
                 "rank": policy.rank,
-                "program": program.name,
+                "programs": list(programs.names),
+                "kv_max_layers": programs.kv_max_layers,
                 "share_port": config.share_port,
                 "identity_sha256": runner.identity_fingerprint["sha256"],
                 "peer_certificates": peer_fingerprints,
@@ -758,6 +865,8 @@ __all__ = [
     "REFUSED_MARKER",
     "D6NodeConfig",
     "D6NodeError",
+    "SessionPayloads",
+    "SessionPrograms",
     "SessionState",
     "block_config",
     "load_weight_shares",
