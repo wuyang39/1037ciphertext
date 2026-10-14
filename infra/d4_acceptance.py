@@ -706,6 +706,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--instance-id", default="loopback")
     parser.add_argument("--cloud-region", default="local")
     parser.add_argument("--node-timeout", type=float, default=DEFAULT_NODE_TIMEOUT)
+    parser.add_argument(
+        "--attestation-json",
+        type=Path,
+        default=None,
+        help=(
+            "JSON file holding the attestation block every node configuration "
+            "should carry; the node then refuses to open its SPU link until the "
+            "KAS has verified its own quote (provision mode)"
+        ),
+    )
     args = parser.parse_args(argv)
 
     run_id = args.run_id or f"d4-{dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
@@ -723,6 +733,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 cluster=cluster,
                 vector_count=args.vectors,
                 batch=args.batch,
+                attestation=(
+                    json.loads(args.attestation_json.read_text(encoding="utf-8"))
+                    if args.attestation_json
+                    else None
+                ),
             )
             print(json.dumps(manifest, ensure_ascii=True, sort_keys=True, indent=2))
             return 0

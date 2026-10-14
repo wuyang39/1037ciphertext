@@ -113,6 +113,7 @@ def _node_config(
     enable_ssl: bool = True,
     connect_retry_times: int = 120,
     connect_retry_interval_ms: int = 500,
+    attestation: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     identity = credentials[node.role]
     peers = {
@@ -166,6 +167,11 @@ def _node_config(
         "connect_retry_times": connect_retry_times,
         "connect_retry_interval_ms": connect_retry_interval_ms,
     }
+    if attestation is not None:
+        # The positive identity then comes from the KAS, not from the local
+        # PKI; the certificate paths above stay in the document because the
+        # negative cases still use them.
+        document["attestation"] = dict(attestation)
     return document
 
 
@@ -180,6 +186,7 @@ def build_workspace(
     cols: int = DEFAULT_COLS,
     seed: int = DEFAULT_SEED,
     release_id: str = "a122-d4",
+    attestation: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Create the whole workspace and return its manifest."""
     root = Path(root)
@@ -236,6 +243,7 @@ def build_workspace(
             batch=batch,
             rows=rows,
             cols=cols,
+            attestation=attestation,
         )
         write_json(configs_root / f"{role}.json", document)
 

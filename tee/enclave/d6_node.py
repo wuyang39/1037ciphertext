@@ -30,7 +30,7 @@ import json
 import shutil
 import threading
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Mapping, Sequence
 
@@ -78,6 +78,14 @@ from tee.enclave.node_common import (
     log,
     runtime_label,
     serve_share_channel,
+)
+from tee.enclave.attestation import (
+    ATTESTATION_DIR_NAME,
+    AttestationConfig,
+    AttestationError,
+    AttestedNodeIdentity,
+    await_peer_certificates,
+    bootstrap_node_identity,
 )
 
 
@@ -200,6 +208,9 @@ class D6NodeConfig:
     connect_retry_interval_ms: int = 500
     spill_session_state: bool = True
     runtime_options: dict[str, Any] = field(default_factory=dict)
+    # When present the node refuses to open the SPU link until the KAS has
+    # verified this enclave's own quote and issued it a short-lived identity.
+    attestation: AttestationConfig | None = None
 
     @staticmethod
     def plan_from_dict(document: Mapping[str, Any]) -> Any:
@@ -269,10 +280,15 @@ class D6NodeConfig:
                     document.get("spill_session_state", True)
                 ),
                 runtime_options=dict(document.get("runtime_options") or {}),
+                attestation=(
+                    AttestationConfig.from_document(document["attestation"])
+                    if document.get("attestation")
+                    else None
+                ),
             )
         except D6NodeError:
             raise
-        except (KeyError, TypeError, ValueError, PlanError) as exc:
+        except (KeyError, TypeError, ValueError, PlanError, AttestationError) as exc:
             raise D6NodeError(f"the node configuration is malformed: {exc}") from exc
 
     @property
@@ -752,6 +768,37 @@ def run_node(
     done_marker: str = DONE_MARKER,
 ) -> int:
     config.out_dir.mkdir(parents=True, exist_ok=True)
+    attested: AttestedNodeIdentity | None = None
+    if config.attestation is not None:
+        # Nothing below this point may run on an unattested identity: the quote
+        # has to come from the platform this process is really executing on,
+        # and the KAS has to bind this process's fresh key into it.
+        attested = bootstrap_node_identity(config.attestation, role=config.role)
+        pinned = await_peer_certificates(
+            config.attestation,
+            peer_roles=config.peer_roles,
+            pin_dir=config.attestation.private_dir / ATTESTATION_DIR_NAME / "peers",
+            ca_bundle_pem=attested.identity.ca_bundle_path.read_text(encoding="ascii"),
+        )
+        config = replace(
+            config,
+            identity=attested.identity,
+            peer_certificates=pinned,
+        )
+        log(
+            "A122-ATTESTED "
+            + json.dumps(
+                {
+                    "role": config.role,
+                    "lease_id": attested.lease_id,
+                    "expires_at": attested.expires_at,
+                    "mrenclave": attested.mrenclave,
+                    "quote_sha256": attested.quote_sha256,
+                },
+                ensure_ascii=True,
+                sort_keys=True,
+            )
+        )
     policy = config.policy()
     peer_fingerprints = verify_peer_certificates(
         policy,
@@ -806,6 +853,10 @@ def run_node(
                 "link_seconds": link_seconds,
                 "weight_tensors": sorted(weight_shares),
                 "session_dir": str(config.session_dir),
+                # Empty unless the node took its identity from a verified
+                # quote; the trace must not imply an attestation that did not
+                # happen.
+                "attestation": attested.to_evidence() if attested else None,
                 # D8's ablation arms are only real if the node says which
                 # runtime approximation settings it actually opened with.
                 "runtime": {

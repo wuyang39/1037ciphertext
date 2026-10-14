@@ -18,6 +18,13 @@ The startup path is fail-closed: a certificate whose SAN does not match the
 configured role, a peer certificate that does not chain to the KAS CA, a
 disabled TLS context, a negative BRPC verify depth, or a minimum version below
 TLS 1.3 all abort before a socket is opened.
+
+When the configuration carries an ``attestation`` block the node goes further
+and takes its whole identity from the KAS: it generates its own P-256 key,
+binds it into a platform quote, and waits for the certificate and lease the KAS
+issues for that quote before it loads SPU material or opens a socket. A missing
+quote, a quote that does not bind this process's key, a rejected release, or a
+peer map that never arrives all stop the node the same way.
 """
 
 from __future__ import annotations
@@ -30,7 +37,7 @@ import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -70,10 +77,19 @@ from tee.enclave.node_common import (
     serve_share_channel,
     wait_for_port as _wait_for_port,
 )
+from tee.enclave.attestation import (
+    ATTESTATION_DIR_NAME,
+    AttestationConfig,
+    AttestationError,
+    AttestedNodeIdentity,
+    await_peer_certificates,
+    bootstrap_node_identity,
+)
 
 
 READY_MARKER = "A122-D4-NODE-READY"
 SHUTDOWN_MARKER = "A122-D4-NODE-DONE"
+ATTESTED_MARKER = "A122-ATTESTED"
 
 
 @dataclass(frozen=True)
@@ -103,6 +119,11 @@ class NodeConfig:
     tolerance: float = DEFAULT_TOLERANCE
     connect_retry_times: int = 120
     connect_retry_interval_ms: int = 500
+    # When present the node refuses to open the SPU link until the KAS has
+    # verified this enclave's own quote and issued it a short-lived identity.
+    # The local PKI paths above stay in the document because the fail-closed
+    # cases still drive them.
+    attestation: AttestationConfig | None = None
 
     @classmethod
     def from_document(cls, document: dict[str, Any]) -> "NodeConfig":
@@ -166,8 +187,13 @@ class NodeConfig:
                 connect_retry_interval_ms=int(
                     document.get("connect_retry_interval_ms", 500)
                 ),
+                attestation=(
+                    AttestationConfig.from_document(document["attestation"])
+                    if document.get("attestation")
+                    else None
+                ),
             )
-        except (KeyError, TypeError, ValueError) as exc:
+        except (KeyError, TypeError, ValueError, AttestationError) as exc:
             raise NodeError(f"the node configuration is malformed: {exc}") from exc
 
     @property
@@ -344,6 +370,38 @@ def _verdicts(
 
 def run_node(config: NodeConfig) -> int:
     config.out_dir.mkdir(parents=True, exist_ok=True)
+    attested: AttestedNodeIdentity | None = None
+    if config.attestation is not None:
+        # Nothing below this point may run on an unattested identity. The
+        # quote has to come from the platform this process is really executing
+        # on, and the KAS has to bind this process's fresh key into it, so a
+        # host that cannot produce one stops here instead of opening a link.
+        attested = bootstrap_node_identity(config.attestation, role=config.role)
+        pinned = await_peer_certificates(
+            config.attestation,
+            peer_roles=config.peer_roles,
+            pin_dir=config.attestation.private_dir / ATTESTATION_DIR_NAME / "peers",
+            ca_bundle_pem=attested.identity.ca_bundle_path.read_text(encoding="ascii"),
+        )
+        config = replace(
+            config,
+            identity=attested.identity,
+            peer_certificates=pinned,
+        )
+        _log(
+            f"{ATTESTED_MARKER} "
+            + json.dumps(
+                {
+                    "role": config.role,
+                    "lease_id": attested.lease_id,
+                    "expires_at": attested.expires_at,
+                    "mrenclave": attested.mrenclave,
+                    "quote_sha256": attested.quote_sha256,
+                },
+                ensure_ascii=True,
+                sort_keys=True,
+            )
+        )
     policy = config.policy()
     peer_fingerprints = verify_peer_certificates(
         policy,
@@ -390,6 +448,9 @@ def run_node(config: NodeConfig) -> int:
                     "require_client_certificate": policy.require_client_certificate,
                 },
                 "link_seconds": link_seconds,
+                # Null unless the identity came from a verified quote; the
+                # ready line must not imply an attestation that did not happen.
+                "attestation": attested.to_evidence() if attested else None,
             },
             ensure_ascii=True,
             sort_keys=True,
@@ -422,6 +483,7 @@ def run_node(config: NodeConfig) -> int:
                 "peer_certificates": peer_fingerprints,
                 "link_seconds": link_seconds,
                 "teardown_finished": teardown_finished,
+                "attestation": attested.to_evidence() if attested else None,
             },
         )
         _log(f"{SHUTDOWN_MARKER} {config.role}")
@@ -625,6 +687,7 @@ def run_node(config: NodeConfig) -> int:
             "identity_sha256": runtime.identity_fingerprint["sha256"],
             "peer_certificates": peer_fingerprints,
             "teardown_finished": teardown_finished,
+            "attestation": attested.to_evidence() if attested else None,
             "batch_share_digest": sha256_bytes(
                 json.dumps(batch_trace, sort_keys=True).encode("utf-8")
             ),

@@ -188,6 +188,7 @@ def finalise_cross_host(
     captures: Mapping[str, Mapping[str, Any]],
     cloud_region: str = "cn-shanghai",
     details: Mapping[str, Any] | None = None,
+    extra_required: Iterable[str] = (),
 ) -> dict[str, Any]:
     """Assemble and seal the evidence of a three-instance run.
 
@@ -196,12 +197,15 @@ def finalise_cross_host(
     recorded in the index but stay on the instances, so the bundle ships their
     digests and the summary each host derived, and the exclusions file records
     exactly which digests a restorer has to match.
+
+    ``extra_required`` names files a variant of the run has to produce as well
+    -- the attested run adds the quotes, the policy and the issued leaves --
+    so the seal is only made over a complete bundle rather than one that
+    happens to be missing its new half.
     """
     out_dir = Path(out_dir)
-    missing = [
-        name for name in CROSS_HOST_REQUIRED_FILES
-        if not (out_dir / name).is_file()
-    ]
+    required = (*CROSS_HOST_REQUIRED_FILES, *extra_required)
+    missing = [name for name in required if not (out_dir / name).is_file()]
     if missing:
         raise D4EvidenceError(
             "the cross-host bundle is incomplete, missing: " + ", ".join(missing)
@@ -255,7 +259,7 @@ def finalise_cross_host(
         "mode": "three-instances",
         "cloud_region": cloud_region,
         "roles": {role: dict(roles[role]) for role in CROSS_HOST_ROLES},
-        "required_files": list(CROSS_HOST_REQUIRED_FILES),
+        "required_files": list(required),
         "missing_files": [],
         "evidence_complete": True,
         "grid": {

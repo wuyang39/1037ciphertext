@@ -29,7 +29,9 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime as dt
+import hashlib
 import json
 import posixpath
 import shlex
@@ -43,6 +45,8 @@ from typing import Any, Mapping, Sequence
 
 from infra.d4_evidence import (
     CROSS_HOST_ROLES,
+    write_document,
+    write_text,
     finalise_cross_host,
 )
 from infra.d4_workspace import (
@@ -54,6 +58,28 @@ from infra.d4_workspace import (
 from infra.d4_vectors import DEFAULT_COUNT
 from infra.evidence import seal_directory, verify_directory, write_json
 from infra.d4_acceptance import REFUSED_MARKER
+from infra.node_attestation import (
+    DEFAULT_KAS_PORT,
+    DEFAULT_PEERS_TIMEOUT_SECONDS,
+    EnclaveClaims,
+    NodeAttestationError,
+    assert_attested_run,
+    assert_certificates_agree,
+    attestation_block,
+    bootstrap_quote_command,
+    certificate_path,
+    collect_published_certificates,
+    kas_start_command,
+    peer_map_document,
+    peers_path,
+    read_bootstrap_claims,
+    release_policy_document,
+    run_release_id,
+    shared_attestation_dir,
+    write_release_policy,
+)
+from mpc.spu_backend.spu_link import FXP_FRACTION_BITS
+from mpc.spu_backend.spu_ops import SPU_OPERATORS
 
 
 DEFAULT_IFACE = "eth0"
@@ -86,6 +112,26 @@ D4_PORTS = (47100, 47101, 47102, 47200, 47201, 47202)
 # escaped so the pattern cannot match the shell that runs ``pkill`` itself.
 NODE_PATTERN = r"tee\.enclave\.spu_node"
 DRIVER = "P0"
+# The attested run replaces the driver-made PKI with identities the KAS issues
+# from a real quote. The KAS runs on the driver's instance, so the nodes reach
+# it over the VPC private address, and its secret material is generated there
+# and never travels.
+DEFAULT_KAS_PYTHON = "~/a122-venv/bin/python"
+DEFAULT_DCAP_VERIFIER = "~/a122-dcap/a122_dcap_verify"
+BOOTSTRAP_MARKER = "A122-QUOTE-BOOTSTRAP"
+ATTESTED_MARKER = "A122-ATTESTED"
+DCAP_BUILD_MARKER = "A122-DCAP-BUILT"
+SPU_GRID_MODEL_VERSION = "a122-d4-spu-grid"
+ATTESTED_REQUIRED_FILES: tuple[str, ...] = (
+    "d4-attest-policy.json",
+    "d4-attest-bootstrap-claims.json",
+    "d4-attest-kas-material.json",
+    "d4-attest-kas.log",
+    "d4-attest-peers.json",
+    *(f"d4-attest-bootstrap-{role.lower()}.log" for role in ("P0", "P1", "P2")),
+    *(f"d4-attest-bootstrap-{role.lower()}-dcap.json" for role in ("P0", "P1", "P2")),
+    *(f"d4-attest-{role.lower()}-cert.pem" for role in ("P0", "P1", "P2")),
+)
 # ``plaintext`` is the probe of the live listeners, not a mutated config, so it
 # is played by the probe step rather than by a driver run.
 CONFIGURED_CASES: tuple[str, ...] = tuple(
@@ -740,6 +786,7 @@ def prepare_enclave(
     return {
         "directory": enclave,
         "wrapper": ["gramine-sgx", f"{enclave}/{node_name}"],
+        "resolved": resolved,
         "measurements": dict(measurements),
         "manifest_sha256": dict(digests),
         "shared_measurement": len(distinct) == 1,
@@ -748,6 +795,586 @@ def prepare_enclave(
         "max_threads": int(max_threads),
         "stack_size": stack_size,
         "template": template.name,
+    }
+
+
+def resolve_remote_path(
+    transport: Transport, route: SSHRoute, value: str
+) -> str:
+    """Turn a ``~``-relative path into the absolute one it names on the host.
+
+    The node configurations carry absolute paths because the shell expands
+    ``$HOME`` before the provision step sees them, and a path written into an
+    enclave configuration cannot expand ``~`` afterwards. The attestation
+    block goes into those same configurations, so it needs the same absolute
+    form.
+    """
+    if not value.startswith("~"):
+        return value
+    _status, home, _err = transport.run(route, "echo $HOME")
+    home = home.strip()
+    if not home:
+        raise ThreeHostError(f"{route.role}: could not resolve the login home")
+    return home if value == "~" else home + value[1:]
+
+
+def precision_plan_hash(*, batch: int, rows: int, cols: int) -> str:
+    """The D4 grid's fixed-point and geometry plan, as one digest.
+
+    D4 has no trained-model precision plan; what it does fix is the operator
+    set, the batch geometry and the fractional width every party has to agree
+    on, so the release records those.
+    """
+    document = {
+        "operators": list(SPU_OPERATORS),
+        "batch": int(batch),
+        "rows": int(rows),
+        "cols": int(cols),
+        "fraction_bits": int(FXP_FRACTION_BITS),
+    }
+    return hashlib.sha256(
+        json.dumps(document, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
+def read_workspace_manifest(
+    transport: Transport, route: SSHRoute, workspace: str
+) -> dict[str, Any]:
+    """Read the provisioned workspace's own manifest back from the host.
+
+    The release binding needs the grid digest and the geometry the workspace
+    actually used, and the driver never computes those itself: taking them from
+    the file the provision step wrote keeps the policy tied to what runs.
+    """
+    path = f"{workspace.rstrip('/')}/workspace.json"
+    status, out, err = transport.run(
+        route, f"cat {shlex.quote(path)}", check=False
+    )
+    if status != 0:
+        raise ThreeHostError(
+            f"the workspace manifest at {path} could not be read: {err.strip()}"
+        )
+    try:
+        return json.loads(out)
+    except json.JSONDecodeError as exc:
+        raise ThreeHostError(f"the workspace manifest at {path} is not JSON") from exc
+
+
+@dataclass(frozen=True)
+class AttestationRequest:
+    """How a run hands the node identity over to the KAS."""
+
+    kas_port: int = DEFAULT_KAS_PORT
+    kas_python: str = DEFAULT_KAS_PYTHON
+    dcap_verify_bin: str = DEFAULT_DCAP_VERIFIER
+    peers_timeout_seconds: float = DEFAULT_PEERS_TIMEOUT_SECONDS
+    node_lease_ttl_seconds: int = 3600
+    challenge_ttl_seconds: int = 120
+    policy_hours: int = 6
+    peers_collect_timeout: float = 300.0
+
+    def node_block(
+        self, *, kas_host: str, shared_dir: str, release_id: str
+    ) -> dict[str, Any]:
+        """The block every node configuration carries."""
+        return attestation_block(
+            kas_url=f"http://{kas_host}:{int(self.kas_port)}",
+            release_id=release_id,
+            shared_dir=shared_dir,
+            peers_timeout_seconds=float(self.peers_timeout_seconds),
+        )
+
+
+def ensure_dcap_verifier(
+    *,
+    transport: Transport,
+    route: SSHRoute,
+    repo: str,
+    target: str,
+    out_dir: Path | None = None,
+) -> str:
+    """Make sure the DCAP verifier the KAS invokes exists on the driver host.
+
+    The verifier is a small C adapter over Intel's QVL, so a host that already
+    has it keeps it and a host that does not builds it out of tree. Building it
+    inside the repository would drop a binary into a tree a manifest may be
+    measuring, so the build happens in its own directory.
+    """
+    resolved = resolve_remote_path(transport, route, target)
+    _status, out, _err = transport.run(
+        route,
+        f"test -x {shlex.quote(resolved)} && echo present || echo missing",
+        check=False,
+    )
+    if out.strip().endswith("present"):
+        return resolved
+
+    build_dir = posixpath.dirname(resolved)
+    source = f"{repo.rstrip('/')}/tee/attestation/dcap_verifier"
+    command = "\n".join(
+        [
+            "set -euo pipefail",
+            f"mkdir -p {shlex.quote(build_dir)}",
+            f"cp {remote_path(source)}/Makefile {remote_path(source)}/a122_dcap_verify.c "
+            f"{shlex.quote(build_dir)}/",
+            f"make -C {shlex.quote(build_dir)} clean all",
+            f"test -x {shlex.quote(resolved)}",
+            f"echo {DCAP_BUILD_MARKER}",
+        ]
+    )
+    status, out, err = transport.run(route, command, timeout=600, check=False)
+    text = out + (f"\n{err}" if err.strip() else "")
+    if status != 0 or DCAP_BUILD_MARKER not in text:
+        raise ThreeHostError(
+            f"{route.role} could not build the DCAP verifier:\n{text.strip()[-800:]}"
+        )
+    if out_dir is not None:
+        write_text(Path(out_dir) / "d4-attest-dcap-build.txt", text)
+    return resolved
+
+
+def verify_quotes(
+    *,
+    transport: Transport,
+    route: SSHRoute,
+    verifier: str,
+    quotes: Mapping[str, Path],
+    out_dir: Path,
+) -> dict[str, dict[str, Any]]:
+    """Run the same DCAP verifier the KAS runs over each bootstrap quote."""
+    verified: dict[str, dict[str, Any]] = {}
+    for role in ROLES:
+        remote = f"/tmp/{quotes[role].name}"
+        transport.put(route, quotes[role], remote)
+        status, out, err = transport.run(
+            route,
+            f"{shlex.quote(verifier)} --quote {shlex.quote(remote)} --json",
+            check=False,
+        )
+        text = out + (f"\n{err}" if err.strip() else "")
+        write_text(
+            Path(out_dir) / f"d4-attest-bootstrap-{role.lower()}-dcap.json", text
+        )
+        if status != 0:
+            raise ThreeHostError(
+                f"DCAP refused the {role} bootstrap quote:\n{text.strip()[-400:]}"
+            )
+        try:
+            verified[role] = json.loads(out)
+        except json.JSONDecodeError as exc:
+            raise ThreeHostError(
+                f"the DCAP verifier returned no JSON for {role}"
+            ) from exc
+    return verified
+
+
+def wait_for_kas_health(
+    transport: Transport,
+    route: SSHRoute,
+    *,
+    port: int,
+    timeout: float = 120.0,
+    poll: float = 1.0,
+) -> None:
+    command = (
+        f"curl -s -m 2 -o /dev/null -w '%{{http_code}}' "
+        f"http://127.0.0.1:{int(port)}/healthz"
+    )
+    deadline = time.monotonic() + timeout
+    last = ""
+    while time.monotonic() < deadline:
+        _status, out, _err = transport.run(route, command, check=False)
+        last = out.strip()
+        if last.endswith("200"):
+            return
+        time.sleep(poll)
+    raise ThreeHostError(
+        f"the KAS on {route.role} port {int(port)} never became healthy: {last!r}"
+    )
+
+
+def stop_kas_command(port: int) -> str:
+    """Kill whatever listens on the KAS port, and only that process."""
+    return (
+        f"pid=$(ss -ltnpH 'sport = :{int(port)}' 2>/dev/null "
+        f"| grep -o 'pid=[0-9]*' | head -1 | cut -d= -f2); "
+        f'if [ -n "$pid" ]; then kill "$pid" && echo stopped; else echo none; fi'
+    )
+
+
+def open_attestation(
+    *,
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    out_dir: Path,
+    scratch: Path,
+    run_id: str,
+    request: AttestationRequest,
+    cluster: Mapping[str, Any],
+    resolved_repo: str,
+    resolved_workspace: str,
+    wrapper: Sequence[str],
+    grid_digest: str,
+    batch: int,
+    rows: int,
+    cols: int,
+) -> dict[str, Any]:
+    """Read the three quotes, register the release, and start the KAS.
+
+    The nodes are not running yet. This is where the one release the run will
+    accept is built: the policy is pinned to the measurement the platforms
+    really report under the signed manifest, read out of a quote rather than
+    taken from the signer on some other host. Nothing is registered until
+    three quotes agree, so a run can never pin a measurement no rank satisfies.
+    """
+    driver = role_routes[DRIVER]
+    kas_instance = str(cluster[DRIVER].get("host", ""))
+    if not kas_instance:
+        raise ThreeHostError("the driver's cluster entry has no private address")
+    shared_dir = shared_attestation_dir(resolved_workspace, run_id)
+    release_id = run_release_id(run_id)
+    kas_dir = f"/tmp/a122-kas-{run_id}"
+    kas_log = f"/tmp/{run_id}-kas.log"
+
+    claims: dict[str, EnclaveClaims] = {}
+    quotes: dict[str, Path] = {}
+    for role in ROLES:
+        route = role_routes[role]
+        # The bootstrapping process runs inside the enclave, where /tmp is its
+        # own tmpfs, so the quote has to land in the workspace's writable
+        # subtree for the driver to be able to read it back off the host.
+        transport.run(route, f"mkdir -p {shlex.quote(shared_dir)}")
+        quote_remote = f"{shared_dir}/bootstrap-{role}.bin"
+        command = bootstrap_quote_command(
+            repo=resolved_repo,
+            out=quote_remote,
+            launcher=list(wrapper),
+        )
+        status, out, err = transport.run(route, command, timeout=900, check=False)
+        text = out + (f"\n{err}" if err.strip() else "")
+        write_text(
+            Path(out_dir) / f"d4-attest-bootstrap-{role.lower()}.log", text
+        )
+        if status != 0 or BOOTSTRAP_MARKER not in text:
+            raise ThreeHostError(
+                f"{role} did not read a bootstrap quote from its enclave:\n"
+                f"{text.strip()[-800:]}"
+            )
+        local = scratch / f"{run_id}-bootstrap-{role}.bin"
+        transport.get(route, quote_remote, local)
+        quotes[role] = local
+        claims[role] = read_bootstrap_claims(local)
+
+    agreed = assert_certificates_agree(claims)
+    write_document(
+        Path(out_dir) / "d4-attest-bootstrap-claims.json",
+        {
+            "roles": {role: claims[role].to_evidence() for role in ROLES},
+            "agreed": agreed.to_evidence(),
+        },
+    )
+    verifier = ensure_dcap_verifier(
+        transport=transport,
+        route=driver,
+        repo=resolved_repo,
+        target=request.dcap_verify_bin,
+        out_dir=out_dir,
+    )
+    verified = verify_quotes(
+        transport=transport,
+        route=driver,
+        verifier=verifier,
+        quotes=quotes,
+        out_dir=out_dir,
+    )
+    for role in ROLES:
+        confirmed = str(verified[role].get("mrenclave", "")).lower()
+        if confirmed != agreed.mrenclave.lower():
+            raise ThreeHostError(
+                f"the DCAP result for {role} reports {confirmed!r}, but the "
+                f"quote it verified carries {agreed.mrenclave}"
+            )
+
+    policy = release_policy_document(
+        release_id=release_id,
+        claims=agreed,
+        spu_build_hash=agreed.mrenclave,
+        model_version=SPU_GRID_MODEL_VERSION,
+        model_manifest_hash=grid_digest,
+        precision_plan_hash=precision_plan_hash(batch=batch, rows=rows, cols=cols),
+        expires_at=dt.datetime.now(dt.timezone.utc)
+        + dt.timedelta(hours=request.policy_hours),
+    )
+    policy_local = scratch / "release-policy.json"
+    write_release_policy(policy_local, policy)
+    policy_remote = f"{kas_dir}/release-policy.json"
+    transport.run(driver, f"rm -rf {shlex.quote(kas_dir)}")
+    transport.run(driver, f"mkdir -p {shlex.quote(kas_dir)}")
+    transport.put(driver, policy_local, policy_remote)
+    write_document(Path(out_dir) / "d4-attest-policy.json", policy)
+
+    material_command = (
+        f"cd {remote_path(resolved_repo)} && {NO_BYTECODE} "
+        f"{remote_path(request.kas_python)} -m infra.kas_material "
+        f"--directory {shlex.quote(kas_dir)}"
+    )
+    status, out, err = transport.run(
+        driver, material_command, timeout=300, check=False
+    )
+    if status != 0:
+        raise ThreeHostError(
+            f"the KAS material could not be generated on {driver.role}:\n"
+            f"{err.strip()[-400:]}"
+        )
+    try:
+        material = json.loads(out[out.index("{") :])
+    except (ValueError, json.JSONDecodeError) as exc:
+        raise ThreeHostError(
+            "the KAS material generator printed no document"
+        ) from exc
+    write_document(
+        Path(out_dir) / "d4-attest-kas-material.json",
+        {
+            **{key: material[key] for key in sorted(material) if key != "ca_certificate_pem"},
+            "ca_certificate_sha256": material["ca_certificate_sha256"],
+        },
+    )
+
+    transport.start_background(
+        driver,
+        kas_start_command(
+            repo=resolved_repo,
+            python=request.kas_python,
+            settings={
+                "KAS_CA_KEY_PATH": str(material["ca_key_path"]),
+                "KAS_CA_CERT_PATH": str(material["ca_cert_path"]),
+                "KAS_RELEASE_POLICY_PATH": policy_remote,
+                "KAS_DCAP_VERIFY_BIN": verifier,
+                "KAS_TICKET_SIGNING_KEY_PATH": str(
+                    material["ticket_signing_key_path"]
+                ),
+                "KAS_HOST": "0.0.0.0",
+                "KAS_PORT": str(int(request.kas_port)),
+                "KAS_CHALLENGE_TTL_SECONDS": str(int(request.challenge_ttl_seconds)),
+                "KAS_NODE_LEASE_TTL_SECONDS": str(int(request.node_lease_ttl_seconds)),
+                "PYTHONDONTWRITEBYTECODE": "1",
+            },
+            secret_files={
+                "KAS_STORAGE_KEY_MASTER_HEX": str(
+                    material["storage_key_master_hex_path"]
+                )
+            },
+            log=kas_log,
+        ),
+    )
+    wait_for_kas_health(transport, driver, port=request.kas_port)
+    return {
+        "release_id": release_id,
+        "kas_url": f"http://{kas_instance}:{int(request.kas_port)}",
+        "kas_instance": kas_instance,
+        "out_dir": str(out_dir),
+        "kas_dir": kas_dir,
+        "kas_log": kas_log,
+        "dcap_verifier": verifier,
+        "shared_dir": shared_dir,
+        "policy": policy,
+        "bootstrap": {role: claims[role].to_evidence() for role in ROLES},
+        "dcap": {role: verified[role] for role in ROLES},
+        "material": {
+            key: material[key]
+            for key in (
+                "ca_certificate_sha256",
+                "ca_key_sha256",
+                "ticket_signing_key_sha256",
+                "storage_key_master_sha256",
+            )
+        },
+        "peers_timeout_seconds": float(request.peers_timeout_seconds),
+        "lease_ttl_seconds": int(request.node_lease_ttl_seconds),
+    }
+
+
+def collect_node_certificates(
+    *,
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    shared_dir: str,
+    timeout: float,
+    poll: float = 1.0,
+) -> dict[str, str]:
+    """Poll every rank for the certificate the KAS issued it.
+
+    A rank publishes as soon as the KAS has answered, so this is what turns
+    three independent attestations into the one peer map the nodes pin. A leaf
+    that is present but does not parse is treated as "not written yet" rather
+    than as a driver failure, because a half-written file is a race, not a
+    refusal; the refusal belongs to the node that later fails to pin it.
+    """
+    deadline = time.monotonic() + timeout
+    problem = "no node published a certificate"
+    while True:
+        present: dict[str, str | None] = {}
+        for role in ROLES:
+            _status, out, _err = transport.run(
+                role_routes[role],
+                f"cat {shlex.quote(certificate_path(shared_dir, role))} "
+                "2>/dev/null || true",
+                check=False,
+            )
+            present[role] = out if out.strip() else None
+        try:
+            collected = collect_published_certificates(present, ROLES)
+        except NodeAttestationError as exc:
+            problem = str(exc)
+            collected = None
+        if collected is not None:
+            return collected
+        if time.monotonic() > deadline:
+            raise ThreeHostError(
+                f"the nodes published no KAS identity in {timeout:.0f}s: {problem}"
+            )
+        time.sleep(poll)
+
+
+def publish_peer_map(
+    *,
+    transport: Transport,
+    role_routes: Mapping[str, SSHRoute],
+    shared_dir: str,
+    certificates: Mapping[str, str],
+    out_dir: Path,
+) -> dict[str, str]:
+    """Write the collected leaves into every rank's shared directory."""
+    document = peer_map_document(certificates)
+    local = Path(out_dir) / "d4-attest-peers.json"
+    write_document(local, document)
+    for role in ROLES:
+        write_text(
+            Path(out_dir) / f"d4-attest-{role.lower()}-cert.pem",
+            certificates[role],
+        )
+        transport.put(role_routes[role], local, peers_path(shared_dir))
+    return document
+
+
+def collect_kas_log(
+    *,
+    transport: Transport,
+    route: SSHRoute,
+    log: str,
+    out_dir: Path,
+    require: bool = True,
+) -> str:
+    """Read the KAS's own record back, then stop it and remove its material."""
+    status, out, err = transport.run(
+        route, f"cat {shlex.quote(log)} 2>/dev/null || true", check=False
+    )
+    text = out + (f"\n{err}" if err.strip() else "")
+    write_text(Path(out_dir) / "d4-attest-kas.log", text)
+    if require and (status != 0 or not out.strip()):
+        raise ThreeHostError("the KAS wrote no log")
+    return text
+
+
+def close_attestation(
+    *,
+    transport: Transport,
+    route: SSHRoute,
+    request: AttestationRequest,
+    kas_dir: str,
+) -> None:
+    """Stop the KAS and take its keys off the instance."""
+    transport.run(route, stop_kas_command(request.kas_port), check=False)
+    transport.run(route, f"rm -rf {shlex.quote(kas_dir)}", check=False)
+
+
+def close_attestation_state(
+    *,
+    transport: Transport,
+    route: SSHRoute,
+    request: AttestationRequest,
+    state: Mapping[str, Any],
+) -> None:
+    """Stop the KAS and remove its material whatever the run did.
+
+    This runs from the run's cleanup stack, so it must not be the thing that
+    fails a run: it captures the log if the normal path did not get to it, and
+    stops the listener and deletes the keys either way.
+    """
+    try:
+        if not (Path(state["out_dir"]) / "d4-attest-kas.log").is_file():
+            collect_kas_log(
+                transport=transport,
+                route=route,
+                log=str(state["kas_log"]),
+                out_dir=Path(state["out_dir"]),
+                require=False,
+            )
+    except Exception:  # noqa: BLE001 - cleanup must not mask the real failure
+        pass
+    try:
+        close_attestation(
+            transport=transport,
+            route=route,
+            request=request,
+            kas_dir=str(state["kas_dir"]),
+        )
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def assert_attested_evidence(
+    out_dir: Path, *, roles: Sequence[str] = ROLES
+) -> dict[str, Any]:
+    """Re-read what the nodes wrote and require the attested identity.
+
+    The bundle is only an attested run if the nodes say so themselves: each
+    role's status has to carry a KAS lease under the registered measurement,
+    its log has to show the attested line, and the peer map has to be the one
+    the driver published.
+    """
+    out_dir = Path(out_dir)
+    statuses = {
+        role: json.loads(
+            (out_dir / f"d4-three-{role.lower()}-node-status.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        for role in roles
+    }
+    policy = json.loads(
+        (out_dir / "d4-attest-policy.json").read_text(encoding="utf-8")
+    )
+    mrenclave = str(policy["releases"][0]["mrenclave"])
+    summary = assert_attested_run(statuses, roles=roles, mrenclave=mrenclave)
+    attested_logs: dict[str, bool] = {}
+    for role in roles:
+        text = (out_dir / f"d4-three-{role.lower()}-node.log").read_text(
+            encoding="utf-8", errors="replace"
+        )
+        attested_logs[role] = ATTESTED_MARKER in text
+    missing = [role for role, seen in attested_logs.items() if not seen]
+    if missing:
+        raise ThreeHostError(
+            "these ranks never logged an attested identity: " + ", ".join(missing)
+        )
+    peers = json.loads(
+        (out_dir / "d4-attest-peers.json").read_text(encoding="utf-8")
+    )
+    for role in roles:
+        published = (out_dir / f"d4-attest-{role.lower()}-cert.pem").read_text(
+            encoding="ascii"
+        )
+        if peers.get(role) != published:
+            raise ThreeHostError(
+                f"the peer map does not carry the {role} leaf the run published"
+            )
+    return {
+        **summary,
+        "attested_logs": attested_logs,
+        "peer_map_sha256": hashlib.sha256(
+            (out_dir / "d4-attest-peers.json").read_bytes()
+        ).hexdigest(),
     }
 
 
@@ -869,6 +1496,7 @@ def run_three_hosts(
     max_threads: int = DEFAULT_MAX_THREADS,
     stack_size: str = DEFAULT_STACK_SIZE,
     dry_run: bool = False,
+    attestation: AttestationRequest | None = None,
 ) -> dict[str, Any]:
     """Provision, distribute, run, collect and seal one three-instance run."""
     out_dir = Path(out_dir)
@@ -881,6 +1509,19 @@ def run_three_hosts(
     pcaps = {role: f"/tmp/{run_id}-{role}.pcap" for role in ROLES}
     cap_logs = {role: f"/tmp/{run_id}-{role}-capture.log" for role in ROLES}
     node_logs = {role: f"/tmp/{run_id}-{role}.log" for role in ROLES}
+
+    if attestation is not None and enclave_template is None:
+        # A host process has no platform quote, so an attested run only means
+        # something inside the signed enclave.
+        raise ThreeHostError(
+            "an attested run has to start the nodes inside the signed enclave; "
+            "pass --enclave-template"
+        )
+    resolved_workspace = (
+        resolve_remote_path(transport, role_routes[DRIVER], workspace)
+        if attestation is not None
+        else workspace
+    )
 
     if expect_commit:
         for role in ROLES:
@@ -904,11 +1545,26 @@ def run_three_hosts(
         for role in ROLES
     }
 
-    with tempfile.TemporaryDirectory(prefix="a122-d4-three-") as scratch:
+    with tempfile.TemporaryDirectory(prefix="a122-d4-three-") as scratch, \
+            contextlib.ExitStack() as cleanup:
         scratch_path = Path(scratch)
         local_cluster = scratch_path / "cluster.json"
         write_json(local_cluster, cluster_document)
         transport.put(role_routes["P0"], local_cluster, cluster_file)
+        attestation_remote = ""
+        if attestation is not None:
+            # The block goes into every node configuration, so it has to be
+            # settled before the workspace is provisioned: the configurations
+            # live inside the tree the manifest measures.
+            attestation_remote = f"/tmp/{run_id}-attestation.json"
+            block = attestation.node_block(
+                kas_host=str(private[DRIVER]["host"]),
+                shared_dir=shared_attestation_dir(resolved_workspace, run_id),
+                release_id=run_release_id(run_id),
+            )
+            local_block = scratch_path / "attestation.json"
+            write_json(local_block, block)
+            transport.put(role_routes["P0"], local_block, attestation_remote)
         for role in ROLES:
             transport.run(
                 role_routes[role],
@@ -923,6 +1579,11 @@ def run_three_hosts(
             f"--workspace {remote_path(workspace)} --run-id {shlex.quote(run_id)} "
             f"--cluster-file {shlex.quote(cluster_file)} "
             f"--vectors {int(vector_count)} --batch {int(batch)}"
+            + (
+                f" --attestation-json {shlex.quote(attestation_remote)}"
+                if attestation is not None
+                else ""
+            )
         )
         captured: dict[str, dict[str, Any]] = {}
         enclosure: dict[str, Any] | None = None
@@ -964,6 +1625,35 @@ def run_three_hosts(
                     stack_size=stack_size,
                 )
                 wrapper = enclosure["wrapper"]
+            attestation_state: dict[str, Any] | None = None
+            if attestation is not None:
+                resolved = enclosure["resolved"]
+                workspace_manifest = read_workspace_manifest(
+                    transport, role_routes[DRIVER], resolved["workspace"]
+                )
+                attestation_state = open_attestation(
+                    transport=transport,
+                    role_routes=role_routes,
+                    out_dir=out_dir,
+                    scratch=scratch_path,
+                    run_id=run_id,
+                    request=attestation,
+                    cluster=private,
+                    resolved_repo=resolved["repo"],
+                    resolved_workspace=resolved["workspace"],
+                    wrapper=wrapper,
+                    grid_digest=str(workspace_manifest["grid_digest"]),
+                    batch=int(workspace_manifest["batch"]),
+                    rows=int(workspace_manifest["rows"]),
+                    cols=int(workspace_manifest["cols"]),
+                )
+                cleanup.callback(
+                    close_attestation_state,
+                    transport=transport,
+                    route=role_routes[DRIVER],
+                    request=attestation,
+                    state=attestation_state,
+                )
             for role in ROLES:
                 transport.run(
                     role_routes[role],
@@ -994,6 +1684,23 @@ def run_three_hosts(
                     ),
                 )
                 time.sleep(1.0)
+            if attestation_state is not None:
+                # The ranks are waiting for this map before they open a link:
+                # every node has published the certificate the KAS issued it,
+                # and the driver writes the three-way pin back to all of them.
+                certificates = collect_node_certificates(
+                    transport=transport,
+                    role_routes=role_routes,
+                    shared_dir=attestation_state["shared_dir"],
+                    timeout=attestation.peers_collect_timeout,
+                )
+                attestation_state["peers"] = publish_peer_map(
+                    transport=transport,
+                    role_routes=role_routes,
+                    shared_dir=attestation_state["shared_dir"],
+                    certificates=certificates,
+                    out_dir=out_dir,
+                )
             for role in ("P1", "P2"):
                 wait_for_marker(
                     transport,
@@ -1082,6 +1789,18 @@ def run_three_hosts(
                     )
                 captured[role] = {"bytes": size, "sha256": digest}
 
+            if attestation_state is not None:
+                # Only now is there enough on disk to say the identity the
+                # mesh used was the one the KAS issued: every status, log and
+                # published leaf has been pulled back from its own instance.
+                attestation_state["run"] = assert_attested_evidence(out_dir)
+                collect_kas_log(
+                    transport=transport,
+                    route=role_routes[DRIVER],
+                    log=attestation_state["kas_log"],
+                    out_dir=out_dir,
+                )
+
     captures = {
         role: {
             "path": f"d4-three-{role}.pcap",
@@ -1114,7 +1833,11 @@ def run_three_hosts(
         details={
             "commit": expect_commit or None,
             "enclosure": enclosure,
+            "attestation": attestation_state,
         },
+        extra_required=(
+            ATTESTED_REQUIRED_FILES if attestation_state is not None else ()
+        ),
     )
 
 
@@ -1560,6 +2283,46 @@ def _add_enclave_arguments(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def _add_attestation_arguments(parser: argparse.ArgumentParser) -> None:
+    """Let a run take the node identity from the KAS instead of a local PKI."""
+    parser.add_argument("--kas-port", type=int, default=DEFAULT_KAS_PORT)
+    parser.add_argument(
+        "--kas-python",
+        default=DEFAULT_KAS_PYTHON,
+        help="interpreter on the driver's host that can import the KAS",
+    )
+    parser.add_argument(
+        "--dcap-verify-bin",
+        default=DEFAULT_DCAP_VERIFIER,
+        help="KAS_DCAP_VERIFY_BIN on the driver's host; built if it is absent",
+    )
+    parser.add_argument(
+        "--peers-timeout",
+        type=float,
+        default=DEFAULT_PEERS_TIMEOUT_SECONDS,
+        help="how long a node waits for the driver's peer map before refusing",
+    )
+    parser.add_argument("--lease-seconds", type=int, default=3600)
+    parser.add_argument("--challenge-seconds", type=int, default=120)
+    parser.add_argument("--policy-hours", type=int, default=6)
+
+
+def _attestation_request(
+    args: argparse.Namespace,
+) -> AttestationRequest | None:
+    if not getattr(args, "attest", False):
+        return None
+    return AttestationRequest(
+        kas_port=args.kas_port,
+        kas_python=args.kas_python,
+        dcap_verify_bin=args.dcap_verify_bin,
+        peers_timeout_seconds=args.peers_timeout,
+        node_lease_ttl_seconds=args.lease_seconds,
+        challenge_ttl_seconds=args.challenge_seconds,
+        policy_hours=args.policy_hours,
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Run the D4 acceptance across three instances"
@@ -1591,6 +2354,35 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="provision, distribute, then report what would run",
     )
     _add_enclave_arguments(run)
+    attested = subparsers.add_parser(
+        "attested",
+        help=(
+            "run the positive grid with every node identity issued by the KAS "
+            "from a real quote"
+        ),
+    )
+    attested.add_argument("--cluster", required=True, type=Path)
+    attested.add_argument("--out-dir", required=True, type=Path)
+    attested.add_argument("--run-id", default=None)
+    attested.add_argument("--ssh-user", default="jiahao")
+    attested.add_argument("--ssh-host", default=None)
+    attested.add_argument("--ssh-key", default=None)
+    attested.add_argument("--ssh-key-password", default=None)
+    attested.add_argument("--repo", default=DEFAULT_REPO)
+    attested.add_argument("--python", default=DEFAULT_PYTHON)
+    attested.add_argument("--workspace", default=DEFAULT_WORKSPACE)
+    attested.add_argument("--iface", default=DEFAULT_IFACE)
+    attested.add_argument("--vectors", type=int, default=DEFAULT_COUNT)
+    attested.add_argument("--batch", type=int, default=DEFAULT_BATCH)
+    attested.add_argument("--node-timeout", type=float, default=900.0)
+    attested.add_argument(
+        "--expect-commit",
+        default="HEAD",
+        help="commit every instance must be on, or 'HEAD' for this checkout",
+    )
+    _add_enclave_arguments(attested)
+    _add_attestation_arguments(attested)
+    attested.set_defaults(attest=True)
     negatives = subparsers.add_parser(
         "negatives",
         help="replay the fail-closed cases with the peers on their own hosts",
@@ -1674,6 +2466,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 enclave_template=args.enclave_template,
                 enclave_dir=args.enclave_dir,
                 dry_run=args.dry_run,
+                attestation=_attestation_request(args),
             )
     except ThreeHostError as exc:
         print(f"[d4-three] FAILED: {exc}", file=sys.stderr)
@@ -1685,38 +2478,58 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 
 __all__ = [
+    "ATTESTED_MARKER",
+    "ATTESTED_REQUIRED_FILES",
+    "BOOTSTRAP_MARKER",
     "CONFIGURED_CASES",
     "D4_PORTS",
+    "DEFAULT_DCAP_VERIFIER",
     "DEFAULT_ENCLAVE_DIR",
     "DEFAULT_IFACE",
+    "DEFAULT_KAS_PYTHON",
     "DEFAULT_PYTHON",
     "DEFAULT_REPO",
     "DEFAULT_WORKSPACE",
     "DONE_MARKER",
     "ENCLAVE_TEMPLATE",
     "READY_MARKER",
+    "AttestationRequest",
     "SSHRoute",
     "ThreeHostError",
     "Transport",
+    "assert_attested_evidence",
     "capture_command",
     "capture_filter",
+    "close_attestation",
+    "close_attestation_state",
+    "collect_kas_log",
+    "collect_node_certificates",
     "enclave_sign_command",
     "endpoints",
+    "ensure_dcap_verifier",
     "kill_nodes",
     "load_cluster",
     "main",
     "node_command",
+    "open_attestation",
+    "precision_plan_hash",
     "probe_command",
     "probe_live_listeners",
     "prepare_enclave",
+    "publish_peer_map",
+    "read_workspace_manifest",
     "remote_path",
+    "resolve_remote_path",
     "require_workspace",
     "routes",
     "run_negative_cases",
     "run_one_negative_case",
     "run_three_hosts",
+    "stop_kas_command",
     "summary_header",
+    "verify_quotes",
     "wait_for_marker",
+    "wait_for_kas_health",
     "wait_for_remote_file",
 ]
 
