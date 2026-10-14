@@ -435,7 +435,15 @@ def build_gpt2_program(
     inputs = program_inputs(config)
     return SpuProgram(
         name=name or "gpt2-step",
-        text=_function(emitter, inputs, outputs, [current, logits, token]),
+        # The manifest names carry dots -- ``layer_0.attn.q.weight`` -- so the
+        # parameter list goes through the same mangler the body uses.
+        text=_function(
+            emitter,
+            inputs,
+            outputs,
+            [current, logits, token],
+            name_of=lambda spec: ir_name(spec.name),
+        ),
         inputs=inputs,
         outputs=outputs,
     )
