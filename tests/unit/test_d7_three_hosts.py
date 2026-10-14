@@ -32,6 +32,7 @@ from infra.d7_three_hosts import (
     assert_capture_headroom,
     capture_filter,
     capture_headroom_error,
+    scrub_script,
     session_root,
 )
 
@@ -102,6 +103,31 @@ def test_the_capture_filter_is_the_one_the_command_actually_uses() -> None:
         ports=D7_PORTS,
     )
     assert shlex.quote(capture_filter()) in command
+
+
+def test_the_scrub_script_expands_the_home_directory() -> None:
+    """A quoted tilde is a literal directory name, so the scrub would miss.
+
+    The first sealed D7 run reported `share_removed: true` for three instances
+    whose 92 MB share files were still on disk, because every home-relative path
+    in the scrub script had gone through `shlex.quote`. Anything that starts at
+    `~` has to render as `"$HOME/..."` for the remote shell to expand it.
+    """
+    script = scrub_script(
+        role_root="~/a122-d7/three/workspace",
+        dist_root="~/a122-d7/dist",
+        role="P1",
+    )
+    assert (
+        'share="$HOME/a122-d7/three/workspace/shares/P1.json"' in script
+    )
+    assert "'~/" not in script
+    assert '"$HOME/a122-d7/dist"' in script
+    assert '"$HOME/a122-d7/three/workspace/pki/nodes/C"' in script
+    # The pre-removal overwrite is what makes the removal unrecoverable.
+    assert "dd if=/dev/zero" in script
+    # And the verification has to look at a size only a share reaches.
+    assert "-size +1048576c" in script
 
 
 def test_the_capture_ring_is_refused_when_the_kernel_would_clamp_it() -> None:

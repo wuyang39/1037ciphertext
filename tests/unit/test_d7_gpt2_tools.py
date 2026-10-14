@@ -213,7 +213,10 @@ def test_program_interface_matches_the_manifest_tensor_names() -> None:
     assert program.input_names == names
     assert program.output_names == ("hidden", "logits", "token")
     assert "history" not in {spec.name for spec in program.inputs if spec.name != "history"}
-    assert ir_name("layer_0.attn.q.weight") == "%layer_0_attn_q_weight"
+    # The runtime binds each share with ``SetVar`` on the manifest key, so the IR
+    # parameter has to keep the manifest spelling, dots and all.
+    assert ir_name("layer_0.attn.q.weight") == "%layer_0.attn.q.weight"
+    assert all(name in program.text for name in ("%history", "%layer_0.attn.q.weight"))
     assert "mhlo.tanh" in program.text
     assert program.text.count("mhlo.rsqrt") == 2 * 2 + 1
 

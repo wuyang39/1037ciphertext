@@ -323,6 +323,56 @@ def _probes(result: Mapping[str, Any], statuses: Mapping[str, Any]) -> list[str]
     return sorted(value for value in found if value)
 
 
+# A staged share of the real model is about 90 MB of JSON; every descriptor,
+# config and evidence file in the same tree is tens of kilobytes. Anything past
+# a megabyte is share material, so this is the threshold the scrub verifies
+# against after it has overwritten and removed the file it knows about.
+SCRUB_LARGE_JSON_BYTES = 1048576
+
+
+def scrub_script(*, role_root: str, dist_root: str, role: str) -> str:
+    """The remote script that overwrites and removes one instance's staged share.
+
+    A staged tree that outlives the session leaves one party's share of the
+    model on a disk, so the overwrite happens before the removal and the number
+    of bytes that were overwritten is recorded.
+
+    Every path that starts at the home directory goes through :func:`remote_path`
+    so the remote shell expands ``~``. ``shlex.quote`` freezes the tilde into a
+    literal directory name instead, the probe then tests a path that never
+    existed, and the run reports a clean scrub of a share still sitting on the
+    disk. That is what the first D7 run reported, which is why the home-relative
+    paths here are not quoted by hand.
+    """
+    share = f"{role_root}/shares/{role}.json"
+    return "\n".join(
+        [
+            "set -u",
+            f"share={remote_path(share)}",
+            "bytes=0",
+            'if [ -f "$share" ]; then',
+            '  bytes=$(stat -c%s "$share")',
+            '  dd if=/dev/zero of="$share" bs=1M '
+            'count=$(( bytes / 1048576 + 1 )) conv=notrunc status=none '
+            '2>/dev/null || true',
+            '  sync; rm -f "$share"',
+            "fi",
+            f"rm -f {remote_path('/tmp/' + role + '.tgz')}",
+            f"rm -rf {remote_path(role_root + '/pki/nodes/C')}",
+            f"rm -rf {remote_path(dist_root)}",
+            'echo "share_bytes=$bytes"',
+            'test -e "$share" && echo "share_present=yes" '
+            '|| echo "share_present=no"',
+            # The staged tree and the dealer's dist root both hold a copy of the
+            # share, so both are searched for anything share-sized that survived.
+            f"find {remote_path(role_root)} {remote_path(dist_root)} "
+            f"-name '*.json' -size +{SCRUB_LARGE_JSON_BYTES}c "
+            "-printf '%s %p\\n' 2>/dev/null || true",
+            "true",
+        ]
+    )
+
+
 def _scrub_staging(
     transport: Transport,
     role_routes: Mapping[str, Any],
@@ -330,38 +380,11 @@ def _scrub_staging(
     role_root: str,
     dist_root: str,
 ) -> dict[str, Any]:
-    """Overwrite and remove the staged shares on every instance.
-
-    A staged tree that outlives the session leaves one party's share of the
-    model on a disk, so the overwrite happens before the removal and the number
-    of bytes that were overwritten is recorded.
-    """
+    """Overwrite and remove the staged shares on every instance."""
     reports: dict[str, Any] = {}
     for role in ROLES:
         share = f"{role_root}/shares/{role}.json"
-        script = "\n".join(
-            [
-                "set -u",
-                f"share={shlex.quote(share)}",
-                "bytes=0",
-                'if [ -f "$share" ]; then',
-                '  bytes=$(stat -c%s "$share")',
-                '  dd if=/dev/zero of="$share" bs=1M '
-                'count=$(( bytes / 1048576 + 1 )) conv=notrunc status=none '
-                '2>/dev/null || true',
-                '  sync; rm -f "$share"',
-                "fi",
-                f"rm -f {shlex.quote('/tmp/' + role + '.tgz')}",
-                f"rm -rf {shlex.quote(role_root + '/pki/nodes/C')}",
-                f"rm -rf {shlex.quote(dist_root)}",
-                'echo "share_bytes=$bytes"',
-                'test -e "$share" && echo "share_present=yes" '
-                '|| echo "share_present=no"',
-                f"find {shlex.quote(role_root)} -name '*.json' -size +4096c "
-                "-printf '%s %p\\n' 2>/dev/null || true",
-                "true",
-            ]
-        )
+        script = scrub_script(role_root=role_root, dist_root=dist_root, role=role)
         _status, out, err = transport.run(role_routes[role], script, check=False)
         text = out + (f"\n{err}" if err.strip() else "")
         size = 0
@@ -1259,6 +1282,7 @@ __all__ = [
     "capture_headroom_error",
     "main",
     "run_three_hosts",
+    "scrub_script",
     "session_root",
     "wait_for_node_ready",
 ]
